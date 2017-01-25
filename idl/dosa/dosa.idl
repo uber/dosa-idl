@@ -21,6 +21,7 @@
 namespace java com.uber.dosa
 
 typedef string FQN
+typedef i32 Version
 typedef string Scope
 typedef string Token
 
@@ -53,6 +54,11 @@ union RawValue {
 // make it union in case we want to support collections like set
 union Value {
    1: optional RawValue elemValue
+}
+
+struct SchemaID {
+    1: optional FQN fqn
+    2: optional Version version
 }
 
 struct Field {
@@ -88,7 +94,7 @@ struct EntityDefinition {
 }
 
 struct Entity {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional list<Field> fields
 }
 
@@ -103,7 +109,7 @@ struct CreateRequest {
 }
 
 struct ReadRequest {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional list<Field> key
    3: optional list<string> fieldsToRead
 }
@@ -113,7 +119,7 @@ struct ReadResponse {
 }
 
 struct BatchReadRequest {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional list<list<Field>> keys
    3: optional list<string> fieldsToRead
 }
@@ -151,7 +157,7 @@ struct Condition {
 }
 
 struct RangeRequest {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional Token token
    3: optional i32 limit
    4: optional list<Condition> conditions
@@ -164,7 +170,7 @@ struct RangeResponse {
 }
 
 struct SearchRequest {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional Token token
    3: optional i32 limit
    4: optional Field searchBy
@@ -177,7 +183,7 @@ struct SearchResponse {
 }
 
 struct ScanRequest {
-   1: optional FQN fqn
+   1: optional SchemaID schemaID
    2: optional Token token
    3: optional i32 limit
    4: optional list<string> fieldsToRead
