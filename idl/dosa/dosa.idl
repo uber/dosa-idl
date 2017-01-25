@@ -198,6 +198,10 @@ struct CheckSchemaRequest {
    1: optional list<EntityDefinition> entityDefs
 }
 
+struct CheckSchemaResponse {
+   1: optional list<SchemaID> schemaIDs
+}
+
 struct UpsertSchemaRequest {
    1: optional list<EntityDefinition> entityDefs
 }
@@ -285,7 +289,7 @@ service Dosa {
        2: InternalServerError serverError
    )
 
-   void checkSchema(
+   CheckSchemaResponse checkSchema(
        1: CheckSchemaRequest request
    ) throws (
        1: BadRequestError clientError
