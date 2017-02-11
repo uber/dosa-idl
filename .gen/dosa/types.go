@@ -233,23 +233,27 @@ func (v *BadSchemaError) Error() string {
 }
 
 type BatchReadRequest struct {
-	SchemaID     *SchemaID  `json:"schemaID,omitempty"`
-	Keys         [][]*Field `json:"keys"`
-	FieldsToRead []string   `json:"fieldsToRead"`
+	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
+	Keys         []map[string]*Value `json:"keys"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
-type _List_Field_ValueList []*Field
+type _Map_String_Value_MapItemList map[string]*Value
 
-func (v _List_Field_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
+func (m _Map_String_Value_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for k, v := range m {
+		if v == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", k)
 		}
-		w, err := x.ToWire()
+		kw, err := wire.NewValueString(k), error(nil)
 		if err != nil {
 			return err
 		}
-		err = f(w)
+		vw, err := v.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(wire.MapItem{Key: kw, Value: vw})
 		if err != nil {
 			return err
 		}
@@ -257,25 +261,29 @@ func (v _List_Field_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_Field_ValueList) Size() int {
-	return len(v)
+func (m _Map_String_Value_MapItemList) Size() int {
+	return len(m)
 }
 
-func (_List_Field_ValueList) ValueType() wire.Type {
+func (_Map_String_Value_MapItemList) KeyType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Map_String_Value_MapItemList) ValueType() wire.Type {
 	return wire.TStruct
 }
 
-func (_List_Field_ValueList) Close() {
+func (_Map_String_Value_MapItemList) Close() {
 }
 
-type _List_List_Field_ValueList [][]*Field
+type _List_Map_String_Value_ValueList []map[string]*Value
 
-func (v _List_List_Field_ValueList) ForEach(f func(wire.Value) error) error {
+func (v _List_Map_String_Value_ValueList) ForEach(f func(wire.Value) error) error {
 	for i, x := range v {
 		if x == nil {
 			return fmt.Errorf("invalid [%v]: value is nil", i)
 		}
-		w, err := wire.NewValueList(_List_Field_ValueList(x)), error(nil)
+		w, err := wire.NewValueMap(_Map_String_Value_MapItemList(x)), error(nil)
 		if err != nil {
 			return err
 		}
@@ -287,21 +295,21 @@ func (v _List_List_Field_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_List_Field_ValueList) Size() int {
+func (v _List_Map_String_Value_ValueList) Size() int {
 	return len(v)
 }
 
-func (_List_List_Field_ValueList) ValueType() wire.Type {
-	return wire.TList
+func (_List_Map_String_Value_ValueList) ValueType() wire.Type {
+	return wire.TMap
 }
 
-func (_List_List_Field_ValueList) Close() {
+func (_List_Map_String_Value_ValueList) Close() {
 }
 
-type _List_String_ValueList []string
+type _Set_String_ValueList map[string]struct{}
 
-func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
-	for _, x := range v {
+func (v _Set_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for x := range v {
 		w, err := wire.NewValueString(x), error(nil)
 		if err != nil {
 			return err
@@ -314,15 +322,15 @@ func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_String_ValueList) Size() int {
+func (v _Set_String_ValueList) Size() int {
 	return len(v)
 }
 
-func (_List_String_ValueList) ValueType() wire.Type {
+func (_Set_String_ValueList) ValueType() wire.Type {
 	return wire.TBinary
 }
 
-func (_List_String_ValueList) Close() {
+func (_Set_String_ValueList) Close() {
 }
 
 func (v *BatchReadRequest) ToWire() (wire.Value, error) {
@@ -341,7 +349,7 @@ func (v *BatchReadRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Keys != nil {
-		w, err = wire.NewValueList(_List_List_Field_ValueList(v.Keys)), error(nil)
+		w, err = wire.NewValueList(_List_Map_String_Value_ValueList(v.Keys)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -349,7 +357,7 @@ func (v *BatchReadRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToRead != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToRead)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -365,19 +373,43 @@ func _SchemaID_Read(w wire.Value) (*SchemaID, error) {
 	return &v, err
 }
 
-func _Field_Read(w wire.Value) (*Field, error) {
-	var v Field
+func _Value_Read(w wire.Value) (*Value, error) {
+	var v Value
 	err := v.FromWire(w)
 	return &v, err
 }
 
-func _List_Field_Read(l wire.ValueList) ([]*Field, error) {
-	if l.ValueType() != wire.TStruct {
+func _Map_String_Value_Read(m wire.MapItemList) (map[string]*Value, error) {
+	if m.KeyType() != wire.TBinary {
 		return nil, nil
 	}
-	o := make([]*Field, 0, l.Size())
+	if m.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make(map[string]*Value, m.Size())
+	err := m.ForEach(func(x wire.MapItem) error {
+		k, err := x.Key.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		v, err := _Value_Read(x.Value)
+		if err != nil {
+			return err
+		}
+		o[k] = v
+		return nil
+	})
+	m.Close()
+	return o, err
+}
+
+func _List_Map_String_Value_Read(l wire.ValueList) ([]map[string]*Value, error) {
+	if l.ValueType() != wire.TMap {
+		return nil, nil
+	}
+	o := make([]map[string]*Value, 0, l.Size())
 	err := l.ForEach(func(x wire.Value) error {
-		i, err := _Field_Read(x)
+		i, err := _Map_String_Value_Read(x.GetMap())
 		if err != nil {
 			return err
 		}
@@ -388,37 +420,20 @@ func _List_Field_Read(l wire.ValueList) ([]*Field, error) {
 	return o, err
 }
 
-func _List_List_Field_Read(l wire.ValueList) ([][]*Field, error) {
-	if l.ValueType() != wire.TList {
+func _Set_String_Read(s wire.ValueList) (map[string]struct{}, error) {
+	if s.ValueType() != wire.TBinary {
 		return nil, nil
 	}
-	o := make([][]*Field, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _List_Field_Read(x.GetList())
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
-func _List_String_Read(l wire.ValueList) ([]string, error) {
-	if l.ValueType() != wire.TBinary {
-		return nil, nil
-	}
-	o := make([]string, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
+	o := make(map[string]struct{}, s.Size())
+	err := s.ForEach(func(x wire.Value) error {
 		i, err := x.GetString(), error(nil)
 		if err != nil {
 			return err
 		}
-		o = append(o, i)
+		o[i] = struct{}{}
 		return nil
 	})
-	l.Close()
+	s.Close()
 	return o, err
 }
 
@@ -435,14 +450,14 @@ func (v *BatchReadRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TList {
-				v.Keys, err = _List_List_Field_Read(field.Value.GetList())
+				v.Keys, err = _List_Map_String_Value_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
 			}
 		case 3:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToRead, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}
@@ -876,6 +891,12 @@ func _Operator_Read(w wire.Value) (Operator, error) {
 	return v, err
 }
 
+func _Field_Read(w wire.Value) (*Field, error) {
+	var v Field
+	err := v.FromWire(w)
+	return &v, err
+}
+
 func (v *Condition) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
@@ -1230,8 +1251,8 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 }
 
 type Entity struct {
-	SchemaID *SchemaID `json:"schemaID,omitempty"`
-	Fields   []*Field  `json:"fields"`
+	SchemaID *SchemaID         `json:"schemaID,omitempty"`
+	Fields   map[string]*Value `json:"fields"`
 }
 
 func (v *Entity) ToWire() (wire.Value, error) {
@@ -1250,7 +1271,7 @@ func (v *Entity) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Fields != nil {
-		w, err = wire.NewValueList(_List_Field_ValueList(v.Fields)), error(nil)
+		w, err = wire.NewValueMap(_Map_String_Value_MapItemList(v.Fields)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1272,8 +1293,8 @@ func (v *Entity) FromWire(w wire.Value) error {
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TList {
-				v.Fields, err = _List_Field_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TMap {
+				v.Fields, err = _Map_String_Value_Read(field.Value.GetMap())
 				if err != nil {
 					return err
 				}
@@ -1298,23 +1319,27 @@ func (v *Entity) String() string {
 }
 
 type EntityDefinition struct {
-	Fqn        *FQN         `json:"fqn,omitempty"`
-	FieldDescs []*FieldDesc `json:"fieldDescs"`
-	PrimaryKey *PrimaryKey  `json:"primaryKey,omitempty"`
+	Fqn        *FQN                  `json:"fqn,omitempty"`
+	FieldDescs map[string]*FieldDesc `json:"fieldDescs"`
+	PrimaryKey *PrimaryKey           `json:"primaryKey,omitempty"`
 }
 
-type _List_FieldDesc_ValueList []*FieldDesc
+type _Map_String_FieldDesc_MapItemList map[string]*FieldDesc
 
-func (v _List_FieldDesc_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
+func (m _Map_String_FieldDesc_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for k, v := range m {
+		if v == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", k)
 		}
-		w, err := x.ToWire()
+		kw, err := wire.NewValueString(k), error(nil)
 		if err != nil {
 			return err
 		}
-		err = f(w)
+		vw, err := v.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(wire.MapItem{Key: kw, Value: vw})
 		if err != nil {
 			return err
 		}
@@ -1322,15 +1347,19 @@ func (v _List_FieldDesc_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_FieldDesc_ValueList) Size() int {
-	return len(v)
+func (m _Map_String_FieldDesc_MapItemList) Size() int {
+	return len(m)
 }
 
-func (_List_FieldDesc_ValueList) ValueType() wire.Type {
+func (_Map_String_FieldDesc_MapItemList) KeyType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Map_String_FieldDesc_MapItemList) ValueType() wire.Type {
 	return wire.TStruct
 }
 
-func (_List_FieldDesc_ValueList) Close() {
+func (_Map_String_FieldDesc_MapItemList) Close() {
 }
 
 func (v *EntityDefinition) ToWire() (wire.Value, error) {
@@ -1349,7 +1378,7 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldDescs != nil {
-		w, err = wire.NewValueList(_List_FieldDesc_ValueList(v.FieldDescs)), error(nil)
+		w, err = wire.NewValueMap(_Map_String_FieldDesc_MapItemList(v.FieldDescs)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1373,20 +1402,27 @@ func _FieldDesc_Read(w wire.Value) (*FieldDesc, error) {
 	return &v, err
 }
 
-func _List_FieldDesc_Read(l wire.ValueList) ([]*FieldDesc, error) {
-	if l.ValueType() != wire.TStruct {
+func _Map_String_FieldDesc_Read(m wire.MapItemList) (map[string]*FieldDesc, error) {
+	if m.KeyType() != wire.TBinary {
 		return nil, nil
 	}
-	o := make([]*FieldDesc, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _FieldDesc_Read(x)
+	if m.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make(map[string]*FieldDesc, m.Size())
+	err := m.ForEach(func(x wire.MapItem) error {
+		k, err := x.Key.GetString(), error(nil)
 		if err != nil {
 			return err
 		}
-		o = append(o, i)
+		v, err := _FieldDesc_Read(x.Value)
+		if err != nil {
+			return err
+		}
+		o[k] = v
 		return nil
 	})
-	l.Close()
+	m.Close()
 	return o, err
 }
 
@@ -1410,8 +1446,8 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TList {
-				v.FieldDescs, err = _List_FieldDesc_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TMap {
+				v.FieldDescs, err = _Map_String_FieldDesc_Read(field.Value.GetMap())
 				if err != nil {
 					return err
 				}
@@ -1676,12 +1712,6 @@ func (v *Field) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Value_Read(w wire.Value) (*Value, error) {
-	var v Value
-	err := v.FromWire(w)
-	return &v, err
-}
-
 func (v *Field) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
@@ -1722,7 +1752,6 @@ func (v *Field) String() string {
 }
 
 type FieldDesc struct {
-	Name *string     `json:"name,omitempty"`
 	Type *ElemType   `json:"type,omitempty"`
 	Tags []*FieldTag `json:"tags"`
 }
@@ -1759,19 +1788,11 @@ func (_Set_FieldTag_ValueList) Close() {
 
 func (v *FieldDesc) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
-	if v.Name != nil {
-		w, err = wire.NewValueString(*(v.Name)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
 	if v.Type != nil {
 		w, err = v.Type.ToWire()
 		if err != nil {
@@ -1824,15 +1845,6 @@ func (v *FieldDesc) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TBinary {
-				var x string
-				x, err = field.Value.GetString(), error(nil)
-				v.Name = &x
-				if err != nil {
-					return err
-				}
-			}
 		case 2:
 			if field.Value.Type() == wire.TI32 {
 				var x ElemType
@@ -1855,12 +1867,8 @@ func (v *FieldDesc) FromWire(w wire.Value) error {
 }
 
 func (v *FieldDesc) String() string {
-	var fields [3]string
+	var fields [2]string
 	i := 0
-	if v.Name != nil {
-		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
-		i++
-	}
 	if v.Type != nil {
 		fields[i] = fmt.Sprintf("Type: %v", *(v.Type))
 		i++
@@ -2144,6 +2152,33 @@ type PrimaryKey struct {
 	ClusteringKeys []*ClusteringKey `json:"clusteringKeys"`
 }
 
+type _List_String_ValueList []string
+
+func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for _, x := range v {
+		w, err := wire.NewValueString(x), error(nil)
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_String_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_String_ValueList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_List_String_ValueList) Close() {
+}
+
 type _List_ClusteringKey_ValueList []*ClusteringKey
 
 func (v _List_ClusteringKey_ValueList) ForEach(f func(wire.Value) error) error {
@@ -2198,6 +2233,23 @@ func (v *PrimaryKey) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_String_Read(l wire.ValueList) ([]string, error) {
+	if l.ValueType() != wire.TBinary {
+		return nil, nil
+	}
+	o := make([]string, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := x.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
 }
 
 func _ClusteringKey_Read(w wire.Value) (*ClusteringKey, error) {
@@ -2261,11 +2313,11 @@ func (v *PrimaryKey) String() string {
 }
 
 type RangeRequest struct {
-	SchemaID     *SchemaID    `json:"schemaID,omitempty"`
-	Token        *Token       `json:"token,omitempty"`
-	Limit        *int32       `json:"limit,omitempty"`
-	Conditions   []*Condition `json:"conditions"`
-	FieldsToRead []string     `json:"fieldsToRead"`
+	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
+	Token        *Token              `json:"token,omitempty"`
+	Limit        *int32              `json:"limit,omitempty"`
+	Conditions   []*Condition        `json:"conditions"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
 type _List_Condition_ValueList []*Condition
@@ -2338,7 +2390,7 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToRead != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToRead)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2414,8 +2466,8 @@ func (v *RangeRequest) FromWire(w wire.Value) error {
 				}
 			}
 		case 5:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToRead, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}
@@ -2752,9 +2804,9 @@ func (v *RawValue) String() string {
 }
 
 type ReadRequest struct {
-	SchemaID     *SchemaID `json:"schemaID,omitempty"`
-	Key          []*Field  `json:"key"`
-	FieldsToRead []string  `json:"fieldsToRead"`
+	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
+	Key          map[string]*Value   `json:"key"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
 func (v *ReadRequest) ToWire() (wire.Value, error) {
@@ -2773,7 +2825,7 @@ func (v *ReadRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Key != nil {
-		w, err = wire.NewValueList(_List_Field_ValueList(v.Key)), error(nil)
+		w, err = wire.NewValueMap(_Map_String_Value_MapItemList(v.Key)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2781,7 +2833,7 @@ func (v *ReadRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToRead != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToRead)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2803,15 +2855,15 @@ func (v *ReadRequest) FromWire(w wire.Value) error {
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TList {
-				v.Key, err = _List_Field_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TMap {
+				v.Key, err = _Map_String_Value_Read(field.Value.GetMap())
 				if err != nil {
 					return err
 				}
 			}
 		case 3:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToRead, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}
@@ -2888,8 +2940,8 @@ func (v *ReadResponse) String() string {
 }
 
 type RemoveRequest struct {
-	Fqn           *FQN       `json:"fqn,omitempty"`
-	KeyFieldsList [][]*Field `json:"keyFieldsList"`
+	Fqn           *FQN                `json:"fqn,omitempty"`
+	KeyFieldsList []map[string]*Value `json:"keyFieldsList"`
 }
 
 func (v *RemoveRequest) ToWire() (wire.Value, error) {
@@ -2908,7 +2960,7 @@ func (v *RemoveRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.KeyFieldsList != nil {
-		w, err = wire.NewValueList(_List_List_Field_ValueList(v.KeyFieldsList)), error(nil)
+		w, err = wire.NewValueList(_List_Map_String_Value_ValueList(v.KeyFieldsList)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2933,7 +2985,7 @@ func (v *RemoveRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TList {
-				v.KeyFieldsList, err = _List_List_Field_Read(field.Value.GetList())
+				v.KeyFieldsList, err = _List_Map_String_Value_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -2958,10 +3010,10 @@ func (v *RemoveRequest) String() string {
 }
 
 type ScanRequest struct {
-	SchemaID     *SchemaID `json:"schemaID,omitempty"`
-	Token        *Token    `json:"token,omitempty"`
-	Limit        *int32    `json:"limit,omitempty"`
-	FieldsToRead []string  `json:"fieldsToRead"`
+	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
+	Token        *Token              `json:"token,omitempty"`
+	Limit        *int32              `json:"limit,omitempty"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
 func (v *ScanRequest) ToWire() (wire.Value, error) {
@@ -2996,7 +3048,7 @@ func (v *ScanRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToRead != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToRead)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3036,8 +3088,8 @@ func (v *ScanRequest) FromWire(w wire.Value) error {
 				}
 			}
 		case 4:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToRead, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}
@@ -3236,11 +3288,11 @@ func (v *Scope) FromWire(w wire.Value) error {
 }
 
 type SearchRequest struct {
-	SchemaID     *SchemaID `json:"schemaID,omitempty"`
-	Token        *Token    `json:"token,omitempty"`
-	Limit        *int32    `json:"limit,omitempty"`
-	SearchBy     *Field    `json:"searchBy,omitempty"`
-	FieldsToRead []string  `json:"fieldsToRead"`
+	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
+	Token        *Token              `json:"token,omitempty"`
+	Limit        *int32              `json:"limit,omitempty"`
+	SearchBy     *Field              `json:"searchBy,omitempty"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
 func (v *SearchRequest) ToWire() (wire.Value, error) {
@@ -3283,7 +3335,7 @@ func (v *SearchRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToRead != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToRead)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3330,8 +3382,8 @@ func (v *SearchRequest) FromWire(w wire.Value) error {
 				}
 			}
 		case 5:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToRead, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}
@@ -3506,8 +3558,8 @@ func (v *TruncateScopeRequest) String() string {
 }
 
 type UpsertRequest struct {
-	Entities       []*Entity `json:"entities"`
-	FieldsToUpdate []string  `json:"fieldsToUpdate"`
+	Entities       []*Entity           `json:"entities"`
+	FieldsToUpdate map[string]struct{} `json:"fieldsToUpdate"`
 }
 
 func (v *UpsertRequest) ToWire() (wire.Value, error) {
@@ -3526,7 +3578,7 @@ func (v *UpsertRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.FieldsToUpdate != nil {
-		w, err = wire.NewValueList(_List_String_ValueList(v.FieldsToUpdate)), error(nil)
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToUpdate)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3548,8 +3600,8 @@ func (v *UpsertRequest) FromWire(w wire.Value) error {
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TList {
-				v.FieldsToUpdate, err = _List_String_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToUpdate, err = _Set_String_Read(field.Value.GetSet())
 				if err != nil {
 					return err
 				}

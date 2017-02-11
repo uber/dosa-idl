@@ -72,7 +72,6 @@ struct FieldTag {
 }
 
 struct FieldDesc {
-   1: optional string name
    2: optional ElemType type
    3: optional set<FieldTag> tags
 }
@@ -89,13 +88,13 @@ struct PrimaryKey {
 
 struct EntityDefinition {
    1: optional FQN fqn
-   2: optional list<FieldDesc> fieldDescs
+   2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
 }
 
 struct Entity {
    1: optional SchemaID schemaID
-   2: optional list<Field> fields
+   2: optional map<string, Value> fields
 }
 
 struct Error {
@@ -110,8 +109,8 @@ struct CreateRequest {
 
 struct ReadRequest {
    1: optional SchemaID schemaID
-   2: optional list<Field> key
-   3: optional list<string> fieldsToRead
+   2: optional map<string, Value> key
+   3: optional set<string> fieldsToRead
 }
 
 struct ReadResponse {
@@ -120,8 +119,8 @@ struct ReadResponse {
 
 struct BatchReadRequest {
    1: optional SchemaID schemaID
-   2: optional list<list<Field>> keys
-   3: optional list<string> fieldsToRead
+   2: optional list<map<string, Value>> keys
+   3: optional set<string> fieldsToRead
 }
 
 union EntityOrError{
@@ -135,12 +134,12 @@ struct BatchReadResponse {
 
 struct UpsertRequest {
     1: optional list<Entity> entities
-    2: optional list<string> fieldsToUpdate
+    2: optional set<string> fieldsToUpdate
 }
 
 struct RemoveRequest {
    1: optional FQN fqn
-   2: optional list<list<Field>> keyFieldsList
+   2: optional list<map<string, Value>> keyFieldsList
 }
 
 enum Operator {
@@ -161,7 +160,7 @@ struct RangeRequest {
    2: optional Token token
    3: optional i32 limit
    4: optional list<Condition> conditions
-   5: optional list<string> fieldsToRead
+   5: optional set<string> fieldsToRead
 }
 
 struct RangeResponse {
@@ -174,7 +173,7 @@ struct SearchRequest {
    2: optional Token token
    3: optional i32 limit
    4: optional Field searchBy
-   5: optional list<string> fieldsToRead
+   5: optional set<string> fieldsToRead
 }
 
 struct SearchResponse {
@@ -186,7 +185,7 @@ struct ScanRequest {
    1: optional SchemaID schemaID
    2: optional Token token
    3: optional i32 limit
-   4: optional list<string> fieldsToRead
+   4: optional set<string> fieldsToRead
 }
 
 struct ScanResponse {
