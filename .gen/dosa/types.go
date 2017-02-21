@@ -675,8 +675,8 @@ func (v *BatchUpsertRequest) String() string {
 }
 
 type CheckSchemaRequest struct {
-	Scope      *Scope              `json:"scope,omitempty"`
-	NamePrefix *NamePrefix         `json:"namePrefix,omitempty"`
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
 	EntityDefs []*EntityDefinition `json:"entityDefs"`
 }
 
@@ -718,7 +718,7 @@ func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Scope != nil {
-		w, err = v.Scope.ToWire()
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -726,7 +726,7 @@ func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NamePrefix != nil {
-		w, err = v.NamePrefix.ToWire()
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -742,18 +742,6 @@ func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _Scope_Read(w wire.Value) (Scope, error) {
-	var x Scope
-	err := x.FromWire(w)
-	return x, err
-}
-
-func _NamePrefix_Read(w wire.Value) (NamePrefix, error) {
-	var x NamePrefix
-	err := x.FromWire(w)
-	return x, err
 }
 
 func _EntityDefinition_Read(w wire.Value) (*EntityDefinition, error) {
@@ -785,8 +773,8 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Scope = &x
 				if err != nil {
 					return err
@@ -794,8 +782,8 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x NamePrefix
-				x, err = _NamePrefix_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NamePrefix = &x
 				if err != nil {
 					return err
@@ -1152,7 +1140,7 @@ func (v *CreateRequest) String() string {
 }
 
 type CreateScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
@@ -1163,7 +1151,7 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1179,8 +1167,8 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -1202,7 +1190,7 @@ func (v *CreateScopeRequest) String() string {
 }
 
 type DropScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *DropScopeRequest) ToWire() (wire.Value, error) {
@@ -1213,7 +1201,7 @@ func (v *DropScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1229,8 +1217,8 @@ func (v *DropScopeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -1406,7 +1394,7 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 }
 
 type EntityDefinition struct {
-	Name       *EntityName           `json:"name,omitempty"`
+	Name       *string               `json:"name,omitempty"`
 	FieldDescs map[string]*FieldDesc `json:"fieldDescs"`
 	PrimaryKey *PrimaryKey           `json:"primaryKey,omitempty"`
 }
@@ -1457,7 +1445,7 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1481,12 +1469,6 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _EntityName_Read(w wire.Value) (EntityName, error) {
-	var x EntityName
-	err := x.FromWire(w)
-	return x, err
 }
 
 func _FieldDesc_Read(w wire.Value) (*FieldDesc, error) {
@@ -1531,8 +1513,8 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x EntityName
-				x, err = _EntityName_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -1573,24 +1555,6 @@ func (v *EntityDefinition) String() string {
 		i++
 	}
 	return fmt.Sprintf("EntityDefinition{%v}", strings.Join(fields[:i], ", "))
-}
-
-type EntityName string
-
-func (v EntityName) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v EntityName) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *EntityName) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (EntityName)(x)
-	return err
 }
 
 type EntityOrError struct {
@@ -2228,24 +2192,6 @@ func (v *InternalServerError) Error() string {
 	return v.String()
 }
 
-type NamePrefix string
-
-func (v NamePrefix) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v NamePrefix) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *NamePrefix) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (NamePrefix)(x)
-	return err
-}
-
 type Operator int32
 
 const (
@@ -2511,7 +2457,7 @@ func (v *PrimaryKey) String() string {
 
 type RangeRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	Conditions   []*Condition        `json:"conditions"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
@@ -2563,7 +2509,7 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2595,12 +2541,6 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _Token_Read(w wire.Value) (Token, error) {
-	var x Token
-	err := x.FromWire(w)
-	return x, err
 }
 
 func _Condition_Read(w wire.Value) (*Condition, error) {
@@ -2639,8 +2579,8 @@ func (v *RangeRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -2702,7 +2642,7 @@ func (v *RangeRequest) String() string {
 
 type RangeResponse struct {
 	Entities  []FieldValueMap `json:"entities"`
-	NextToken *Token          `json:"nextToken,omitempty"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *RangeResponse) ToWire() (wire.Value, error) {
@@ -2721,7 +2661,7 @@ func (v *RangeResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2744,8 +2684,8 @@ func (v *RangeResponse) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -3159,7 +3099,7 @@ func (v *RemoveRequest) String() string {
 
 type ScanRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
@@ -3180,7 +3120,7 @@ func (v *ScanRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3219,8 +3159,8 @@ func (v *ScanRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -3271,7 +3211,7 @@ func (v *ScanRequest) String() string {
 
 type ScanResponse struct {
 	Entities  []FieldValueMap `json:"entities"`
-	NextToken *Token          `json:"nextToken,omitempty"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *ScanResponse) ToWire() (wire.Value, error) {
@@ -3290,7 +3230,7 @@ func (v *ScanResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3313,8 +3253,8 @@ func (v *ScanResponse) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -3340,10 +3280,10 @@ func (v *ScanResponse) String() string {
 }
 
 type SchemaRef struct {
-	Scope      *Scope      `json:"scope,omitempty"`
-	NamePrefix *NamePrefix `json:"namePrefix,omitempty"`
-	EntityName *EntityName `json:"entityName,omitempty"`
-	Version    *Version    `json:"version,omitempty"`
+	Scope      *string  `json:"scope,omitempty"`
+	NamePrefix *string  `json:"namePrefix,omitempty"`
+	EntityName *string  `json:"entityName,omitempty"`
+	Version    *Version `json:"version,omitempty"`
 }
 
 func (v *SchemaRef) ToWire() (wire.Value, error) {
@@ -3354,7 +3294,7 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Scope != nil {
-		w, err = v.Scope.ToWire()
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3362,7 +3302,7 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NamePrefix != nil {
-		w, err = v.NamePrefix.ToWire()
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3370,7 +3310,7 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.EntityName != nil {
-		w, err = v.EntityName.ToWire()
+		w, err = wire.NewValueString(*(v.EntityName)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3394,8 +3334,8 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Scope = &x
 				if err != nil {
 					return err
@@ -3403,8 +3343,8 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x NamePrefix
-				x, err = _NamePrefix_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NamePrefix = &x
 				if err != nil {
 					return err
@@ -3412,8 +3352,8 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 			}
 		case 3:
 			if field.Value.Type() == wire.TBinary {
-				var x EntityName
-				x, err = _EntityName_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.EntityName = &x
 				if err != nil {
 					return err
@@ -3455,27 +3395,9 @@ func (v *SchemaRef) String() string {
 	return fmt.Sprintf("SchemaRef{%v}", strings.Join(fields[:i], ", "))
 }
 
-type Scope string
-
-func (v Scope) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v Scope) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *Scope) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (Scope)(x)
-	return err
-}
-
 type SearchRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	SearchBy     *Field              `json:"searchBy,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
@@ -3497,7 +3419,7 @@ func (v *SearchRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3544,8 +3466,8 @@ func (v *SearchRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -3607,7 +3529,7 @@ func (v *SearchRequest) String() string {
 
 type SearchResponse struct {
 	Entities  []FieldValueMap `json:"entities"`
-	NextToken *Token          `json:"nextToken,omitempty"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *SearchResponse) ToWire() (wire.Value, error) {
@@ -3626,7 +3548,7 @@ func (v *SearchResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3649,8 +3571,8 @@ func (v *SearchResponse) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -3675,26 +3597,8 @@ func (v *SearchResponse) String() string {
 	return fmt.Sprintf("SearchResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
-type Token string
-
-func (v Token) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v Token) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *Token) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (Token)(x)
-	return err
-}
-
 type TruncateScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
@@ -3705,7 +3609,7 @@ func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3721,8 +3625,8 @@ func (v *TruncateScopeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -3812,8 +3716,8 @@ func (v *UpsertRequest) String() string {
 }
 
 type UpsertSchemaRequest struct {
-	Scope      *Scope              `json:"scope,omitempty"`
-	NamePrefix *NamePrefix         `json:"namePrefix,omitempty"`
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
 	EntityDefs []*EntityDefinition `json:"entityDefs"`
 }
 
@@ -3825,7 +3729,7 @@ func (v *UpsertSchemaRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Scope != nil {
-		w, err = v.Scope.ToWire()
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3833,7 +3737,7 @@ func (v *UpsertSchemaRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NamePrefix != nil {
-		w, err = v.NamePrefix.ToWire()
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3857,8 +3761,8 @@ func (v *UpsertSchemaRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Scope = &x
 				if err != nil {
 					return err
@@ -3866,8 +3770,8 @@ func (v *UpsertSchemaRequest) FromWire(w wire.Value) error {
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x NamePrefix
-				x, err = _NamePrefix_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NamePrefix = &x
 				if err != nil {
 					return err

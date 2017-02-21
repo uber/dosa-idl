@@ -21,10 +21,6 @@
 namespace java com.uber.dosa
 
 typedef i32 Version
-typedef string Scope
-typedef string Token
-typedef string NamePrefix
-typedef string EntityName
 typedef map<string, Value> FieldValueMap
 
 enum ElemType {
@@ -59,9 +55,9 @@ union Value {
 }
 
 struct SchemaRef {
-    1: optional Scope scope
-    2: optional NamePrefix namePrefix
-    3: optional EntityName entityName
+    1: optional string scope
+    2: optional string namePrefix
+    3: optional string entityName
     4: optional Version version
 }
 
@@ -86,7 +82,7 @@ struct PrimaryKey {
 }
 
 struct EntityDefinition {
-   1: optional EntityName name
+   1: optional string name
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
 }
@@ -167,7 +163,7 @@ struct Condition {
 
 struct RangeRequest {
    1: optional SchemaRef ref
-   2: optional Token token
+   2: optional string token
    3: optional i32 limit
    4: optional list<Condition> conditions
    5: optional set<string> fieldsToRead
@@ -175,12 +171,12 @@ struct RangeRequest {
 
 struct RangeResponse {
    1: optional list<FieldValueMap> entities
-   2: optional Token nextToken
+   2: optional string nextToken
 }
 
 struct SearchRequest {
    1: optional SchemaRef ref
-   2: optional Token token
+   2: optional string token
    3: optional i32 limit
    4: optional Field searchBy
    5: optional set<string> fieldsToRead
@@ -188,24 +184,24 @@ struct SearchRequest {
 
 struct SearchResponse {
    1: optional list<FieldValueMap> entities
-   2: optional Token nextToken
+   2: optional string nextToken
 }
 
 struct ScanRequest {
    1: optional SchemaRef ref
-   2: optional Token token
+   2: optional string token
    3: optional i32 limit
    4: optional set<string> fieldsToRead
 }
 
 struct ScanResponse {
    1: optional list<FieldValueMap> entities
-   2: optional Token nextToken
+   2: optional string nextToken
 }
 
 struct CheckSchemaRequest {
-   1: optional Scope scope
-   2: optional NamePrefix namePrefix
+   1: optional string scope
+   2: optional string namePrefix
    3: optional list<EntityDefinition> entityDefs
 }
 
@@ -214,8 +210,8 @@ struct CheckSchemaResponse {
 }
 
 struct UpsertSchemaRequest {
-   1: optional Scope scope
-   2: optional NamePrefix namePrefix
+   1: optional string scope
+   2: optional string namePrefix
    3: optional list<EntityDefinition> entityDefs
 }
 
@@ -224,13 +220,13 @@ struct UpsertSchemaResponse {
 }
 
 struct CreateScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 struct TruncateScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 struct DropScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 
 exception BadRequestError {
