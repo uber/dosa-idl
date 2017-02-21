@@ -76,7 +76,7 @@ type Interface interface {
 	UpsertSchema(
 		ctx context.Context,
 		Request *dosa.UpsertSchemaRequest,
-	) error
+	) (*dosa.UpsertSchemaResponse, error)
 }
 
 // New prepares an implementation of the Dosa service for
@@ -217,7 +217,7 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.UpsertSchema),
 				},
-				Signature: "UpsertSchema(Request *dosa.UpsertSchemaRequest)",
+				Signature: "UpsertSchema(Request *dosa.UpsertSchemaRequest) (*dosa.UpsertSchemaResponse)",
 			},
 		},
 	}
@@ -463,10 +463,10 @@ func (h handler) UpsertSchema(ctx context.Context, body wire.Value) (thrift.Resp
 		return thrift.Response{}, err
 	}
 
-	err := h.impl.UpsertSchema(ctx, args.Request)
+	success, err := h.impl.UpsertSchema(ctx, args.Request)
 
 	hadError := err != nil
-	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(err)
+	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {

@@ -436,7 +436,7 @@ func (m *MockClient) UpsertSchema(
 	ctx context.Context,
 	_Request *dosa.UpsertSchemaRequest,
 	opts ...yarpc.CallOption,
-) (err error) {
+) (success *dosa.UpsertSchemaResponse, err error) {
 
 	args := []interface{}{ctx, _Request}
 	for _, o := range opts {
@@ -444,6 +444,8 @@ func (m *MockClient) UpsertSchema(
 	}
 	i := 0
 	ret := m.ctrl.Call(m, "UpsertSchema", args...)
+	success, _ = ret[i].(*dosa.UpsertSchemaResponse)
+	i++
 	err, _ = ret[i].(error)
 	return
 }

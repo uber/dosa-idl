@@ -20,10 +20,12 @@
 
 namespace java com.uber.dosa
 
-typedef string FQN
 typedef i32 Version
 typedef string Scope
 typedef string Token
+typedef string NamePrefix
+typedef string EntityName
+typedef map<string, Value> FieldValueMap
 
 enum ElemType {
    BOOL,
@@ -56,14 +58,11 @@ union Value {
    1: optional RawValue elemValue
 }
 
-struct SchemaID {
-    1: optional FQN fqn
-    2: optional Version version
-}
-
-struct Field {
-   1: optional string name
-   2: optional Value value
+struct SchemaRef {
+    1: optional Scope scope
+    2: optional NamePrefix namePrefix
+    3: optional EntityName entityName
+    4: optional Version version
 }
 
 struct FieldTag {
@@ -72,8 +71,8 @@ struct FieldTag {
 }
 
 struct FieldDesc {
-   2: optional ElemType type
-   3: optional set<FieldTag> tags
+   1: optional ElemType type
+   2: optional set<FieldTag> tags
 }
 
 struct ClusteringKey {
@@ -87,14 +86,9 @@ struct PrimaryKey {
 }
 
 struct EntityDefinition {
-   1: optional FQN fqn
+   1: optional EntityName name
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
-}
-
-struct Entity {
-   1: optional SchemaID schemaID
-   2: optional map<string, Value> fields
 }
 
 struct Error {
@@ -104,27 +98,28 @@ struct Error {
 }
 
 struct CreateRequest {
-   1: optional Entity entity
+   1: optional SchemaRef ref
+   2: optional FieldValueMap entityValues
 }
 
 struct ReadRequest {
-   1: optional SchemaID schemaID
-   2: optional map<string, Value> key
+   1: optional SchemaRef ref
+   2: optional FieldValueMap keyValues
    3: optional set<string> fieldsToRead
 }
 
 struct ReadResponse {
-   1: optional Entity entity
+   1: optional FieldValueMap entityValues
 }
 
 struct BatchReadRequest {
-   1: optional SchemaID schemaID
-   2: optional list<map<string, Value>> keys
+   1: optional SchemaRef ref
+   2: optional list<FieldValueMap> keyValues
    3: optional set<string> fieldsToRead
 }
 
 union EntityOrError{
-   1: optional Entity entity
+   1: optional FieldValueMap entityValues
    2: optional Error error
 }
 
@@ -133,13 +128,23 @@ struct BatchReadResponse {
 }
 
 struct UpsertRequest {
-    1: optional list<Entity> entities
-    2: optional set<string> fieldsToUpdate
+    1: optional SchemaRef ref
+    2: optional FieldValueMap entityValues
+}
+
+struct BatchUpsertRequest {
+    1: optional SchemaRef ref
+    2: optional list<FieldValueMap> entities
 }
 
 struct RemoveRequest {
-   1: optional FQN fqn
-   2: optional list<map<string, Value>> keyFieldsList
+   1: optional SchemaRef ref
+   2: optional FieldValueMap keyValues
+}
+
+struct BatchRemoveRequest {
+   1: optional SchemaRef ref 
+   2: optional list<FieldValueMap> keyValues
 }
 
 enum Operator {
@@ -150,13 +155,18 @@ enum Operator {
    GT_OR_EQ,
 }
 
+struct Field {
+   1: optional string name
+   2: optional Value value
+}
+
 struct Condition {
    1: optional Operator op
    2: optional Field field
 }
 
 struct RangeRequest {
-   1: optional SchemaID schemaID
+   1: optional SchemaRef ref
    2: optional Token token
    3: optional i32 limit
    4: optional list<Condition> conditions
@@ -164,12 +174,12 @@ struct RangeRequest {
 }
 
 struct RangeResponse {
-   1: optional list<Entity> entities
+   1: optional list<FieldValueMap> entities
    2: optional Token nextToken
 }
 
 struct SearchRequest {
-   1: optional SchemaID schemaID
+   1: optional SchemaRef ref
    2: optional Token token
    3: optional i32 limit
    4: optional Field searchBy
@@ -177,32 +187,40 @@ struct SearchRequest {
 }
 
 struct SearchResponse {
-   1: optional list<Entity> entities
+   1: optional list<FieldValueMap> entities
    2: optional Token nextToken
 }
 
 struct ScanRequest {
-   1: optional SchemaID schemaID
+   1: optional SchemaRef ref
    2: optional Token token
    3: optional i32 limit
    4: optional set<string> fieldsToRead
 }
 
 struct ScanResponse {
-   1: optional list<Entity> entities
+   1: optional list<FieldValueMap> entities
    2: optional Token nextToken
 }
 
 struct CheckSchemaRequest {
-   1: optional list<EntityDefinition> entityDefs
+   1: optional Scope scope
+   2: optional NamePrefix namePrefix
+   3: optional list<EntityDefinition> entityDefs
 }
 
 struct CheckSchemaResponse {
-   1: optional list<SchemaID> schemaIDs
+   1: optional list<Version> versions
 }
 
 struct UpsertSchemaRequest {
-   1: optional list<EntityDefinition> entityDefs
+   1: optional Scope scope
+   2: optional NamePrefix namePrefix
+   3: optional list<EntityDefinition> entityDefs
+}
+
+struct UpsertSchemaResponse {
+   1: optional list<Version> versions
 }
 
 struct CreateScopeRequest {
@@ -228,7 +246,7 @@ exception InternalServerError {
 }
 
 exception BadSchemaError {
-    1: required map<FQN, string> reasons
+    1: required map<SchemaRef, string> reasons
 }
 
 service Dosa {
@@ -260,12 +278,30 @@ service Dosa {
        2: InternalServerError serverError
    )
 
+   /* Future:
+   void batchUpsert (
+       1: BatchUpsertRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+   */
+   
    void remove (
        1: RemoveRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
    )
+
+   /* Future:
+   void batchRemove (
+       1: BatchRemoveRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+   */
 
    RangeResponse range (
        1: RangeRequest request
@@ -296,7 +332,7 @@ service Dosa {
        3: BadSchemaError schemaError
    )
 
-   void upsertSchema(
+   UpsertSchemaResponse upsertSchema(
        1: UpsertSchemaRequest request
    ) throws (
        1: BadRequestError clientError

@@ -90,7 +90,7 @@ type Interface interface {
 		ctx context.Context,
 		Request *dosa.UpsertSchemaRequest,
 		opts ...yarpc.CallOption,
-	) error
+	) (*dosa.UpsertSchemaResponse, error)
 }
 
 // New builds a new client for the Dosa service.
@@ -395,7 +395,7 @@ func (c client) UpsertSchema(
 	ctx context.Context,
 	_Request *dosa.UpsertSchemaRequest,
 	opts ...yarpc.CallOption,
-) (err error) {
+) (success *dosa.UpsertSchemaResponse, err error) {
 
 	args := dosa.Dosa_UpsertSchema_Helper.Args(_Request)
 
@@ -410,6 +410,6 @@ func (c client) UpsertSchema(
 		return
 	}
 
-	err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)
+	success, err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)
 	return
 }
