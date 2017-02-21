@@ -20,10 +20,8 @@
 
 namespace java com.uber.dosa
 
-typedef string FQN
 typedef i32 Version
-typedef string Scope
-typedef string Token
+typedef map<string, Value> FieldValueMap
 
 enum ElemType {
    BOOL,
@@ -56,14 +54,11 @@ union Value {
    1: optional RawValue elemValue
 }
 
-struct SchemaID {
-    1: optional FQN fqn
-    2: optional Version version
-}
-
-struct Field {
-   1: optional string name
-   2: optional Value value
+struct SchemaRef {
+    1: optional string scope
+    2: optional string namePrefix
+    3: optional string entityName
+    4: optional Version version
 }
 
 struct FieldTag {
@@ -72,8 +67,8 @@ struct FieldTag {
 }
 
 struct FieldDesc {
-   2: optional ElemType type
-   3: optional set<FieldTag> tags
+   1: optional ElemType type
+   2: optional set<FieldTag> tags
 }
 
 struct ClusteringKey {
@@ -87,14 +82,9 @@ struct PrimaryKey {
 }
 
 struct EntityDefinition {
-   1: optional FQN fqn
+   1: optional string name
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
-}
-
-struct Entity {
-   1: optional SchemaID schemaID
-   2: optional map<string, Value> fields
 }
 
 struct Error {
@@ -104,42 +94,61 @@ struct Error {
 }
 
 struct CreateRequest {
-   1: optional Entity entity
+   1: optional SchemaRef ref
+   2: optional FieldValueMap entityValues
 }
 
 struct ReadRequest {
-   1: optional SchemaID schemaID
-   2: optional map<string, Value> key
+   1: optional SchemaRef ref
+   2: optional FieldValueMap keyValues
    3: optional set<string> fieldsToRead
 }
 
 struct ReadResponse {
-   1: optional Entity entity
+   1: optional FieldValueMap entityValues
 }
 
-struct BatchReadRequest {
-   1: optional SchemaID schemaID
-   2: optional list<map<string, Value>> keys
+struct MultiReadRequest {
+   1: optional SchemaRef ref
+   2: optional list<FieldValueMap> keyValues
    3: optional set<string> fieldsToRead
 }
 
 union EntityOrError{
-   1: optional Entity entity
+   1: optional FieldValueMap entityValues
    2: optional Error error
 }
 
-struct BatchReadResponse {
+struct MultiReadResponse {
    1: optional list<EntityOrError> results
 }
 
+struct MultiUpsertResponse {
+   1: optional list<Error> errors
+}
+
 struct UpsertRequest {
-    1: optional list<Entity> entities
-    2: optional set<string> fieldsToUpdate
+    1: optional SchemaRef ref
+    2: optional FieldValueMap entityValues
+}
+
+struct MultiUpsertRequest {
+    1: optional SchemaRef ref
+    2: optional list<FieldValueMap> entities
 }
 
 struct RemoveRequest {
-   1: optional FQN fqn
-   2: optional list<map<string, Value>> keyFieldsList
+   1: optional SchemaRef ref
+   2: optional FieldValueMap keyValues
+}
+
+struct MultiRemoveRequest {
+   1: optional SchemaRef ref 
+   2: optional list<FieldValueMap> keyValues
+}
+
+struct MultiRemoveResponse {
+   1: optional list<Error> errors
 }
 
 enum Operator {
@@ -150,69 +159,82 @@ enum Operator {
    GT_OR_EQ,
 }
 
+struct Field {
+   1: optional string name
+   2: optional Value value
+}
+
 struct Condition {
    1: optional Operator op
    2: optional Field field
 }
 
 struct RangeRequest {
-   1: optional SchemaID schemaID
-   2: optional Token token
+   1: optional SchemaRef ref
+   2: optional string token
    3: optional i32 limit
    4: optional list<Condition> conditions
    5: optional set<string> fieldsToRead
 }
 
 struct RangeResponse {
-   1: optional list<Entity> entities
-   2: optional Token nextToken
+   1: optional list<FieldValueMap> entities
+   2: optional string nextToken
 }
 
 struct SearchRequest {
-   1: optional SchemaID schemaID
-   2: optional Token token
+   1: optional SchemaRef ref
+   2: optional string token
    3: optional i32 limit
    4: optional Field searchBy
    5: optional set<string> fieldsToRead
 }
 
 struct SearchResponse {
-   1: optional list<Entity> entities
-   2: optional Token nextToken
+   1: optional list<FieldValueMap> entities
+   2: optional string nextToken
 }
 
 struct ScanRequest {
-   1: optional SchemaID schemaID
-   2: optional Token token
+   1: optional SchemaRef ref
+   2: optional string token
    3: optional i32 limit
    4: optional set<string> fieldsToRead
 }
 
 struct ScanResponse {
-   1: optional list<Entity> entities
-   2: optional Token nextToken
+   1: optional list<FieldValueMap> entities
+   2: optional string nextToken
 }
 
 struct CheckSchemaRequest {
-   1: optional list<EntityDefinition> entityDefs
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
 }
 
 struct CheckSchemaResponse {
-   1: optional list<SchemaID> schemaIDs
+   1: optional list<Version> versions
 }
 
 struct UpsertSchemaRequest {
-   1: optional list<EntityDefinition> entityDefs
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
+}
+
+struct UpsertSchemaResponse {
+   1: optional list<Version> versions
 }
 
 struct CreateScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 struct TruncateScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 struct DropScopeRequest {
-   1: optional Scope name
+   1: optional string name
 }
 
 exception BadRequestError {
@@ -228,7 +250,7 @@ exception InternalServerError {
 }
 
 exception BadSchemaError {
-    1: required map<FQN, string> reasons
+    1: required map<SchemaRef, string> reasons
 }
 
 service Dosa {
@@ -246,8 +268,8 @@ service Dosa {
        2: InternalServerError serverError
    )
 
-   BatchReadResponse batchRead (
-       1: BatchReadRequest request
+   MultiReadResponse multiRead (
+       1: MultiReadRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
@@ -260,8 +282,22 @@ service Dosa {
        2: InternalServerError serverError
    )
 
+   MultiUpsertResponse multiUpsert (
+       1: MultiUpsertRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+   
    void remove (
        1: RemoveRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+
+   MultiRemoveResponse multiRemove (
+       1: MultiRemoveRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
@@ -296,7 +332,7 @@ service Dosa {
        3: BadSchemaError schemaError
    )
 
-   void upsertSchema(
+   UpsertSchemaResponse upsertSchema(
        1: UpsertSchemaRequest request
    ) throws (
        1: BadRequestError clientError

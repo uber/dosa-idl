@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-type Dosa_BatchRead_Args struct {
-	Request *BatchReadRequest `json:"request,omitempty"`
+type Dosa_MultiRead_Args struct {
+	Request *MultiReadRequest `json:"request,omitempty"`
 }
 
-func (v *Dosa_BatchRead_Args) ToWire() (wire.Value, error) {
+func (v *Dosa_MultiRead_Args) ToWire() (wire.Value, error) {
 	var (
 		fields [1]wire.Field
 		i      int = 0
@@ -32,19 +32,19 @@ func (v *Dosa_BatchRead_Args) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _BatchReadRequest_Read(w wire.Value) (*BatchReadRequest, error) {
-	var v BatchReadRequest
+func _MultiReadRequest_Read(w wire.Value) (*MultiReadRequest, error) {
+	var v MultiReadRequest
 	err := v.FromWire(w)
 	return &v, err
 }
 
-func (v *Dosa_BatchRead_Args) FromWire(w wire.Value) error {
+func (v *Dosa_MultiRead_Args) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.Request, err = _BatchReadRequest_Read(field.Value)
+				v.Request, err = _MultiReadRequest_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -54,36 +54,36 @@ func (v *Dosa_BatchRead_Args) FromWire(w wire.Value) error {
 	return nil
 }
 
-func (v *Dosa_BatchRead_Args) String() string {
+func (v *Dosa_MultiRead_Args) String() string {
 	var fields [1]string
 	i := 0
 	if v.Request != nil {
 		fields[i] = fmt.Sprintf("Request: %v", v.Request)
 		i++
 	}
-	return fmt.Sprintf("Dosa_BatchRead_Args{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_MultiRead_Args{%v}", strings.Join(fields[:i], ", "))
 }
 
-func (v *Dosa_BatchRead_Args) MethodName() string {
-	return "batchRead"
+func (v *Dosa_MultiRead_Args) MethodName() string {
+	return "multiRead"
 }
 
-func (v *Dosa_BatchRead_Args) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_MultiRead_Args) EnvelopeType() wire.EnvelopeType {
 	return wire.Call
 }
 
-var Dosa_BatchRead_Helper = struct {
-	Args           func(request *BatchReadRequest) *Dosa_BatchRead_Args
+var Dosa_MultiRead_Helper = struct {
+	Args           func(request *MultiReadRequest) *Dosa_MultiRead_Args
 	IsException    func(error) bool
-	WrapResponse   func(*BatchReadResponse, error) (*Dosa_BatchRead_Result, error)
-	UnwrapResponse func(*Dosa_BatchRead_Result) (*BatchReadResponse, error)
+	WrapResponse   func(*MultiReadResponse, error) (*Dosa_MultiRead_Result, error)
+	UnwrapResponse func(*Dosa_MultiRead_Result) (*MultiReadResponse, error)
 }{}
 
 func init() {
-	Dosa_BatchRead_Helper.Args = func(request *BatchReadRequest) *Dosa_BatchRead_Args {
-		return &Dosa_BatchRead_Args{Request: request}
+	Dosa_MultiRead_Helper.Args = func(request *MultiReadRequest) *Dosa_MultiRead_Args {
+		return &Dosa_MultiRead_Args{Request: request}
 	}
-	Dosa_BatchRead_Helper.IsException = func(err error) bool {
+	Dosa_MultiRead_Helper.IsException = func(err error) bool {
 		switch err.(type) {
 		case *BadRequestError:
 			return true
@@ -93,25 +93,25 @@ func init() {
 			return false
 		}
 	}
-	Dosa_BatchRead_Helper.WrapResponse = func(success *BatchReadResponse, err error) (*Dosa_BatchRead_Result, error) {
+	Dosa_MultiRead_Helper.WrapResponse = func(success *MultiReadResponse, err error) (*Dosa_MultiRead_Result, error) {
 		if err == nil {
-			return &Dosa_BatchRead_Result{Success: success}, nil
+			return &Dosa_MultiRead_Result{Success: success}, nil
 		}
 		switch e := err.(type) {
 		case *BadRequestError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_BatchRead_Result.ClientError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_MultiRead_Result.ClientError")
 			}
-			return &Dosa_BatchRead_Result{ClientError: e}, nil
+			return &Dosa_MultiRead_Result{ClientError: e}, nil
 		case *InternalServerError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_BatchRead_Result.ServerError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_MultiRead_Result.ServerError")
 			}
-			return &Dosa_BatchRead_Result{ServerError: e}, nil
+			return &Dosa_MultiRead_Result{ServerError: e}, nil
 		}
 		return nil, err
 	}
-	Dosa_BatchRead_Helper.UnwrapResponse = func(result *Dosa_BatchRead_Result) (success *BatchReadResponse, err error) {
+	Dosa_MultiRead_Helper.UnwrapResponse = func(result *Dosa_MultiRead_Result) (success *MultiReadResponse, err error) {
 		if result.ClientError != nil {
 			err = result.ClientError
 			return
@@ -129,13 +129,13 @@ func init() {
 	}
 }
 
-type Dosa_BatchRead_Result struct {
-	Success     *BatchReadResponse   `json:"success,omitempty"`
+type Dosa_MultiRead_Result struct {
+	Success     *MultiReadResponse   `json:"success,omitempty"`
 	ClientError *BadRequestError     `json:"clientError,omitempty"`
 	ServerError *InternalServerError `json:"serverError,omitempty"`
 }
 
-func (v *Dosa_BatchRead_Result) ToWire() (wire.Value, error) {
+func (v *Dosa_MultiRead_Result) ToWire() (wire.Value, error) {
 	var (
 		fields [3]wire.Field
 		i      int = 0
@@ -167,36 +167,24 @@ func (v *Dosa_BatchRead_Result) ToWire() (wire.Value, error) {
 		i++
 	}
 	if i != 1 {
-		return wire.Value{}, fmt.Errorf("Dosa_BatchRead_Result should have exactly one field: got %v fields", i)
+		return wire.Value{}, fmt.Errorf("Dosa_MultiRead_Result should have exactly one field: got %v fields", i)
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _BatchReadResponse_Read(w wire.Value) (*BatchReadResponse, error) {
-	var v BatchReadResponse
+func _MultiReadResponse_Read(w wire.Value) (*MultiReadResponse, error) {
+	var v MultiReadResponse
 	err := v.FromWire(w)
 	return &v, err
 }
 
-func _BadRequestError_Read(w wire.Value) (*BadRequestError, error) {
-	var v BadRequestError
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _InternalServerError_Read(w wire.Value) (*InternalServerError, error) {
-	var v InternalServerError
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func (v *Dosa_BatchRead_Result) FromWire(w wire.Value) error {
+func (v *Dosa_MultiRead_Result) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 0:
 			if field.Value.Type() == wire.TStruct {
-				v.Success, err = _BatchReadResponse_Read(field.Value)
+				v.Success, err = _MultiReadResponse_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -228,12 +216,12 @@ func (v *Dosa_BatchRead_Result) FromWire(w wire.Value) error {
 		count++
 	}
 	if count != 1 {
-		return fmt.Errorf("Dosa_BatchRead_Result should have exactly one field: got %v fields", count)
+		return fmt.Errorf("Dosa_MultiRead_Result should have exactly one field: got %v fields", count)
 	}
 	return nil
 }
 
-func (v *Dosa_BatchRead_Result) String() string {
+func (v *Dosa_MultiRead_Result) String() string {
 	var fields [3]string
 	i := 0
 	if v.Success != nil {
@@ -248,13 +236,13 @@ func (v *Dosa_BatchRead_Result) String() string {
 		fields[i] = fmt.Sprintf("ServerError: %v", v.ServerError)
 		i++
 	}
-	return fmt.Sprintf("Dosa_BatchRead_Result{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_MultiRead_Result{%v}", strings.Join(fields[:i], ", "))
 }
 
-func (v *Dosa_BatchRead_Result) MethodName() string {
-	return "batchRead"
+func (v *Dosa_MultiRead_Result) MethodName() string {
+	return "multiRead"
 }
 
-func (v *Dosa_BatchRead_Result) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_MultiRead_Result) EnvelopeType() wire.EnvelopeType {
 	return wire.Reply
 }

@@ -42,39 +42,6 @@ func (m *MockClient) EXPECT() *_MockClientRecorder {
 	return m.recorder
 }
 
-// BatchRead responds to a BatchRead call based on the mock expectations. This
-// call will fail if the mock does not expect this call. Use EXPECT to expect
-// a call to this function.
-//
-// 	client.EXPECT().BatchRead(gomock.Any(), ...).Return(...)
-// 	... := client.BatchRead(...)
-func (m *MockClient) BatchRead(
-	ctx context.Context,
-	_Request *dosa.BatchReadRequest,
-	opts ...yarpc.CallOption,
-) (success *dosa.BatchReadResponse, err error) {
-
-	args := []interface{}{ctx, _Request}
-	for _, o := range opts {
-		args = append(args, o)
-	}
-	i := 0
-	ret := m.ctrl.Call(m, "BatchRead", args...)
-	success, _ = ret[i].(*dosa.BatchReadResponse)
-	i++
-	err, _ = ret[i].(error)
-	return
-}
-
-func (mr *_MockClientRecorder) BatchRead(
-	ctx interface{},
-	_Request interface{},
-	opts ...interface{},
-) *gomock.Call {
-	args := append([]interface{}{ctx, _Request}, opts...)
-	return mr.mock.ctrl.RecordCall(mr.mock, "BatchRead", args...)
-}
-
 // CheckSchema responds to a CheckSchema call based on the mock expectations. This
 // call will fail if the mock does not expect this call. Use EXPECT to expect
 // a call to this function.
@@ -199,6 +166,105 @@ func (mr *_MockClientRecorder) DropScope(
 ) *gomock.Call {
 	args := append([]interface{}{ctx, _Request}, opts...)
 	return mr.mock.ctrl.RecordCall(mr.mock, "DropScope", args...)
+}
+
+// MultiRead responds to a MultiRead call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().MultiRead(gomock.Any(), ...).Return(...)
+// 	... := client.MultiRead(...)
+func (m *MockClient) MultiRead(
+	ctx context.Context,
+	_Request *dosa.MultiReadRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiReadResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "MultiRead", args...)
+	success, _ = ret[i].(*dosa.MultiReadResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) MultiRead(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "MultiRead", args...)
+}
+
+// MultiRemove responds to a MultiRemove call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().MultiRemove(gomock.Any(), ...).Return(...)
+// 	... := client.MultiRemove(...)
+func (m *MockClient) MultiRemove(
+	ctx context.Context,
+	_Request *dosa.MultiRemoveRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiRemoveResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "MultiRemove", args...)
+	success, _ = ret[i].(*dosa.MultiRemoveResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) MultiRemove(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "MultiRemove", args...)
+}
+
+// MultiUpsert responds to a MultiUpsert call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().MultiUpsert(gomock.Any(), ...).Return(...)
+// 	... := client.MultiUpsert(...)
+func (m *MockClient) MultiUpsert(
+	ctx context.Context,
+	_Request *dosa.MultiUpsertRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiUpsertResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "MultiUpsert", args...)
+	success, _ = ret[i].(*dosa.MultiUpsertResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) MultiUpsert(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "MultiUpsert", args...)
 }
 
 // Range responds to a Range call based on the mock expectations. This
@@ -436,7 +502,7 @@ func (m *MockClient) UpsertSchema(
 	ctx context.Context,
 	_Request *dosa.UpsertSchemaRequest,
 	opts ...yarpc.CallOption,
-) (err error) {
+) (success *dosa.UpsertSchemaResponse, err error) {
 
 	args := []interface{}{ctx, _Request}
 	for _, o := range opts {
@@ -444,6 +510,8 @@ func (m *MockClient) UpsertSchema(
 	}
 	i := 0
 	ret := m.ctrl.Call(m, "UpsertSchema", args...)
+	success, _ = ret[i].(*dosa.UpsertSchemaResponse)
+	i++
 	err, _ = ret[i].(error)
 	return
 }

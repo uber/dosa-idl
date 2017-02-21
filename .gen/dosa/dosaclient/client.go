@@ -14,12 +14,6 @@ import (
 
 // Interface is a client for the Dosa service.
 type Interface interface {
-	BatchRead(
-		ctx context.Context,
-		Request *dosa.BatchReadRequest,
-		opts ...yarpc.CallOption,
-	) (*dosa.BatchReadResponse, error)
-
 	CheckSchema(
 		ctx context.Context,
 		Request *dosa.CheckSchemaRequest,
@@ -43,6 +37,24 @@ type Interface interface {
 		Request *dosa.DropScopeRequest,
 		opts ...yarpc.CallOption,
 	) error
+
+	MultiRead(
+		ctx context.Context,
+		Request *dosa.MultiReadRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.MultiReadResponse, error)
+
+	MultiRemove(
+		ctx context.Context,
+		Request *dosa.MultiRemoveRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.MultiRemoveResponse, error)
+
+	MultiUpsert(
+		ctx context.Context,
+		Request *dosa.MultiUpsertRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.MultiUpsertResponse, error)
 
 	Range(
 		ctx context.Context,
@@ -90,7 +102,7 @@ type Interface interface {
 		ctx context.Context,
 		Request *dosa.UpsertSchemaRequest,
 		opts ...yarpc.CallOption,
-	) error
+	) (*dosa.UpsertSchemaResponse, error)
 }
 
 // New builds a new client for the Dosa service.
@@ -113,29 +125,6 @@ func init() {
 
 type client struct {
 	c thrift.Client
-}
-
-func (c client) BatchRead(
-	ctx context.Context,
-	_Request *dosa.BatchReadRequest,
-	opts ...yarpc.CallOption,
-) (success *dosa.BatchReadResponse, err error) {
-
-	args := dosa.Dosa_BatchRead_Helper.Args(_Request)
-
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
-
-	var result dosa.Dosa_BatchRead_Result
-	if err = result.FromWire(body); err != nil {
-		return
-	}
-
-	success, err = dosa.Dosa_BatchRead_Helper.UnwrapResponse(&result)
-	return
 }
 
 func (c client) CheckSchema(
@@ -227,6 +216,75 @@ func (c client) DropScope(
 	}
 
 	err = dosa.Dosa_DropScope_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) MultiRead(
+	ctx context.Context,
+	_Request *dosa.MultiReadRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiReadResponse, err error) {
+
+	args := dosa.Dosa_MultiRead_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_MultiRead_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_MultiRead_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) MultiRemove(
+	ctx context.Context,
+	_Request *dosa.MultiRemoveRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiRemoveResponse, err error) {
+
+	args := dosa.Dosa_MultiRemove_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_MultiRemove_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_MultiRemove_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) MultiUpsert(
+	ctx context.Context,
+	_Request *dosa.MultiUpsertRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.MultiUpsertResponse, err error) {
+
+	args := dosa.Dosa_MultiUpsert_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_MultiUpsert_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_MultiUpsert_Helper.UnwrapResponse(&result)
 	return
 }
 
@@ -395,7 +453,7 @@ func (c client) UpsertSchema(
 	ctx context.Context,
 	_Request *dosa.UpsertSchemaRequest,
 	opts ...yarpc.CallOption,
-) (err error) {
+) (success *dosa.UpsertSchemaResponse, err error) {
 
 	args := dosa.Dosa_UpsertSchema_Helper.Args(_Request)
 
@@ -410,6 +468,6 @@ func (c client) UpsertSchema(
 		return
 	}
 
-	err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)
+	success, err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)
 	return
 }

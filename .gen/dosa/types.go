@@ -112,13 +112,24 @@ func (v *BadRequestError) Error() string {
 }
 
 type BadSchemaError struct {
-	Reasons map[FQN]string `json:"reasons"`
+	Reasons []struct {
+		Key   *SchemaRef
+		Value string
+	} `json:"reasons"`
 }
 
-type _Map_FQN_String_MapItemList map[FQN]string
+type _Map_SchemaRef_String_MapItemList []struct {
+	Key   *SchemaRef
+	Value string
+}
 
-func (m _Map_FQN_String_MapItemList) ForEach(f func(wire.MapItem) error) error {
-	for k, v := range m {
+func (m _Map_SchemaRef_String_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for _, i := range m {
+		k := i.Key
+		v := i.Value
+		if k == nil {
+			return fmt.Errorf("invalid map key: value is nil")
+		}
 		kw, err := k.ToWire()
 		if err != nil {
 			return err
@@ -135,19 +146,19 @@ func (m _Map_FQN_String_MapItemList) ForEach(f func(wire.MapItem) error) error {
 	return nil
 }
 
-func (m _Map_FQN_String_MapItemList) Size() int {
+func (m _Map_SchemaRef_String_MapItemList) Size() int {
 	return len(m)
 }
 
-func (_Map_FQN_String_MapItemList) KeyType() wire.Type {
+func (_Map_SchemaRef_String_MapItemList) KeyType() wire.Type {
+	return wire.TStruct
+}
+
+func (_Map_SchemaRef_String_MapItemList) ValueType() wire.Type {
 	return wire.TBinary
 }
 
-func (_Map_FQN_String_MapItemList) ValueType() wire.Type {
-	return wire.TBinary
-}
-
-func (_Map_FQN_String_MapItemList) Close() {
+func (_Map_SchemaRef_String_MapItemList) Close() {
 }
 
 func (v *BadSchemaError) ToWire() (wire.Value, error) {
@@ -160,7 +171,7 @@ func (v *BadSchemaError) ToWire() (wire.Value, error) {
 	if v.Reasons == nil {
 		return w, errors.New("field Reasons of BadSchemaError is required")
 	}
-	w, err = wire.NewValueMap(_Map_FQN_String_MapItemList(v.Reasons)), error(nil)
+	w, err = wire.NewValueMap(_Map_SchemaRef_String_MapItemList(v.Reasons)), error(nil)
 	if err != nil {
 		return w, err
 	}
@@ -169,22 +180,28 @@ func (v *BadSchemaError) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _FQN_Read(w wire.Value) (FQN, error) {
-	var x FQN
-	err := x.FromWire(w)
-	return x, err
+func _SchemaRef_Read(w wire.Value) (*SchemaRef, error) {
+	var v SchemaRef
+	err := v.FromWire(w)
+	return &v, err
 }
 
-func _Map_FQN_String_Read(m wire.MapItemList) (map[FQN]string, error) {
-	if m.KeyType() != wire.TBinary {
+func _Map_SchemaRef_String_Read(m wire.MapItemList) ([]struct {
+	Key   *SchemaRef
+	Value string
+}, error) {
+	if m.KeyType() != wire.TStruct {
 		return nil, nil
 	}
 	if m.ValueType() != wire.TBinary {
 		return nil, nil
 	}
-	o := make(map[FQN]string, m.Size())
+	o := make([]struct {
+		Key   *SchemaRef
+		Value string
+	}, 0, m.Size())
 	err := m.ForEach(func(x wire.MapItem) error {
-		k, err := _FQN_Read(x.Key)
+		k, err := _SchemaRef_Read(x.Key)
 		if err != nil {
 			return err
 		}
@@ -192,7 +209,10 @@ func _Map_FQN_String_Read(m wire.MapItemList) (map[FQN]string, error) {
 		if err != nil {
 			return err
 		}
-		o[k] = v
+		o = append(o, struct {
+			Key   *SchemaRef
+			Value string
+		}{k, v})
 		return nil
 	})
 	m.Close()
@@ -206,7 +226,7 @@ func (v *BadSchemaError) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TMap {
-				v.Reasons, err = _Map_FQN_String_Read(field.Value.GetMap())
+				v.Reasons, err = _Map_SchemaRef_String_Read(field.Value.GetMap())
 				if err != nil {
 					return err
 				}
@@ -232,361 +252,9 @@ func (v *BadSchemaError) Error() string {
 	return v.String()
 }
 
-type BatchReadRequest struct {
-	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
-	Keys         []map[string]*Value `json:"keys"`
-	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
-}
-
-type _Map_String_Value_MapItemList map[string]*Value
-
-func (m _Map_String_Value_MapItemList) ForEach(f func(wire.MapItem) error) error {
-	for k, v := range m {
-		if v == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", k)
-		}
-		kw, err := wire.NewValueString(k), error(nil)
-		if err != nil {
-			return err
-		}
-		vw, err := v.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(wire.MapItem{Key: kw, Value: vw})
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (m _Map_String_Value_MapItemList) Size() int {
-	return len(m)
-}
-
-func (_Map_String_Value_MapItemList) KeyType() wire.Type {
-	return wire.TBinary
-}
-
-func (_Map_String_Value_MapItemList) ValueType() wire.Type {
-	return wire.TStruct
-}
-
-func (_Map_String_Value_MapItemList) Close() {
-}
-
-type _List_Map_String_Value_ValueList []map[string]*Value
-
-func (v _List_Map_String_Value_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := wire.NewValueMap(_Map_String_Value_MapItemList(x)), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_Map_String_Value_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_Map_String_Value_ValueList) ValueType() wire.Type {
-	return wire.TMap
-}
-
-func (_List_Map_String_Value_ValueList) Close() {
-}
-
-type _Set_String_ValueList map[string]struct{}
-
-func (v _Set_String_ValueList) ForEach(f func(wire.Value) error) error {
-	for x := range v {
-		w, err := wire.NewValueString(x), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _Set_String_ValueList) Size() int {
-	return len(v)
-}
-
-func (_Set_String_ValueList) ValueType() wire.Type {
-	return wire.TBinary
-}
-
-func (_Set_String_ValueList) Close() {
-}
-
-func (v *BatchReadRequest) ToWire() (wire.Value, error) {
-	var (
-		fields [3]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	if v.Keys != nil {
-		w, err = wire.NewValueList(_List_Map_String_Value_ValueList(v.Keys)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	if v.FieldsToRead != nil {
-		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 3, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _SchemaID_Read(w wire.Value) (*SchemaID, error) {
-	var v SchemaID
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _Value_Read(w wire.Value) (*Value, error) {
-	var v Value
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _Map_String_Value_Read(m wire.MapItemList) (map[string]*Value, error) {
-	if m.KeyType() != wire.TBinary {
-		return nil, nil
-	}
-	if m.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-	o := make(map[string]*Value, m.Size())
-	err := m.ForEach(func(x wire.MapItem) error {
-		k, err := x.Key.GetString(), error(nil)
-		if err != nil {
-			return err
-		}
-		v, err := _Value_Read(x.Value)
-		if err != nil {
-			return err
-		}
-		o[k] = v
-		return nil
-	})
-	m.Close()
-	return o, err
-}
-
-func _List_Map_String_Value_Read(l wire.ValueList) ([]map[string]*Value, error) {
-	if l.ValueType() != wire.TMap {
-		return nil, nil
-	}
-	o := make([]map[string]*Value, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _Map_String_Value_Read(x.GetMap())
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
-func _Set_String_Read(s wire.ValueList) (map[string]struct{}, error) {
-	if s.ValueType() != wire.TBinary {
-		return nil, nil
-	}
-	o := make(map[string]struct{}, s.Size())
-	err := s.ForEach(func(x wire.Value) error {
-		i, err := x.GetString(), error(nil)
-		if err != nil {
-			return err
-		}
-		o[i] = struct{}{}
-		return nil
-	})
-	s.Close()
-	return o, err
-}
-
-func (v *BatchReadRequest) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
-				if err != nil {
-					return err
-				}
-			}
-		case 2:
-			if field.Value.Type() == wire.TList {
-				v.Keys, err = _List_Map_String_Value_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		case 3:
-			if field.Value.Type() == wire.TSet {
-				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchReadRequest) String() string {
-	var fields [3]string
-	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
-		i++
-	}
-	if v.Keys != nil {
-		fields[i] = fmt.Sprintf("Keys: %v", v.Keys)
-		i++
-	}
-	if v.FieldsToRead != nil {
-		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
-		i++
-	}
-	return fmt.Sprintf("BatchReadRequest{%v}", strings.Join(fields[:i], ", "))
-}
-
-type BatchReadResponse struct {
-	Results []*EntityOrError `json:"results"`
-}
-
-type _List_EntityOrError_ValueList []*EntityOrError
-
-func (v _List_EntityOrError_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_EntityOrError_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_EntityOrError_ValueList) ValueType() wire.Type {
-	return wire.TStruct
-}
-
-func (_List_EntityOrError_ValueList) Close() {
-}
-
-func (v *BatchReadResponse) ToWire() (wire.Value, error) {
-	var (
-		fields [1]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.Results != nil {
-		w, err = wire.NewValueList(_List_EntityOrError_ValueList(v.Results)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _EntityOrError_Read(w wire.Value) (*EntityOrError, error) {
-	var v EntityOrError
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _List_EntityOrError_Read(l wire.ValueList) ([]*EntityOrError, error) {
-	if l.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-	o := make([]*EntityOrError, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _EntityOrError_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
-func (v *BatchReadResponse) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TList {
-				v.Results, err = _List_EntityOrError_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchReadResponse) String() string {
-	var fields [1]string
-	i := 0
-	if v.Results != nil {
-		fields[i] = fmt.Sprintf("Results: %v", v.Results)
-		i++
-	}
-	return fmt.Sprintf("BatchReadResponse{%v}", strings.Join(fields[:i], ", "))
-}
-
 type CheckSchemaRequest struct {
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
 	EntityDefs []*EntityDefinition `json:"entityDefs"`
 }
 
@@ -622,17 +290,33 @@ func (_List_EntityDefinition_ValueList) Close() {
 
 func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
 	if v.EntityDefs != nil {
 		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 1, Value: w}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -666,6 +350,24 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
 			if field.Value.Type() == wire.TList {
 				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
 				if err != nil {
@@ -678,8 +380,16 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 }
 
 func (v *CheckSchemaRequest) String() string {
-	var fields [1]string
+	var fields [3]string
 	i := 0
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
 	if v.EntityDefs != nil {
 		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
 		i++
@@ -688,16 +398,13 @@ func (v *CheckSchemaRequest) String() string {
 }
 
 type CheckSchemaResponse struct {
-	SchemaIDs []*SchemaID `json:"schemaIDs"`
+	Versions []Version `json:"versions"`
 }
 
-type _List_SchemaID_ValueList []*SchemaID
+type _List_Version_ValueList []Version
 
-func (v _List_SchemaID_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
+func (v _List_Version_ValueList) ForEach(f func(wire.Value) error) error {
+	for _, x := range v {
 		w, err := x.ToWire()
 		if err != nil {
 			return err
@@ -710,15 +417,15 @@ func (v _List_SchemaID_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_SchemaID_ValueList) Size() int {
+func (v _List_Version_ValueList) Size() int {
 	return len(v)
 }
 
-func (_List_SchemaID_ValueList) ValueType() wire.Type {
-	return wire.TStruct
+func (_List_Version_ValueList) ValueType() wire.Type {
+	return wire.TI32
 }
 
-func (_List_SchemaID_ValueList) Close() {
+func (_List_Version_ValueList) Close() {
 }
 
 func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
@@ -728,8 +435,8 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.SchemaIDs != nil {
-		w, err = wire.NewValueList(_List_SchemaID_ValueList(v.SchemaIDs)), error(nil)
+	if v.Versions != nil {
+		w, err = wire.NewValueList(_List_Version_ValueList(v.Versions)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -739,13 +446,19 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _List_SchemaID_Read(l wire.ValueList) ([]*SchemaID, error) {
-	if l.ValueType() != wire.TStruct {
+func _Version_Read(w wire.Value) (Version, error) {
+	var x Version
+	err := x.FromWire(w)
+	return x, err
+}
+
+func _List_Version_Read(l wire.ValueList) ([]Version, error) {
+	if l.ValueType() != wire.TI32 {
 		return nil, nil
 	}
-	o := make([]*SchemaID, 0, l.Size())
+	o := make([]Version, 0, l.Size())
 	err := l.ForEach(func(x wire.Value) error {
-		i, err := _SchemaID_Read(x)
+		i, err := _Version_Read(x)
 		if err != nil {
 			return err
 		}
@@ -762,7 +475,7 @@ func (v *CheckSchemaResponse) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.SchemaIDs, err = _List_SchemaID_Read(field.Value.GetList())
+				v.Versions, err = _List_Version_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -775,8 +488,8 @@ func (v *CheckSchemaResponse) FromWire(w wire.Value) error {
 func (v *CheckSchemaResponse) String() string {
 	var fields [1]string
 	i := 0
-	if v.SchemaIDs != nil {
-		fields[i] = fmt.Sprintf("SchemaIDs: %v", v.SchemaIDs)
+	if v.Versions != nil {
+		fields[i] = fmt.Sprintf("Versions: %v", v.Versions)
 		i++
 	}
 	return fmt.Sprintf("CheckSchemaResponse{%v}", strings.Join(fields[:i], ", "))
@@ -937,31 +650,40 @@ func (v *Condition) String() string {
 }
 
 type CreateRequest struct {
-	Entity *Entity `json:"entity,omitempty"`
+	Ref          *SchemaRef    `json:"ref,omitempty"`
+	EntityValues FieldValueMap `json:"entityValues"`
 }
 
 func (v *CreateRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
-	if v.Entity != nil {
-		w, err = v.Entity.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
+	if v.EntityValues != nil {
+		w, err = v.EntityValues.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Entity_Read(w wire.Value) (*Entity, error) {
-	var v Entity
-	err := v.FromWire(w)
-	return &v, err
+func _FieldValueMap_Read(w wire.Value) (FieldValueMap, error) {
+	var x FieldValueMap
+	err := x.FromWire(w)
+	return x, err
 }
 
 func (v *CreateRequest) FromWire(w wire.Value) error {
@@ -970,7 +692,14 @@ func (v *CreateRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.Entity, err = _Entity_Read(field.Value)
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TMap {
+				v.EntityValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -981,17 +710,21 @@ func (v *CreateRequest) FromWire(w wire.Value) error {
 }
 
 func (v *CreateRequest) String() string {
-	var fields [1]string
+	var fields [2]string
 	i := 0
-	if v.Entity != nil {
-		fields[i] = fmt.Sprintf("Entity: %v", v.Entity)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.EntityValues != nil {
+		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
 		i++
 	}
 	return fmt.Sprintf("CreateRequest{%v}", strings.Join(fields[:i], ", "))
 }
 
 type CreateScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
@@ -1002,7 +735,7 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1012,20 +745,14 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Scope_Read(w wire.Value) (Scope, error) {
-	var x Scope
-	err := x.FromWire(w)
-	return x, err
-}
-
 func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -1047,7 +774,7 @@ func (v *CreateScopeRequest) String() string {
 }
 
 type DropScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *DropScopeRequest) ToWire() (wire.Value, error) {
@@ -1058,7 +785,7 @@ func (v *DropScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1074,8 +801,8 @@ func (v *DropScopeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -1250,76 +977,8 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 	}
 }
 
-type Entity struct {
-	SchemaID *SchemaID         `json:"schemaID,omitempty"`
-	Fields   map[string]*Value `json:"fields"`
-}
-
-func (v *Entity) ToWire() (wire.Value, error) {
-	var (
-		fields [2]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	if v.Fields != nil {
-		w, err = wire.NewValueMap(_Map_String_Value_MapItemList(v.Fields)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func (v *Entity) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
-				if err != nil {
-					return err
-				}
-			}
-		case 2:
-			if field.Value.Type() == wire.TMap {
-				v.Fields, err = _Map_String_Value_Read(field.Value.GetMap())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *Entity) String() string {
-	var fields [2]string
-	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
-		i++
-	}
-	if v.Fields != nil {
-		fields[i] = fmt.Sprintf("Fields: %v", v.Fields)
-		i++
-	}
-	return fmt.Sprintf("Entity{%v}", strings.Join(fields[:i], ", "))
-}
-
 type EntityDefinition struct {
-	Fqn        *FQN                  `json:"fqn,omitempty"`
+	Name       *string               `json:"name,omitempty"`
 	FieldDescs map[string]*FieldDesc `json:"fieldDescs"`
 	PrimaryKey *PrimaryKey           `json:"primaryKey,omitempty"`
 }
@@ -1369,8 +1028,8 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Fqn != nil {
-		w, err = v.Fqn.ToWire()
+	if v.Name != nil {
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -1438,9 +1097,9 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x FQN
-				x, err = _FQN_Read(field.Value)
-				v.Fqn = &x
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Name = &x
 				if err != nil {
 					return err
 				}
@@ -1467,8 +1126,8 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 func (v *EntityDefinition) String() string {
 	var fields [3]string
 	i := 0
-	if v.Fqn != nil {
-		fields[i] = fmt.Sprintf("Fqn: %v", *(v.Fqn))
+	if v.Name != nil {
+		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
 		i++
 	}
 	if v.FieldDescs != nil {
@@ -1483,8 +1142,8 @@ func (v *EntityDefinition) String() string {
 }
 
 type EntityOrError struct {
-	Entity *Entity `json:"entity,omitempty"`
-	Error  *Error  `json:"error,omitempty"`
+	EntityValues FieldValueMap `json:"entityValues"`
+	Error        *Error        `json:"error,omitempty"`
 }
 
 func (v *EntityOrError) ToWire() (wire.Value, error) {
@@ -1494,8 +1153,8 @@ func (v *EntityOrError) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Entity != nil {
-		w, err = v.Entity.ToWire()
+	if v.EntityValues != nil {
+		w, err = v.EntityValues.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -1527,8 +1186,8 @@ func (v *EntityOrError) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.Entity, err = _Entity_Read(field.Value)
+			if field.Value.Type() == wire.TMap {
+				v.EntityValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -1543,7 +1202,7 @@ func (v *EntityOrError) FromWire(w wire.Value) error {
 		}
 	}
 	count := 0
-	if v.Entity != nil {
+	if v.EntityValues != nil {
 		count++
 	}
 	if v.Error != nil {
@@ -1558,8 +1217,8 @@ func (v *EntityOrError) FromWire(w wire.Value) error {
 func (v *EntityOrError) String() string {
 	var fields [2]string
 	i := 0
-	if v.Entity != nil {
-		fields[i] = fmt.Sprintf("Entity: %v", v.Entity)
+	if v.EntityValues != nil {
+		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
 		i++
 	}
 	if v.Error != nil {
@@ -1663,24 +1322,6 @@ func (v *Error) String() string {
 	return fmt.Sprintf("Error{%v}", strings.Join(fields[:i], ", "))
 }
 
-type FQN string
-
-func (v FQN) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v FQN) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *FQN) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (FQN)(x)
-	return err
-}
-
 type Field struct {
 	Name  *string `json:"name,omitempty"`
 	Value *Value  `json:"value,omitempty"`
@@ -1710,6 +1351,12 @@ func (v *Field) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _Value_Read(w wire.Value) (*Value, error) {
+	var v Value
+	err := v.FromWire(w)
+	return &v, err
 }
 
 func (v *Field) FromWire(w wire.Value) error {
@@ -1798,7 +1445,7 @@ func (v *FieldDesc) ToWire() (wire.Value, error) {
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 2, Value: w}
+		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
 	if v.Tags != nil {
@@ -1806,7 +1453,7 @@ func (v *FieldDesc) ToWire() (wire.Value, error) {
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 3, Value: w}
+		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -1845,7 +1492,7 @@ func (v *FieldDesc) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
-		case 2:
+		case 1:
 			if field.Value.Type() == wire.TI32 {
 				var x ElemType
 				x, err = _ElemType_Read(field.Value)
@@ -1854,7 +1501,7 @@ func (v *FieldDesc) FromWire(w wire.Value) error {
 					return err
 				}
 			}
-		case 3:
+		case 2:
 			if field.Value.Type() == wire.TSet {
 				v.Tags, err = _Set_FieldTag_Read(field.Value.GetSet())
 				if err != nil {
@@ -1952,6 +1599,86 @@ func (v *FieldTag) String() string {
 	return fmt.Sprintf("FieldTag{%v}", strings.Join(fields[:i], ", "))
 }
 
+type _Map_String_Value_MapItemList map[string]*Value
+
+func (m _Map_String_Value_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for k, v := range m {
+		if v == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", k)
+		}
+		kw, err := wire.NewValueString(k), error(nil)
+		if err != nil {
+			return err
+		}
+		vw, err := v.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(wire.MapItem{Key: kw, Value: vw})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (m _Map_String_Value_MapItemList) Size() int {
+	return len(m)
+}
+
+func (_Map_String_Value_MapItemList) KeyType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Map_String_Value_MapItemList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_Map_String_Value_MapItemList) Close() {
+}
+
+func _Map_String_Value_Read(m wire.MapItemList) (map[string]*Value, error) {
+	if m.KeyType() != wire.TBinary {
+		return nil, nil
+	}
+	if m.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make(map[string]*Value, m.Size())
+	err := m.ForEach(func(x wire.MapItem) error {
+		k, err := x.Key.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		v, err := _Value_Read(x.Value)
+		if err != nil {
+			return err
+		}
+		o[k] = v
+		return nil
+	})
+	m.Close()
+	return o, err
+}
+
+type FieldValueMap map[string]*Value
+
+func (v FieldValueMap) ToWire() (wire.Value, error) {
+	x := (map[string]*Value)(v)
+	return wire.NewValueMap(_Map_String_Value_MapItemList(x)), error(nil)
+}
+
+func (v FieldValueMap) String() string {
+	x := (map[string]*Value)(v)
+	return fmt.Sprint(x)
+}
+
+func (v *FieldValueMap) FromWire(w wire.Value) error {
+	x, err := _Map_String_Value_Read(w.GetMap())
+	*v = (FieldValueMap)(x)
+	return err
+}
+
 type InternalServerError struct {
 	Err       string  `json:"err"`
 	Message   *string `json:"message,omitempty"`
@@ -2047,6 +1774,565 @@ func (v *InternalServerError) String() string {
 
 func (v *InternalServerError) Error() string {
 	return v.String()
+}
+
+type MultiReadRequest struct {
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	KeyValues    []FieldValueMap     `json:"keyValues"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
+}
+
+type _List_FieldValueMap_ValueList []FieldValueMap
+
+func (v _List_FieldValueMap_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_FieldValueMap_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_FieldValueMap_ValueList) ValueType() wire.Type {
+	return wire.TMap
+}
+
+func (_List_FieldValueMap_ValueList) Close() {
+}
+
+type _Set_String_ValueList map[string]struct{}
+
+func (v _Set_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for x := range v {
+		w, err := wire.NewValueString(x), error(nil)
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _Set_String_ValueList) Size() int {
+	return len(v)
+}
+
+func (_Set_String_ValueList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Set_String_ValueList) Close() {
+}
+
+func (v *MultiReadRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.KeyValues != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.FieldsToRead != nil {
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_FieldValueMap_Read(l wire.ValueList) ([]FieldValueMap, error) {
+	if l.ValueType() != wire.TMap {
+		return nil, nil
+	}
+	o := make([]FieldValueMap, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _FieldValueMap_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func _Set_String_Read(s wire.ValueList) (map[string]struct{}, error) {
+	if s.ValueType() != wire.TBinary {
+		return nil, nil
+	}
+	o := make(map[string]struct{}, s.Size())
+	err := s.ForEach(func(x wire.Value) error {
+		i, err := x.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		o[i] = struct{}{}
+		return nil
+	})
+	s.Close()
+	return o, err
+}
+
+func (v *MultiReadRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiReadRequest) String() string {
+	var fields [3]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	if v.FieldsToRead != nil {
+		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	return fmt.Sprintf("MultiReadRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiReadResponse struct {
+	Results []*EntityOrError `json:"results"`
+}
+
+type _List_EntityOrError_ValueList []*EntityOrError
+
+func (v _List_EntityOrError_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_EntityOrError_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_EntityOrError_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_EntityOrError_ValueList) Close() {
+}
+
+func (v *MultiReadResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Results != nil {
+		w, err = wire.NewValueList(_List_EntityOrError_ValueList(v.Results)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _EntityOrError_Read(w wire.Value) (*EntityOrError, error) {
+	var v EntityOrError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _List_EntityOrError_Read(l wire.ValueList) ([]*EntityOrError, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make([]*EntityOrError, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _EntityOrError_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func (v *MultiReadResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Results, err = _List_EntityOrError_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiReadResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Results != nil {
+		fields[i] = fmt.Sprintf("Results: %v", v.Results)
+		i++
+	}
+	return fmt.Sprintf("MultiReadResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiRemoveRequest struct {
+	Ref       *SchemaRef      `json:"ref,omitempty"`
+	KeyValues []FieldValueMap `json:"keyValues"`
+}
+
+func (v *MultiRemoveRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [2]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.KeyValues != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiRemoveRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiRemoveRequest) String() string {
+	var fields [2]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	return fmt.Sprintf("MultiRemoveRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiRemoveResponse struct {
+	Errors []*Error `json:"errors"`
+}
+
+type _List_Error_ValueList []*Error
+
+func (v _List_Error_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_Error_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_Error_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_Error_ValueList) Close() {
+}
+
+func (v *MultiRemoveResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Errors != nil {
+		w, err = wire.NewValueList(_List_Error_ValueList(v.Errors)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_Error_Read(l wire.ValueList) ([]*Error, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make([]*Error, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _Error_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func (v *MultiRemoveResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Errors, err = _List_Error_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiRemoveResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Errors != nil {
+		fields[i] = fmt.Sprintf("Errors: %v", v.Errors)
+		i++
+	}
+	return fmt.Sprintf("MultiRemoveResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiUpsertRequest struct {
+	Ref      *SchemaRef      `json:"ref,omitempty"`
+	Entities []FieldValueMap `json:"entities"`
+}
+
+func (v *MultiUpsertRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [2]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Entities != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiUpsertRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiUpsertRequest) String() string {
+	var fields [2]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.Entities != nil {
+		fields[i] = fmt.Sprintf("Entities: %v", v.Entities)
+		i++
+	}
+	return fmt.Sprintf("MultiUpsertRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiUpsertResponse struct {
+	Errors []*Error `json:"errors"`
+}
+
+func (v *MultiUpsertResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Errors != nil {
+		w, err = wire.NewValueList(_List_Error_ValueList(v.Errors)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiUpsertResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Errors, err = _List_Error_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiUpsertResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Errors != nil {
+		fields[i] = fmt.Sprintf("Errors: %v", v.Errors)
+		i++
+	}
+	return fmt.Sprintf("MultiUpsertResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
 type Operator int32
@@ -2313,8 +2599,8 @@ func (v *PrimaryKey) String() string {
 }
 
 type RangeRequest struct {
-	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	Conditions   []*Condition        `json:"conditions"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
@@ -2357,8 +2643,8 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -2366,7 +2652,7 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2400,12 +2686,6 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Token_Read(w wire.Value) (Token, error) {
-	var x Token
-	err := x.FromWire(w)
-	return x, err
-}
-
 func _Condition_Read(w wire.Value) (*Condition, error) {
 	var v Condition
 	err := v.FromWire(w)
@@ -2435,15 +2715,15 @@ func (v *RangeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -2480,8 +2760,8 @@ func (v *RangeRequest) FromWire(w wire.Value) error {
 func (v *RangeRequest) String() string {
 	var fields [5]string
 	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
 	if v.Token != nil {
@@ -2504,38 +2784,8 @@ func (v *RangeRequest) String() string {
 }
 
 type RangeResponse struct {
-	Entities  []*Entity `json:"entities"`
-	NextToken *Token    `json:"nextToken,omitempty"`
-}
-
-type _List_Entity_ValueList []*Entity
-
-func (v _List_Entity_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_Entity_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_Entity_ValueList) ValueType() wire.Type {
-	return wire.TStruct
-}
-
-func (_List_Entity_ValueList) Close() {
+	Entities  []FieldValueMap `json:"entities"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *RangeResponse) ToWire() (wire.Value, error) {
@@ -2546,7 +2796,7 @@ func (v *RangeResponse) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Entities != nil {
-		w, err = wire.NewValueList(_List_Entity_ValueList(v.Entities)), error(nil)
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2554,7 +2804,7 @@ func (v *RangeResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -2564,38 +2814,21 @@ func (v *RangeResponse) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _List_Entity_Read(l wire.ValueList) ([]*Entity, error) {
-	if l.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-	o := make([]*Entity, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _Entity_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
 func (v *RangeResponse) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.Entities, err = _List_Entity_Read(field.Value.GetList())
+				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -2804,8 +3037,8 @@ func (v *RawValue) String() string {
 }
 
 type ReadRequest struct {
-	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
-	Key          map[string]*Value   `json:"key"`
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	KeyValues    FieldValueMap       `json:"keyValues"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
 
@@ -2816,16 +3049,16 @@ func (v *ReadRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
-	if v.Key != nil {
-		w, err = wire.NewValueMap(_Map_String_Value_MapItemList(v.Key)), error(nil)
+	if v.KeyValues != nil {
+		w, err = v.KeyValues.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -2849,14 +3082,14 @@ func (v *ReadRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TMap {
-				v.Key, err = _Map_String_Value_Read(field.Value.GetMap())
+				v.KeyValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -2876,12 +3109,12 @@ func (v *ReadRequest) FromWire(w wire.Value) error {
 func (v *ReadRequest) String() string {
 	var fields [3]string
 	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
-	if v.Key != nil {
-		fields[i] = fmt.Sprintf("Key: %v", v.Key)
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
 		i++
 	}
 	if v.FieldsToRead != nil {
@@ -2892,7 +3125,7 @@ func (v *ReadRequest) String() string {
 }
 
 type ReadResponse struct {
-	Entity *Entity `json:"entity,omitempty"`
+	EntityValues FieldValueMap `json:"entityValues"`
 }
 
 func (v *ReadResponse) ToWire() (wire.Value, error) {
@@ -2902,8 +3135,8 @@ func (v *ReadResponse) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Entity != nil {
-		w, err = v.Entity.ToWire()
+	if v.EntityValues != nil {
+		w, err = v.EntityValues.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -2918,8 +3151,8 @@ func (v *ReadResponse) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.Entity, err = _Entity_Read(field.Value)
+			if field.Value.Type() == wire.TMap {
+				v.EntityValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -2932,16 +3165,16 @@ func (v *ReadResponse) FromWire(w wire.Value) error {
 func (v *ReadResponse) String() string {
 	var fields [1]string
 	i := 0
-	if v.Entity != nil {
-		fields[i] = fmt.Sprintf("Entity: %v", v.Entity)
+	if v.EntityValues != nil {
+		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
 		i++
 	}
 	return fmt.Sprintf("ReadResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
 type RemoveRequest struct {
-	Fqn           *FQN                `json:"fqn,omitempty"`
-	KeyFieldsList []map[string]*Value `json:"keyFieldsList"`
+	Ref       *SchemaRef    `json:"ref,omitempty"`
+	KeyValues FieldValueMap `json:"keyValues"`
 }
 
 func (v *RemoveRequest) ToWire() (wire.Value, error) {
@@ -2951,16 +3184,16 @@ func (v *RemoveRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Fqn != nil {
-		w, err = v.Fqn.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
-	if v.KeyFieldsList != nil {
-		w, err = wire.NewValueList(_List_Map_String_Value_ValueList(v.KeyFieldsList)), error(nil)
+	if v.KeyValues != nil {
+		w, err = v.KeyValues.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -2975,17 +3208,15 @@ func (v *RemoveRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TBinary {
-				var x FQN
-				x, err = _FQN_Read(field.Value)
-				v.Fqn = &x
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TList {
-				v.KeyFieldsList, err = _List_Map_String_Value_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TMap {
+				v.KeyValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -2998,20 +3229,20 @@ func (v *RemoveRequest) FromWire(w wire.Value) error {
 func (v *RemoveRequest) String() string {
 	var fields [2]string
 	i := 0
-	if v.Fqn != nil {
-		fields[i] = fmt.Sprintf("Fqn: %v", *(v.Fqn))
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
-	if v.KeyFieldsList != nil {
-		fields[i] = fmt.Sprintf("KeyFieldsList: %v", v.KeyFieldsList)
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
 		i++
 	}
 	return fmt.Sprintf("RemoveRequest{%v}", strings.Join(fields[:i], ", "))
 }
 
 type ScanRequest struct {
-	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
 }
@@ -3023,8 +3254,8 @@ func (v *ScanRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -3032,7 +3263,7 @@ func (v *ScanRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3064,15 +3295,15 @@ func (v *ScanRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -3102,8 +3333,8 @@ func (v *ScanRequest) FromWire(w wire.Value) error {
 func (v *ScanRequest) String() string {
 	var fields [4]string
 	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
 	if v.Token != nil {
@@ -3122,8 +3353,8 @@ func (v *ScanRequest) String() string {
 }
 
 type ScanResponse struct {
-	Entities  []*Entity `json:"entities"`
-	NextToken *Token    `json:"nextToken,omitempty"`
+	Entities  []FieldValueMap `json:"entities"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *ScanResponse) ToWire() (wire.Value, error) {
@@ -3134,7 +3365,7 @@ func (v *ScanResponse) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Entities != nil {
-		w, err = wire.NewValueList(_List_Entity_ValueList(v.Entities)), error(nil)
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3142,7 +3373,7 @@ func (v *ScanResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3158,15 +3389,15 @@ func (v *ScanResponse) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.Entities, err = _List_Entity_Read(field.Value.GetList())
+				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -3191,24 +3422,42 @@ func (v *ScanResponse) String() string {
 	return fmt.Sprintf("ScanResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
-type SchemaID struct {
-	Fqn     *FQN     `json:"fqn,omitempty"`
-	Version *Version `json:"version,omitempty"`
+type SchemaRef struct {
+	Scope      *string  `json:"scope,omitempty"`
+	NamePrefix *string  `json:"namePrefix,omitempty"`
+	EntityName *string  `json:"entityName,omitempty"`
+	Version    *Version `json:"version,omitempty"`
 }
 
-func (v *SchemaID) ToWire() (wire.Value, error) {
+func (v *SchemaRef) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
-	if v.Fqn != nil {
-		w, err = v.Fqn.ToWire()
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityName != nil {
+		w, err = wire.NewValueString(*(v.EntityName)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 	if v.Version != nil {
@@ -3216,32 +3465,44 @@ func (v *SchemaID) ToWire() (wire.Value, error) {
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 2, Value: w}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Version_Read(w wire.Value) (Version, error) {
-	var x Version
-	err := x.FromWire(w)
-	return x, err
-}
-
-func (v *SchemaID) FromWire(w wire.Value) error {
+func (v *SchemaRef) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x FQN
-				x, err = _FQN_Read(field.Value)
-				v.Fqn = &x
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.EntityName = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 4:
 			if field.Value.Type() == wire.TI32 {
 				var x Version
 				x, err = _Version_Read(field.Value)
@@ -3255,41 +3516,31 @@ func (v *SchemaID) FromWire(w wire.Value) error {
 	return nil
 }
 
-func (v *SchemaID) String() string {
-	var fields [2]string
+func (v *SchemaRef) String() string {
+	var fields [4]string
 	i := 0
-	if v.Fqn != nil {
-		fields[i] = fmt.Sprintf("Fqn: %v", *(v.Fqn))
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.EntityName != nil {
+		fields[i] = fmt.Sprintf("EntityName: %v", *(v.EntityName))
 		i++
 	}
 	if v.Version != nil {
 		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
 		i++
 	}
-	return fmt.Sprintf("SchemaID{%v}", strings.Join(fields[:i], ", "))
-}
-
-type Scope string
-
-func (v Scope) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v Scope) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *Scope) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (Scope)(x)
-	return err
+	return fmt.Sprintf("SchemaRef{%v}", strings.Join(fields[:i], ", "))
 }
 
 type SearchRequest struct {
-	SchemaID     *SchemaID           `json:"schemaID,omitempty"`
-	Token        *Token              `json:"token,omitempty"`
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	SearchBy     *Field              `json:"searchBy,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
@@ -3302,8 +3553,8 @@ func (v *SearchRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.SchemaID != nil {
-		w, err = v.SchemaID.ToWire()
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -3311,7 +3562,7 @@ func (v *SearchRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Token != nil {
-		w, err = v.Token.ToWire()
+		w, err = wire.NewValueString(*(v.Token)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3351,15 +3602,15 @@ func (v *SearchRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.SchemaID, err = _SchemaID_Read(field.Value)
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Token = &x
 				if err != nil {
 					return err
@@ -3396,8 +3647,8 @@ func (v *SearchRequest) FromWire(w wire.Value) error {
 func (v *SearchRequest) String() string {
 	var fields [5]string
 	i := 0
-	if v.SchemaID != nil {
-		fields[i] = fmt.Sprintf("SchemaID: %v", v.SchemaID)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
 	if v.Token != nil {
@@ -3420,8 +3671,8 @@ func (v *SearchRequest) String() string {
 }
 
 type SearchResponse struct {
-	Entities  []*Entity `json:"entities"`
-	NextToken *Token    `json:"nextToken,omitempty"`
+	Entities  []FieldValueMap `json:"entities"`
+	NextToken *string         `json:"nextToken,omitempty"`
 }
 
 func (v *SearchResponse) ToWire() (wire.Value, error) {
@@ -3432,7 +3683,7 @@ func (v *SearchResponse) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Entities != nil {
-		w, err = wire.NewValueList(_List_Entity_ValueList(v.Entities)), error(nil)
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3440,7 +3691,7 @@ func (v *SearchResponse) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.NextToken != nil {
-		w, err = v.NextToken.ToWire()
+		w, err = wire.NewValueString(*(v.NextToken)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3456,15 +3707,15 @@ func (v *SearchResponse) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.Entities, err = _List_Entity_Read(field.Value.GetList())
+				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
 			if field.Value.Type() == wire.TBinary {
-				var x Token
-				x, err = _Token_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.NextToken = &x
 				if err != nil {
 					return err
@@ -3489,26 +3740,8 @@ func (v *SearchResponse) String() string {
 	return fmt.Sprintf("SearchResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
-type Token string
-
-func (v Token) ToWire() (wire.Value, error) {
-	x := (string)(v)
-	return wire.NewValueString(x), error(nil)
-}
-
-func (v Token) String() string {
-	x := (string)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *Token) FromWire(w wire.Value) error {
-	x, err := w.GetString(), error(nil)
-	*v = (Token)(x)
-	return err
-}
-
 type TruncateScopeRequest struct {
-	Name *Scope `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
@@ -3519,7 +3752,7 @@ func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Name != nil {
-		w, err = v.Name.ToWire()
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3535,8 +3768,8 @@ func (v *TruncateScopeRequest) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TBinary {
-				var x Scope
-				x, err = _Scope_Read(field.Value)
+				var x string
+				x, err = field.Value.GetString(), error(nil)
 				v.Name = &x
 				if err != nil {
 					return err
@@ -3558,8 +3791,8 @@ func (v *TruncateScopeRequest) String() string {
 }
 
 type UpsertRequest struct {
-	Entities       []*Entity           `json:"entities"`
-	FieldsToUpdate map[string]struct{} `json:"fieldsToUpdate"`
+	Ref          *SchemaRef    `json:"ref,omitempty"`
+	EntityValues FieldValueMap `json:"entityValues"`
 }
 
 func (v *UpsertRequest) ToWire() (wire.Value, error) {
@@ -3569,16 +3802,16 @@ func (v *UpsertRequest) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Entities != nil {
-		w, err = wire.NewValueList(_List_Entity_ValueList(v.Entities)), error(nil)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
-	if v.FieldsToUpdate != nil {
-		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToUpdate)), error(nil)
+	if v.EntityValues != nil {
+		w, err = v.EntityValues.ToWire()
 		if err != nil {
 			return w, err
 		}
@@ -3593,15 +3826,15 @@ func (v *UpsertRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TList {
-				v.Entities, err = _List_Entity_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
 				if err != nil {
 					return err
 				}
 			}
 		case 2:
-			if field.Value.Type() == wire.TSet {
-				v.FieldsToUpdate, err = _Set_String_Read(field.Value.GetSet())
+			if field.Value.Type() == wire.TMap {
+				v.EntityValues, err = _FieldValueMap_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -3614,34 +3847,52 @@ func (v *UpsertRequest) FromWire(w wire.Value) error {
 func (v *UpsertRequest) String() string {
 	var fields [2]string
 	i := 0
-	if v.Entities != nil {
-		fields[i] = fmt.Sprintf("Entities: %v", v.Entities)
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
 		i++
 	}
-	if v.FieldsToUpdate != nil {
-		fields[i] = fmt.Sprintf("FieldsToUpdate: %v", v.FieldsToUpdate)
+	if v.EntityValues != nil {
+		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
 		i++
 	}
 	return fmt.Sprintf("UpsertRequest{%v}", strings.Join(fields[:i], ", "))
 }
 
 type UpsertSchemaRequest struct {
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
 	EntityDefs []*EntityDefinition `json:"entityDefs"`
 }
 
 func (v *UpsertSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
 	if v.EntityDefs != nil {
 		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 1, Value: w}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -3652,6 +3903,24 @@ func (v *UpsertSchemaRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
 			if field.Value.Type() == wire.TList {
 				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
 				if err != nil {
@@ -3664,13 +3933,69 @@ func (v *UpsertSchemaRequest) FromWire(w wire.Value) error {
 }
 
 func (v *UpsertSchemaRequest) String() string {
-	var fields [1]string
+	var fields [3]string
 	i := 0
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
 	if v.EntityDefs != nil {
 		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
 		i++
 	}
 	return fmt.Sprintf("UpsertSchemaRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type UpsertSchemaResponse struct {
+	Versions []Version `json:"versions"`
+}
+
+func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Versions != nil {
+		w, err = wire.NewValueList(_List_Version_ValueList(v.Versions)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *UpsertSchemaResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Versions, err = _List_Version_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *UpsertSchemaResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Versions != nil {
+		fields[i] = fmt.Sprintf("Versions: %v", v.Versions)
+		i++
+	}
+	return fmt.Sprintf("UpsertSchemaResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
 type Value struct {
