@@ -112,25 +112,14 @@ func (v *BadRequestError) Error() string {
 }
 
 type BadSchemaError struct {
-	Reasons []struct {
-		Key   *SchemaRef
-		Value string
-	} `json:"reasons"`
+	Reasons map[string]string `json:"reasons"`
 }
 
-type _Map_SchemaRef_String_MapItemList []struct {
-	Key   *SchemaRef
-	Value string
-}
+type _Map_String_String_MapItemList map[string]string
 
-func (m _Map_SchemaRef_String_MapItemList) ForEach(f func(wire.MapItem) error) error {
-	for _, i := range m {
-		k := i.Key
-		v := i.Value
-		if k == nil {
-			return fmt.Errorf("invalid map key: value is nil")
-		}
-		kw, err := k.ToWire()
+func (m _Map_String_String_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for k, v := range m {
+		kw, err := wire.NewValueString(k), error(nil)
 		if err != nil {
 			return err
 		}
@@ -146,19 +135,19 @@ func (m _Map_SchemaRef_String_MapItemList) ForEach(f func(wire.MapItem) error) e
 	return nil
 }
 
-func (m _Map_SchemaRef_String_MapItemList) Size() int {
+func (m _Map_String_String_MapItemList) Size() int {
 	return len(m)
 }
 
-func (_Map_SchemaRef_String_MapItemList) KeyType() wire.Type {
-	return wire.TStruct
-}
-
-func (_Map_SchemaRef_String_MapItemList) ValueType() wire.Type {
+func (_Map_String_String_MapItemList) KeyType() wire.Type {
 	return wire.TBinary
 }
 
-func (_Map_SchemaRef_String_MapItemList) Close() {
+func (_Map_String_String_MapItemList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Map_String_String_MapItemList) Close() {
 }
 
 func (v *BadSchemaError) ToWire() (wire.Value, error) {
@@ -171,7 +160,7 @@ func (v *BadSchemaError) ToWire() (wire.Value, error) {
 	if v.Reasons == nil {
 		return w, errors.New("field Reasons of BadSchemaError is required")
 	}
-	w, err = wire.NewValueMap(_Map_SchemaRef_String_MapItemList(v.Reasons)), error(nil)
+	w, err = wire.NewValueMap(_Map_String_String_MapItemList(v.Reasons)), error(nil)
 	if err != nil {
 		return w, err
 	}
@@ -180,28 +169,16 @@ func (v *BadSchemaError) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _SchemaRef_Read(w wire.Value) (*SchemaRef, error) {
-	var v SchemaRef
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _Map_SchemaRef_String_Read(m wire.MapItemList) ([]struct {
-	Key   *SchemaRef
-	Value string
-}, error) {
-	if m.KeyType() != wire.TStruct {
+func _Map_String_String_Read(m wire.MapItemList) (map[string]string, error) {
+	if m.KeyType() != wire.TBinary {
 		return nil, nil
 	}
 	if m.ValueType() != wire.TBinary {
 		return nil, nil
 	}
-	o := make([]struct {
-		Key   *SchemaRef
-		Value string
-	}, 0, m.Size())
+	o := make(map[string]string, m.Size())
 	err := m.ForEach(func(x wire.MapItem) error {
-		k, err := _SchemaRef_Read(x.Key)
+		k, err := x.Key.GetString(), error(nil)
 		if err != nil {
 			return err
 		}
@@ -209,10 +186,7 @@ func _Map_SchemaRef_String_Read(m wire.MapItemList) ([]struct {
 		if err != nil {
 			return err
 		}
-		o = append(o, struct {
-			Key   *SchemaRef
-			Value string
-		}{k, v})
+		o[k] = v
 		return nil
 	})
 	m.Close()
@@ -226,7 +200,7 @@ func (v *BadSchemaError) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TMap {
-				v.Reasons, err = _Map_SchemaRef_String_Read(field.Value.GetMap())
+				v.Reasons, err = _Map_String_String_Read(field.Value.GetMap())
 				if err != nil {
 					return err
 				}
@@ -672,6 +646,12 @@ func (v *CreateRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _SchemaRef_Read(w wire.Value) (*SchemaRef, error) {
+	var v SchemaRef
+	err := v.FromWire(w)
+	return &v, err
 }
 
 func _FieldValueMap_Read(w wire.Value) (FieldValueMap, error) {
