@@ -249,7 +249,8 @@ exception InternalServerError {
 }
 
 exception BadSchemaError {
-    1: required map<SchemaRef, string> reasons
+    // EntityName -> Error msg
+    1: required map<string, string> reasons
 }
 
 service Dosa {
