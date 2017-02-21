@@ -398,14 +398,14 @@ func (v *CheckSchemaRequest) String() string {
 }
 
 type CheckSchemaResponse struct {
-	Versions []Version `json:"versions"`
+	Versions []int32 `json:"versions"`
 }
 
-type _List_Version_ValueList []Version
+type _List_I32_ValueList []int32
 
-func (v _List_Version_ValueList) ForEach(f func(wire.Value) error) error {
+func (v _List_I32_ValueList) ForEach(f func(wire.Value) error) error {
 	for _, x := range v {
-		w, err := x.ToWire()
+		w, err := wire.NewValueI32(x), error(nil)
 		if err != nil {
 			return err
 		}
@@ -417,15 +417,15 @@ func (v _List_Version_ValueList) ForEach(f func(wire.Value) error) error {
 	return nil
 }
 
-func (v _List_Version_ValueList) Size() int {
+func (v _List_I32_ValueList) Size() int {
 	return len(v)
 }
 
-func (_List_Version_ValueList) ValueType() wire.Type {
+func (_List_I32_ValueList) ValueType() wire.Type {
 	return wire.TI32
 }
 
-func (_List_Version_ValueList) Close() {
+func (_List_I32_ValueList) Close() {
 }
 
 func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
@@ -436,7 +436,7 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Versions != nil {
-		w, err = wire.NewValueList(_List_Version_ValueList(v.Versions)), error(nil)
+		w, err = wire.NewValueList(_List_I32_ValueList(v.Versions)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -446,19 +446,13 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _Version_Read(w wire.Value) (Version, error) {
-	var x Version
-	err := x.FromWire(w)
-	return x, err
-}
-
-func _List_Version_Read(l wire.ValueList) ([]Version, error) {
+func _List_I32_Read(l wire.ValueList) ([]int32, error) {
 	if l.ValueType() != wire.TI32 {
 		return nil, nil
 	}
-	o := make([]Version, 0, l.Size())
+	o := make([]int32, 0, l.Size())
 	err := l.ForEach(func(x wire.Value) error {
-		i, err := _Version_Read(x)
+		i, err := x.GetI32(), error(nil)
 		if err != nil {
 			return err
 		}
@@ -475,7 +469,7 @@ func (v *CheckSchemaResponse) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.Versions, err = _List_Version_Read(field.Value.GetList())
+				v.Versions, err = _List_I32_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -3423,10 +3417,10 @@ func (v *ScanResponse) String() string {
 }
 
 type SchemaRef struct {
-	Scope      *string  `json:"scope,omitempty"`
-	NamePrefix *string  `json:"namePrefix,omitempty"`
-	EntityName *string  `json:"entityName,omitempty"`
-	Version    *Version `json:"version,omitempty"`
+	Scope      *string `json:"scope,omitempty"`
+	NamePrefix *string `json:"namePrefix,omitempty"`
+	EntityName *string `json:"entityName,omitempty"`
+	Version    *int32  `json:"version,omitempty"`
 }
 
 func (v *SchemaRef) ToWire() (wire.Value, error) {
@@ -3461,7 +3455,7 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 		i++
 	}
 	if v.Version != nil {
-		w, err = v.Version.ToWire()
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3504,8 +3498,8 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 			}
 		case 4:
 			if field.Value.Type() == wire.TI32 {
-				var x Version
-				x, err = _Version_Read(field.Value)
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
 				v.Version = &x
 				if err != nil {
 					return err
@@ -3951,7 +3945,7 @@ func (v *UpsertSchemaRequest) String() string {
 }
 
 type UpsertSchemaResponse struct {
-	Versions []Version `json:"versions"`
+	Versions []int32 `json:"versions"`
 }
 
 func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
@@ -3962,7 +3956,7 @@ func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
 		err    error
 	)
 	if v.Versions != nil {
-		w, err = wire.NewValueList(_List_Version_ValueList(v.Versions)), error(nil)
+		w, err = wire.NewValueList(_List_I32_ValueList(v.Versions)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -3978,7 +3972,7 @@ func (v *UpsertSchemaResponse) FromWire(w wire.Value) error {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TList {
-				v.Versions, err = _List_Version_Read(field.Value.GetList())
+				v.Versions, err = _List_I32_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -4060,22 +4054,4 @@ func (v *Value) String() string {
 		i++
 	}
 	return fmt.Sprintf("Value{%v}", strings.Join(fields[:i], ", "))
-}
-
-type Version int32
-
-func (v Version) ToWire() (wire.Value, error) {
-	x := (int32)(v)
-	return wire.NewValueI32(x), error(nil)
-}
-
-func (v Version) String() string {
-	x := (int32)(v)
-	return fmt.Sprint(x)
-}
-
-func (v *Version) FromWire(w wire.Value) error {
-	x, err := w.GetI32(), error(nil)
-	*v = (Version)(x)
-	return err
 }
