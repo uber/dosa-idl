@@ -108,7 +108,7 @@ struct ReadResponse {
    1: optional FieldValueMap entityValues
 }
 
-struct BatchReadRequest {
+struct MultiReadRequest {
    1: optional SchemaRef ref
    2: optional list<FieldValueMap> keyValues
    3: optional set<string> fieldsToRead
@@ -119,8 +119,12 @@ union EntityOrError{
    2: optional Error error
 }
 
-struct BatchReadResponse {
+struct MultiReadResponse {
    1: optional list<EntityOrError> results
+}
+
+struct MultiUpsertResponse {
+   1: optional list<Error> errors
 }
 
 struct UpsertRequest {
@@ -128,7 +132,7 @@ struct UpsertRequest {
     2: optional FieldValueMap entityValues
 }
 
-struct BatchUpsertRequest {
+struct MultiUpsertRequest {
     1: optional SchemaRef ref
     2: optional list<FieldValueMap> entities
 }
@@ -138,9 +142,13 @@ struct RemoveRequest {
    2: optional FieldValueMap keyValues
 }
 
-struct BatchRemoveRequest {
+struct MultiRemoveRequest {
    1: optional SchemaRef ref 
    2: optional list<FieldValueMap> keyValues
+}
+
+struct MultiRemoveResponse {
+   1: optional list<Error> errors
 }
 
 enum Operator {
@@ -260,8 +268,8 @@ service Dosa {
        2: InternalServerError serverError
    )
 
-   BatchReadResponse batchRead (
-       1: BatchReadRequest request
+   MultiReadResponse multiRead (
+       1: MultiReadRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
@@ -274,14 +282,12 @@ service Dosa {
        2: InternalServerError serverError
    )
 
-   /* Future:
-   void batchUpsert (
-       1: BatchUpsertRequest request
+   MultiUpsertResponse multiUpsert (
+       1: MultiUpsertRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
    )
-   */
    
    void remove (
        1: RemoveRequest request
@@ -290,14 +296,12 @@ service Dosa {
        2: InternalServerError serverError
    )
 
-   /* Future:
-   void batchRemove (
-       1: BatchRemoveRequest request
+   MultiRemoveResponse multiRemove (
+       1: MultiRemoveRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
    )
-   */
 
    RangeResponse range (
        1: RangeRequest request

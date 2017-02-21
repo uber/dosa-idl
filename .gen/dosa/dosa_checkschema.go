@@ -198,6 +198,18 @@ func _CheckSchemaResponse_Read(w wire.Value) (*CheckSchemaResponse, error) {
 	return &v, err
 }
 
+func _BadRequestError_Read(w wire.Value) (*BadRequestError, error) {
+	var v BadRequestError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _InternalServerError_Read(w wire.Value) (*InternalServerError, error) {
+	var v InternalServerError
+	err := v.FromWire(w)
+	return &v, err
+}
+
 func _BadSchemaError_Read(w wire.Value) (*BadSchemaError, error) {
 	var v BadSchemaError
 	err := v.FromWire(w)

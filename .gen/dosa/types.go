@@ -252,428 +252,6 @@ func (v *BadSchemaError) Error() string {
 	return v.String()
 }
 
-type BatchReadRequest struct {
-	Ref          *SchemaRef          `json:"ref,omitempty"`
-	KeyValues    []FieldValueMap     `json:"keyValues"`
-	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
-}
-
-type _List_FieldValueMap_ValueList []FieldValueMap
-
-func (v _List_FieldValueMap_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_FieldValueMap_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_FieldValueMap_ValueList) ValueType() wire.Type {
-	return wire.TMap
-}
-
-func (_List_FieldValueMap_ValueList) Close() {
-}
-
-type _Set_String_ValueList map[string]struct{}
-
-func (v _Set_String_ValueList) ForEach(f func(wire.Value) error) error {
-	for x := range v {
-		w, err := wire.NewValueString(x), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _Set_String_ValueList) Size() int {
-	return len(v)
-}
-
-func (_Set_String_ValueList) ValueType() wire.Type {
-	return wire.TBinary
-}
-
-func (_Set_String_ValueList) Close() {
-}
-
-func (v *BatchReadRequest) ToWire() (wire.Value, error) {
-	var (
-		fields [3]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.Ref != nil {
-		w, err = v.Ref.ToWire()
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	if v.KeyValues != nil {
-		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	if v.FieldsToRead != nil {
-		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 3, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _FieldValueMap_Read(w wire.Value) (FieldValueMap, error) {
-	var x FieldValueMap
-	err := x.FromWire(w)
-	return x, err
-}
-
-func _List_FieldValueMap_Read(l wire.ValueList) ([]FieldValueMap, error) {
-	if l.ValueType() != wire.TMap {
-		return nil, nil
-	}
-	o := make([]FieldValueMap, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _FieldValueMap_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
-func _Set_String_Read(s wire.ValueList) (map[string]struct{}, error) {
-	if s.ValueType() != wire.TBinary {
-		return nil, nil
-	}
-	o := make(map[string]struct{}, s.Size())
-	err := s.ForEach(func(x wire.Value) error {
-		i, err := x.GetString(), error(nil)
-		if err != nil {
-			return err
-		}
-		o[i] = struct{}{}
-		return nil
-	})
-	s.Close()
-	return o, err
-}
-
-func (v *BatchReadRequest) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.Ref, err = _SchemaRef_Read(field.Value)
-				if err != nil {
-					return err
-				}
-			}
-		case 2:
-			if field.Value.Type() == wire.TList {
-				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		case 3:
-			if field.Value.Type() == wire.TSet {
-				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchReadRequest) String() string {
-	var fields [3]string
-	i := 0
-	if v.Ref != nil {
-		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
-		i++
-	}
-	if v.KeyValues != nil {
-		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
-		i++
-	}
-	if v.FieldsToRead != nil {
-		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
-		i++
-	}
-	return fmt.Sprintf("BatchReadRequest{%v}", strings.Join(fields[:i], ", "))
-}
-
-type BatchReadResponse struct {
-	Results []*EntityOrError `json:"results"`
-}
-
-type _List_EntityOrError_ValueList []*EntityOrError
-
-func (v _List_EntityOrError_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_EntityOrError_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_EntityOrError_ValueList) ValueType() wire.Type {
-	return wire.TStruct
-}
-
-func (_List_EntityOrError_ValueList) Close() {
-}
-
-func (v *BatchReadResponse) ToWire() (wire.Value, error) {
-	var (
-		fields [1]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.Results != nil {
-		w, err = wire.NewValueList(_List_EntityOrError_ValueList(v.Results)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _EntityOrError_Read(w wire.Value) (*EntityOrError, error) {
-	var v EntityOrError
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _List_EntityOrError_Read(l wire.ValueList) ([]*EntityOrError, error) {
-	if l.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-	o := make([]*EntityOrError, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _EntityOrError_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
-func (v *BatchReadResponse) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TList {
-				v.Results, err = _List_EntityOrError_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchReadResponse) String() string {
-	var fields [1]string
-	i := 0
-	if v.Results != nil {
-		fields[i] = fmt.Sprintf("Results: %v", v.Results)
-		i++
-	}
-	return fmt.Sprintf("BatchReadResponse{%v}", strings.Join(fields[:i], ", "))
-}
-
-type BatchRemoveRequest struct {
-	Ref       *SchemaRef      `json:"ref,omitempty"`
-	KeyValues []FieldValueMap `json:"keyValues"`
-}
-
-func (v *BatchRemoveRequest) ToWire() (wire.Value, error) {
-	var (
-		fields [2]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.Ref != nil {
-		w, err = v.Ref.ToWire()
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	if v.KeyValues != nil {
-		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func (v *BatchRemoveRequest) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.Ref, err = _SchemaRef_Read(field.Value)
-				if err != nil {
-					return err
-				}
-			}
-		case 2:
-			if field.Value.Type() == wire.TList {
-				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchRemoveRequest) String() string {
-	var fields [2]string
-	i := 0
-	if v.Ref != nil {
-		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
-		i++
-	}
-	if v.KeyValues != nil {
-		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
-		i++
-	}
-	return fmt.Sprintf("BatchRemoveRequest{%v}", strings.Join(fields[:i], ", "))
-}
-
-type BatchUpsertRequest struct {
-	Ref      *SchemaRef      `json:"ref,omitempty"`
-	Entities []FieldValueMap `json:"entities"`
-}
-
-func (v *BatchUpsertRequest) ToWire() (wire.Value, error) {
-	var (
-		fields [2]wire.Field
-		i      int = 0
-		w      wire.Value
-		err    error
-	)
-	if v.Ref != nil {
-		w, err = v.Ref.ToWire()
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 1, Value: w}
-		i++
-	}
-	if v.Entities != nil {
-		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func (v *BatchUpsertRequest) FromWire(w wire.Value) error {
-	var err error
-	for _, field := range w.GetStruct().Fields {
-		switch field.ID {
-		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.Ref, err = _SchemaRef_Read(field.Value)
-				if err != nil {
-					return err
-				}
-			}
-		case 2:
-			if field.Value.Type() == wire.TList {
-				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (v *BatchUpsertRequest) String() string {
-	var fields [2]string
-	i := 0
-	if v.Ref != nil {
-		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
-		i++
-	}
-	if v.Entities != nil {
-		fields[i] = fmt.Sprintf("Entities: %v", v.Entities)
-		i++
-	}
-	return fmt.Sprintf("BatchUpsertRequest{%v}", strings.Join(fields[:i], ", "))
-}
-
 type CheckSchemaRequest struct {
 	Scope      *string             `json:"scope,omitempty"`
 	NamePrefix *string             `json:"namePrefix,omitempty"`
@@ -1100,6 +678,12 @@ func (v *CreateRequest) ToWire() (wire.Value, error) {
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _FieldValueMap_Read(w wire.Value) (FieldValueMap, error) {
+	var x FieldValueMap
+	err := x.FromWire(w)
+	return x, err
 }
 
 func (v *CreateRequest) FromWire(w wire.Value) error {
@@ -2190,6 +1774,565 @@ func (v *InternalServerError) String() string {
 
 func (v *InternalServerError) Error() string {
 	return v.String()
+}
+
+type MultiReadRequest struct {
+	Ref          *SchemaRef          `json:"ref,omitempty"`
+	KeyValues    []FieldValueMap     `json:"keyValues"`
+	FieldsToRead map[string]struct{} `json:"fieldsToRead"`
+}
+
+type _List_FieldValueMap_ValueList []FieldValueMap
+
+func (v _List_FieldValueMap_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_FieldValueMap_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_FieldValueMap_ValueList) ValueType() wire.Type {
+	return wire.TMap
+}
+
+func (_List_FieldValueMap_ValueList) Close() {
+}
+
+type _Set_String_ValueList map[string]struct{}
+
+func (v _Set_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for x := range v {
+		w, err := wire.NewValueString(x), error(nil)
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _Set_String_ValueList) Size() int {
+	return len(v)
+}
+
+func (_Set_String_ValueList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Set_String_ValueList) Close() {
+}
+
+func (v *MultiReadRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.KeyValues != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.FieldsToRead != nil {
+		w, err = wire.NewValueSet(_Set_String_ValueList(v.FieldsToRead)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_FieldValueMap_Read(l wire.ValueList) ([]FieldValueMap, error) {
+	if l.ValueType() != wire.TMap {
+		return nil, nil
+	}
+	o := make([]FieldValueMap, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _FieldValueMap_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func _Set_String_Read(s wire.ValueList) (map[string]struct{}, error) {
+	if s.ValueType() != wire.TBinary {
+		return nil, nil
+	}
+	o := make(map[string]struct{}, s.Size())
+	err := s.ForEach(func(x wire.Value) error {
+		i, err := x.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		o[i] = struct{}{}
+		return nil
+	})
+	s.Close()
+	return o, err
+}
+
+func (v *MultiReadRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
+			if field.Value.Type() == wire.TSet {
+				v.FieldsToRead, err = _Set_String_Read(field.Value.GetSet())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiReadRequest) String() string {
+	var fields [3]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	if v.FieldsToRead != nil {
+		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	return fmt.Sprintf("MultiReadRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiReadResponse struct {
+	Results []*EntityOrError `json:"results"`
+}
+
+type _List_EntityOrError_ValueList []*EntityOrError
+
+func (v _List_EntityOrError_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_EntityOrError_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_EntityOrError_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_EntityOrError_ValueList) Close() {
+}
+
+func (v *MultiReadResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Results != nil {
+		w, err = wire.NewValueList(_List_EntityOrError_ValueList(v.Results)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _EntityOrError_Read(w wire.Value) (*EntityOrError, error) {
+	var v EntityOrError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _List_EntityOrError_Read(l wire.ValueList) ([]*EntityOrError, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make([]*EntityOrError, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _EntityOrError_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func (v *MultiReadResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Results, err = _List_EntityOrError_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiReadResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Results != nil {
+		fields[i] = fmt.Sprintf("Results: %v", v.Results)
+		i++
+	}
+	return fmt.Sprintf("MultiReadResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiRemoveRequest struct {
+	Ref       *SchemaRef      `json:"ref,omitempty"`
+	KeyValues []FieldValueMap `json:"keyValues"`
+}
+
+func (v *MultiRemoveRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [2]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.KeyValues != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.KeyValues)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiRemoveRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.KeyValues, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiRemoveRequest) String() string {
+	var fields [2]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.KeyValues != nil {
+		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	return fmt.Sprintf("MultiRemoveRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiRemoveResponse struct {
+	Errors []*Error `json:"errors"`
+}
+
+type _List_Error_ValueList []*Error
+
+func (v _List_Error_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_Error_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_Error_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_Error_ValueList) Close() {
+}
+
+func (v *MultiRemoveResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Errors != nil {
+		w, err = wire.NewValueList(_List_Error_ValueList(v.Errors)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_Error_Read(l wire.ValueList) ([]*Error, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make([]*Error, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _Error_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+func (v *MultiRemoveResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Errors, err = _List_Error_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiRemoveResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Errors != nil {
+		fields[i] = fmt.Sprintf("Errors: %v", v.Errors)
+		i++
+	}
+	return fmt.Sprintf("MultiRemoveResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiUpsertRequest struct {
+	Ref      *SchemaRef      `json:"ref,omitempty"`
+	Entities []FieldValueMap `json:"entities"`
+}
+
+func (v *MultiUpsertRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [2]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Ref != nil {
+		w, err = v.Ref.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Entities != nil {
+		w, err = wire.NewValueList(_List_FieldValueMap_ValueList(v.Entities)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiUpsertRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Ref, err = _SchemaRef_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.Entities, err = _List_FieldValueMap_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiUpsertRequest) String() string {
+	var fields [2]string
+	i := 0
+	if v.Ref != nil {
+		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
+		i++
+	}
+	if v.Entities != nil {
+		fields[i] = fmt.Sprintf("Entities: %v", v.Entities)
+		i++
+	}
+	return fmt.Sprintf("MultiUpsertRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type MultiUpsertResponse struct {
+	Errors []*Error `json:"errors"`
+}
+
+func (v *MultiUpsertResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Errors != nil {
+		w, err = wire.NewValueList(_List_Error_ValueList(v.Errors)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *MultiUpsertResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TList {
+				v.Errors, err = _List_Error_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *MultiUpsertResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Errors != nil {
+		fields[i] = fmt.Sprintf("Errors: %v", v.Errors)
+		i++
+	}
+	return fmt.Sprintf("MultiUpsertResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
 type Operator int32

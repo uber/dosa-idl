@@ -13,11 +13,6 @@ import (
 
 // Interface is the server-side interface for the Dosa service.
 type Interface interface {
-	BatchRead(
-		ctx context.Context,
-		Request *dosa.BatchReadRequest,
-	) (*dosa.BatchReadResponse, error)
-
 	CheckSchema(
 		ctx context.Context,
 		Request *dosa.CheckSchemaRequest,
@@ -37,6 +32,21 @@ type Interface interface {
 		ctx context.Context,
 		Request *dosa.DropScopeRequest,
 	) error
+
+	MultiRead(
+		ctx context.Context,
+		Request *dosa.MultiReadRequest,
+	) (*dosa.MultiReadResponse, error)
+
+	MultiRemove(
+		ctx context.Context,
+		Request *dosa.MultiRemoveRequest,
+	) (*dosa.MultiRemoveResponse, error)
+
+	MultiUpsert(
+		ctx context.Context,
+		Request *dosa.MultiUpsertRequest,
+	) (*dosa.MultiUpsertResponse, error)
 
 	Range(
 		ctx context.Context,
@@ -91,16 +101,6 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 		Methods: []thrift.Method{
 
 			thrift.Method{
-				Name: "batchRead",
-				HandlerSpec: thrift.HandlerSpec{
-
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.BatchRead),
-				},
-				Signature: "BatchRead(Request *dosa.BatchReadRequest) (*dosa.BatchReadResponse)",
-			},
-
-			thrift.Method{
 				Name: "checkSchema",
 				HandlerSpec: thrift.HandlerSpec{
 
@@ -138,6 +138,36 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Unary: thrift.UnaryHandler(h.DropScope),
 				},
 				Signature: "DropScope(Request *dosa.DropScopeRequest)",
+			},
+
+			thrift.Method{
+				Name: "multiRead",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.MultiRead),
+				},
+				Signature: "MultiRead(Request *dosa.MultiReadRequest) (*dosa.MultiReadResponse)",
+			},
+
+			thrift.Method{
+				Name: "multiRemove",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.MultiRemove),
+				},
+				Signature: "MultiRemove(Request *dosa.MultiRemoveRequest) (*dosa.MultiRemoveResponse)",
+			},
+
+			thrift.Method{
+				Name: "multiUpsert",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.MultiUpsert),
+				},
+				Signature: "MultiUpsert(Request *dosa.MultiUpsertRequest) (*dosa.MultiUpsertResponse)",
 			},
 
 			thrift.Method{
@@ -222,31 +252,12 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 		},
 	}
 
-	procedures := make([]transport.Procedure, 0, 13)
+	procedures := make([]transport.Procedure, 0, 15)
 	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
 	return procedures
 }
 
 type handler struct{ impl Interface }
-
-func (h handler) BatchRead(ctx context.Context, body wire.Value) (thrift.Response, error) {
-	var args dosa.Dosa_BatchRead_Args
-	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
-	}
-
-	success, err := h.impl.BatchRead(ctx, args.Request)
-
-	hadError := err != nil
-	result, err := dosa.Dosa_BatchRead_Helper.WrapResponse(success, err)
-
-	var response thrift.Response
-	if err == nil {
-		response.IsApplicationError = hadError
-		response.Body = result
-	}
-	return response, err
-}
 
 func (h handler) CheckSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CheckSchema_Args
@@ -315,6 +326,63 @@ func (h handler) DropScope(ctx context.Context, body wire.Value) (thrift.Respons
 
 	hadError := err != nil
 	result, err := dosa.Dosa_DropScope_Helper.WrapResponse(err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
+
+func (h handler) MultiRead(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_MultiRead_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.MultiRead(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_MultiRead_Helper.WrapResponse(success, err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
+
+func (h handler) MultiRemove(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_MultiRemove_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.MultiRemove(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_MultiRemove_Helper.WrapResponse(success, err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
+
+func (h handler) MultiUpsert(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_MultiUpsert_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.MultiUpsert(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_MultiUpsert_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {
