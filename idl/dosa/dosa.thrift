@@ -20,7 +20,6 @@
 
 namespace java com.uber.dosa
 
-typedef i32 Version
 typedef map<string, Value> FieldValueMap
 
 enum ElemType {
@@ -58,7 +57,7 @@ struct SchemaRef {
     1: optional string scope
     2: optional string namePrefix
     3: optional string entityName
-    4: optional Version version
+    4: optional i32 version
 }
 
 struct FieldTag {
@@ -214,7 +213,7 @@ struct CheckSchemaRequest {
 }
 
 struct CheckSchemaResponse {
-   1: optional list<Version> versions
+   1: optional list<i32> versions
 }
 
 struct UpsertSchemaRequest {
@@ -224,7 +223,7 @@ struct UpsertSchemaRequest {
 }
 
 struct UpsertSchemaResponse {
-   1: optional list<Version> versions
+   1: optional list<i32> versions
 }
 
 struct CreateScopeRequest {
