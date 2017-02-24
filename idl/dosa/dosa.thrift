@@ -229,6 +229,15 @@ struct UpsertSchemaResponse {
 struct CreateScopeRequest {
    1: optional string name
 }
+
+struct ScopeExistsRequest {
+   1: optional string name
+}
+
+struct ScopeExistsResponse {
+   1: optional bool exists
+}
+
 struct TruncateScopeRequest {
    1: optional string name
 }
@@ -341,24 +350,31 @@ service Dosa {
    )
 
   void createScope(
-        1: CreateScopeRequest request
+       1: CreateScopeRequest request
+  ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+  )
+
+  ScopeExistsResponse scopeExists(
+       1: ScopeExistsRequest request
   ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
   )
 
   void truncateScope(
-        1: TruncateScopeRequest request
+       1: TruncateScopeRequest request
   ) throws (
-        1: BadRequestError clientError
-        2: InternalServerError serverError
+       1: BadRequestError clientError
+       2: InternalServerError serverError
   )
 
   void dropScope(
-        1: DropScopeRequest request
+       1: DropScopeRequest request
   ) throws (
-        1: BadRequestError clientError
-        2: InternalServerError serverError
+       1: BadRequestError clientError
+       2: InternalServerError serverError
    )
 }
 

@@ -80,6 +80,12 @@ type Interface interface {
 		opts ...yarpc.CallOption,
 	) (*dosa.ScanResponse, error)
 
+	ScopeExists(
+		ctx context.Context,
+		Request *dosa.ScopeExistsRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.ScopeExistsResponse, error)
+
 	Search(
 		ctx context.Context,
 		Request *dosa.SearchRequest,
@@ -377,6 +383,29 @@ func (c client) Scan(
 	}
 
 	success, err = dosa.Dosa_Scan_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) ScopeExists(
+	ctx context.Context,
+	_Request *dosa.ScopeExistsRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.ScopeExistsResponse, err error) {
+
+	args := dosa.Dosa_ScopeExists_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_ScopeExists_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_ScopeExists_Helper.UnwrapResponse(&result)
 	return
 }
 
