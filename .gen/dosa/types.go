@@ -3512,6 +3512,106 @@ func (v *SchemaRef) String() string {
 	return fmt.Sprintf("SchemaRef{%v}", strings.Join(fields[:i], ", "))
 }
 
+type ScopeExistsRequest struct {
+	Name *string `json:"name,omitempty"`
+}
+
+func (v *ScopeExistsRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Name != nil {
+		w, err = wire.NewValueString(*(v.Name)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *ScopeExistsRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Name = &x
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *ScopeExistsRequest) String() string {
+	var fields [1]string
+	i := 0
+	if v.Name != nil {
+		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
+		i++
+	}
+	return fmt.Sprintf("ScopeExistsRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type ScopeExistsResponse struct {
+	Exists *bool `json:"exists,omitempty"`
+}
+
+func (v *ScopeExistsResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Exists != nil {
+		w, err = wire.NewValueBool(*(v.Exists)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *ScopeExistsResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBool {
+				var x bool
+				x, err = field.Value.GetBool(), error(nil)
+				v.Exists = &x
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *ScopeExistsResponse) String() string {
+	var fields [1]string
+	i := 0
+	if v.Exists != nil {
+		fields[i] = fmt.Sprintf("Exists: %v", *(v.Exists))
+		i++
+	}
+	return fmt.Sprintf("ScopeExistsResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
 type SearchRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
 	Token        *string             `json:"token,omitempty"`

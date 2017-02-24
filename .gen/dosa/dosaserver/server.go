@@ -68,6 +68,11 @@ type Interface interface {
 		Request *dosa.ScanRequest,
 	) (*dosa.ScanResponse, error)
 
+	ScopeExists(
+		ctx context.Context,
+		Request *dosa.ScopeExistsRequest,
+	) (*dosa.ScopeExistsResponse, error)
+
 	Search(
 		ctx context.Context,
 		Request *dosa.SearchRequest,
@@ -211,6 +216,16 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 			},
 
 			thrift.Method{
+				Name: "scopeExists",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.ScopeExists),
+				},
+				Signature: "ScopeExists(Request *dosa.ScopeExistsRequest) (*dosa.ScopeExistsResponse)",
+			},
+
+			thrift.Method{
 				Name: "search",
 				HandlerSpec: thrift.HandlerSpec{
 
@@ -252,7 +267,7 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 		},
 	}
 
-	procedures := make([]transport.Procedure, 0, 15)
+	procedures := make([]transport.Procedure, 0, 16)
 	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
 	return procedures
 }
@@ -459,6 +474,25 @@ func (h handler) Scan(ctx context.Context, body wire.Value) (thrift.Response, er
 
 	hadError := err != nil
 	result, err := dosa.Dosa_Scan_Helper.WrapResponse(success, err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
+
+func (h handler) ScopeExists(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_ScopeExists_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.ScopeExists(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_ScopeExists_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {

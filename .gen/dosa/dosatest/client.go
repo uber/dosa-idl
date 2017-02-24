@@ -397,6 +397,39 @@ func (mr *_MockClientRecorder) Scan(
 	return mr.mock.ctrl.RecordCall(mr.mock, "Scan", args...)
 }
 
+// ScopeExists responds to a ScopeExists call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().ScopeExists(gomock.Any(), ...).Return(...)
+// 	... := client.ScopeExists(...)
+func (m *MockClient) ScopeExists(
+	ctx context.Context,
+	_Request *dosa.ScopeExistsRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.ScopeExistsResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "ScopeExists", args...)
+	success, _ = ret[i].(*dosa.ScopeExistsResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) ScopeExists(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "ScopeExists", args...)
+}
+
 // Search responds to a Search call based on the mock expectations. This
 // call will fail if the mock does not expect this call. Use EXPECT to expect
 // a call to this function.
