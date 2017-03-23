@@ -4149,12 +4149,13 @@ func (v *UpsertSchemaRequest) String() string {
 }
 
 type UpsertSchemaResponse struct {
-	Version *int32 `json:"version,omitempty"`
+	Version *int32  `json:"version,omitempty"`
+	Status  *string `json:"status,omitempty"`
 }
 
 func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4165,6 +4166,14 @@ func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Status != nil {
+		w, err = wire.NewValueString(*(v.Status)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -4183,16 +4192,29 @@ func (v *UpsertSchemaResponse) FromWire(w wire.Value) error {
 					return err
 				}
 			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Status = &x
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
 }
 
 func (v *UpsertSchemaResponse) String() string {
-	var fields [1]string
+	var fields [2]string
 	i := 0
 	if v.Version != nil {
 		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
+		i++
+	}
+	if v.Status != nil {
+		fields[i] = fmt.Sprintf("Status: %v", *(v.Status))
 		i++
 	}
 	return fmt.Sprintf("UpsertSchemaResponse{%v}", strings.Join(fields[:i], ", "))

@@ -224,6 +224,7 @@ struct UpsertSchemaRequest {
 
 struct UpsertSchemaResponse {
    1: optional i32 version
+   2: optional string status
 }
 
 struct CheckSchemaStatusRequest {
