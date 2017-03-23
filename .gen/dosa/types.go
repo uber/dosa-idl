@@ -372,34 +372,7 @@ func (v *CheckSchemaRequest) String() string {
 }
 
 type CheckSchemaResponse struct {
-	Versions []int32 `json:"versions"`
-}
-
-type _List_I32_ValueList []int32
-
-func (v _List_I32_ValueList) ForEach(f func(wire.Value) error) error {
-	for _, x := range v {
-		w, err := wire.NewValueI32(x), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_I32_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_I32_ValueList) ValueType() wire.Type {
-	return wire.TI32
-}
-
-func (_List_I32_ValueList) Close() {
+	Version *int32 `json:"version,omitempty"`
 }
 
 func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
@@ -409,8 +382,8 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Versions != nil {
-		w, err = wire.NewValueList(_List_I32_ValueList(v.Versions)), error(nil)
+	if v.Version != nil {
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -420,30 +393,15 @@ func (v *CheckSchemaResponse) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _List_I32_Read(l wire.ValueList) ([]int32, error) {
-	if l.ValueType() != wire.TI32 {
-		return nil, nil
-	}
-	o := make([]int32, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := x.GetI32(), error(nil)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
-}
-
 func (v *CheckSchemaResponse) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TList {
-				v.Versions, err = _List_I32_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Version = &x
 				if err != nil {
 					return err
 				}
@@ -456,11 +414,177 @@ func (v *CheckSchemaResponse) FromWire(w wire.Value) error {
 func (v *CheckSchemaResponse) String() string {
 	var fields [1]string
 	i := 0
-	if v.Versions != nil {
-		fields[i] = fmt.Sprintf("Versions: %v", v.Versions)
+	if v.Version != nil {
+		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
 		i++
 	}
 	return fmt.Sprintf("CheckSchemaResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+type CheckSchemaStatusRequest struct {
+	Scope      *string `json:"scope,omitempty"`
+	NamePrefix *string `json:"namePrefix,omitempty"`
+	Version    *int32  `json:"version,omitempty"`
+}
+
+func (v *CheckSchemaStatusRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.Version != nil {
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *CheckSchemaStatusRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Version = &x
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *CheckSchemaStatusRequest) String() string {
+	var fields [3]string
+	i := 0
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.Version != nil {
+		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
+		i++
+	}
+	return fmt.Sprintf("CheckSchemaStatusRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type CheckSchemaStatusResponse struct {
+	Version *int32  `json:"version,omitempty"`
+	Status  *string `json:"status,omitempty"`
+}
+
+func (v *CheckSchemaStatusResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [2]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Version != nil {
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Status != nil {
+		w, err = wire.NewValueString(*(v.Status)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *CheckSchemaStatusResponse) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Version = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Status = &x
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *CheckSchemaStatusResponse) String() string {
+	var fields [2]string
+	i := 0
+	if v.Version != nil {
+		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
+		i++
+	}
+	if v.Status != nil {
+		fields[i] = fmt.Sprintf("Status: %v", *(v.Status))
+		i++
+	}
+	return fmt.Sprintf("CheckSchemaStatusResponse{%v}", strings.Join(fields[:i], ", "))
 }
 
 type ClusteringKey struct {
@@ -4025,7 +4149,7 @@ func (v *UpsertSchemaRequest) String() string {
 }
 
 type UpsertSchemaResponse struct {
-	Versions []int32 `json:"versions"`
+	Version *int32 `json:"version,omitempty"`
 }
 
 func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
@@ -4035,8 +4159,8 @@ func (v *UpsertSchemaResponse) ToWire() (wire.Value, error) {
 		w      wire.Value
 		err    error
 	)
-	if v.Versions != nil {
-		w, err = wire.NewValueList(_List_I32_ValueList(v.Versions)), error(nil)
+	if v.Version != nil {
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
 		if err != nil {
 			return w, err
 		}
@@ -4051,8 +4175,10 @@ func (v *UpsertSchemaResponse) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TList {
-				v.Versions, err = _List_I32_Read(field.Value.GetList())
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Version = &x
 				if err != nil {
 					return err
 				}
@@ -4065,8 +4191,8 @@ func (v *UpsertSchemaResponse) FromWire(w wire.Value) error {
 func (v *UpsertSchemaResponse) String() string {
 	var fields [1]string
 	i := 0
-	if v.Versions != nil {
-		fields[i] = fmt.Sprintf("Versions: %v", v.Versions)
+	if v.Version != nil {
+		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
 		i++
 	}
 	return fmt.Sprintf("UpsertSchemaResponse{%v}", strings.Join(fields[:i], ", "))

@@ -213,7 +213,7 @@ struct CheckSchemaRequest {
 }
 
 struct CheckSchemaResponse {
-   1: optional list<i32> versions
+   1: optional i32 version
 }
 
 struct UpsertSchemaRequest {
@@ -223,7 +223,18 @@ struct UpsertSchemaRequest {
 }
 
 struct UpsertSchemaResponse {
-   1: optional list<i32> versions
+   1: optional i32 version
+}
+
+struct CheckSchemaStatusRequest {
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional i32 version
+}
+
+struct CheckSchemaStatusResponse {
+    1: optional i32 version
+    2: optional string status
 }
 
 struct CreateScopeRequest {
@@ -349,30 +360,37 @@ service Dosa {
        3: BadSchemaError schemaError
    )
 
-  void createScope(
+   CheckSchemaStatusResponse checkSchemaStatus(
+       1: CheckSchemaStatusRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+
+   void createScope(
        1: CreateScopeRequest request
-  ) throws (
+   ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
-  )
+   )
 
-  ScopeExistsResponse scopeExists(
+   ScopeExistsResponse scopeExists(
        1: ScopeExistsRequest request
-  ) throws (
+   ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
-  )
+   )
 
-  void truncateScope(
+   void truncateScope(
        1: TruncateScopeRequest request
-  ) throws (
+   ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
-  )
+   )
 
-  void dropScope(
+   void dropScope(
        1: DropScopeRequest request
-  ) throws (
+   ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
    )

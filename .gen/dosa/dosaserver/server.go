@@ -18,6 +18,11 @@ type Interface interface {
 		Request *dosa.CheckSchemaRequest,
 	) (*dosa.CheckSchemaResponse, error)
 
+	CheckSchemaStatus(
+		ctx context.Context,
+		Request *dosa.CheckSchemaStatusRequest,
+	) (*dosa.CheckSchemaStatusResponse, error)
+
 	CreateIfNotExists(
 		ctx context.Context,
 		Request *dosa.CreateRequest,
@@ -113,6 +118,16 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Unary: thrift.UnaryHandler(h.CheckSchema),
 				},
 				Signature: "CheckSchema(Request *dosa.CheckSchemaRequest) (*dosa.CheckSchemaResponse)",
+			},
+
+			thrift.Method{
+				Name: "checkSchemaStatus",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.CheckSchemaStatus),
+				},
+				Signature: "CheckSchemaStatus(Request *dosa.CheckSchemaStatusRequest) (*dosa.CheckSchemaStatusResponse)",
 			},
 
 			thrift.Method{
@@ -267,7 +282,7 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 		},
 	}
 
-	procedures := make([]transport.Procedure, 0, 16)
+	procedures := make([]transport.Procedure, 0, 17)
 	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
 	return procedures
 }
@@ -284,6 +299,25 @@ func (h handler) CheckSchema(ctx context.Context, body wire.Value) (thrift.Respo
 
 	hadError := err != nil
 	result, err := dosa.Dosa_CheckSchema_Helper.WrapResponse(success, err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
+
+func (h handler) CheckSchemaStatus(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_CheckSchemaStatus_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.CheckSchemaStatus(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_CheckSchemaStatus_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {

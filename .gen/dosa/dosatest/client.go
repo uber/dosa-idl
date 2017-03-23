@@ -75,6 +75,39 @@ func (mr *_MockClientRecorder) CheckSchema(
 	return mr.mock.ctrl.RecordCall(mr.mock, "CheckSchema", args...)
 }
 
+// CheckSchemaStatus responds to a CheckSchemaStatus call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().CheckSchemaStatus(gomock.Any(), ...).Return(...)
+// 	... := client.CheckSchemaStatus(...)
+func (m *MockClient) CheckSchemaStatus(
+	ctx context.Context,
+	_Request *dosa.CheckSchemaStatusRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.CheckSchemaStatusResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "CheckSchemaStatus", args...)
+	success, _ = ret[i].(*dosa.CheckSchemaStatusResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) CheckSchemaStatus(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "CheckSchemaStatus", args...)
+}
+
 // CreateIfNotExists responds to a CreateIfNotExists call based on the mock expectations. This
 // call will fail if the mock does not expect this call. Use EXPECT to expect
 // a call to this function.
