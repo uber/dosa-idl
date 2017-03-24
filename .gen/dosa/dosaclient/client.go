@@ -20,6 +20,12 @@ type Interface interface {
 		opts ...yarpc.CallOption,
 	) (*dosa.CheckSchemaResponse, error)
 
+	CheckSchemaStatus(
+		ctx context.Context,
+		Request *dosa.CheckSchemaStatusRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.CheckSchemaStatusResponse, error)
+
 	CreateIfNotExists(
 		ctx context.Context,
 		Request *dosa.CreateRequest,
@@ -153,6 +159,29 @@ func (c client) CheckSchema(
 	}
 
 	success, err = dosa.Dosa_CheckSchema_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) CheckSchemaStatus(
+	ctx context.Context,
+	_Request *dosa.CheckSchemaStatusRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.CheckSchemaStatusResponse, err error) {
+
+	args := dosa.Dosa_CheckSchemaStatus_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_CheckSchemaStatus_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_CheckSchemaStatus_Helper.UnwrapResponse(&result)
 	return
 }
 
