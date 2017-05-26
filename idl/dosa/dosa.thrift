@@ -181,6 +181,11 @@ struct RangeResponse {
    2: optional string nextToken
 }
 
+struct RemoveRangeRequest {
+   1: optional SchemaRef ref
+   2: optional list<Condition> conditions
+}
+
 struct SearchRequest {
    1: optional SchemaRef ref
    2: optional string token
@@ -326,6 +331,13 @@ service Dosa {
 
    RangeResponse range (
        1: RangeRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+   )
+
+   void removeRange (
+       1: RemoveRangeRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
