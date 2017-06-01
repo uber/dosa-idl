@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-type Dosa_Remove_Args struct {
-	Request *RemoveRequest `json:"request,omitempty"`
+type Dosa_RemoveRange_Args struct {
+	Request *RemoveRangeRequest `json:"request,omitempty"`
 }
 
-func (v *Dosa_Remove_Args) ToWire() (wire.Value, error) {
+func (v *Dosa_RemoveRange_Args) ToWire() (wire.Value, error) {
 	var (
 		fields [1]wire.Field
 		i      int = 0
@@ -32,19 +32,19 @@ func (v *Dosa_Remove_Args) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _RemoveRequest_Read(w wire.Value) (*RemoveRequest, error) {
-	var v RemoveRequest
+func _RemoveRangeRequest_Read(w wire.Value) (*RemoveRangeRequest, error) {
+	var v RemoveRangeRequest
 	err := v.FromWire(w)
 	return &v, err
 }
 
-func (v *Dosa_Remove_Args) FromWire(w wire.Value) error {
+func (v *Dosa_RemoveRange_Args) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.Request, err = _RemoveRequest_Read(field.Value)
+				v.Request, err = _RemoveRangeRequest_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -54,7 +54,7 @@ func (v *Dosa_Remove_Args) FromWire(w wire.Value) error {
 	return nil
 }
 
-func (v *Dosa_Remove_Args) String() string {
+func (v *Dosa_RemoveRange_Args) String() string {
 	if v == nil {
 		return "<nil>"
 	}
@@ -64,36 +64,36 @@ func (v *Dosa_Remove_Args) String() string {
 		fields[i] = fmt.Sprintf("Request: %v", v.Request)
 		i++
 	}
-	return fmt.Sprintf("Dosa_Remove_Args{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_RemoveRange_Args{%v}", strings.Join(fields[:i], ", "))
 }
 
-func (v *Dosa_Remove_Args) Equals(rhs *Dosa_Remove_Args) bool {
+func (v *Dosa_RemoveRange_Args) Equals(rhs *Dosa_RemoveRange_Args) bool {
 	if !((v.Request == nil && rhs.Request == nil) || (v.Request != nil && rhs.Request != nil && v.Request.Equals(rhs.Request))) {
 		return false
 	}
 	return true
 }
 
-func (v *Dosa_Remove_Args) MethodName() string {
-	return "remove"
+func (v *Dosa_RemoveRange_Args) MethodName() string {
+	return "removeRange"
 }
 
-func (v *Dosa_Remove_Args) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_RemoveRange_Args) EnvelopeType() wire.EnvelopeType {
 	return wire.Call
 }
 
-var Dosa_Remove_Helper = struct {
-	Args           func(request *RemoveRequest) *Dosa_Remove_Args
+var Dosa_RemoveRange_Helper = struct {
+	Args           func(request *RemoveRangeRequest) *Dosa_RemoveRange_Args
 	IsException    func(error) bool
-	WrapResponse   func(error) (*Dosa_Remove_Result, error)
-	UnwrapResponse func(*Dosa_Remove_Result) error
+	WrapResponse   func(error) (*Dosa_RemoveRange_Result, error)
+	UnwrapResponse func(*Dosa_RemoveRange_Result) error
 }{}
 
 func init() {
-	Dosa_Remove_Helper.Args = func(request *RemoveRequest) *Dosa_Remove_Args {
-		return &Dosa_Remove_Args{Request: request}
+	Dosa_RemoveRange_Helper.Args = func(request *RemoveRangeRequest) *Dosa_RemoveRange_Args {
+		return &Dosa_RemoveRange_Args{Request: request}
 	}
-	Dosa_Remove_Helper.IsException = func(err error) bool {
+	Dosa_RemoveRange_Helper.IsException = func(err error) bool {
 		switch err.(type) {
 		case *BadRequestError:
 			return true
@@ -103,25 +103,25 @@ func init() {
 			return false
 		}
 	}
-	Dosa_Remove_Helper.WrapResponse = func(err error) (*Dosa_Remove_Result, error) {
+	Dosa_RemoveRange_Helper.WrapResponse = func(err error) (*Dosa_RemoveRange_Result, error) {
 		if err == nil {
-			return &Dosa_Remove_Result{}, nil
+			return &Dosa_RemoveRange_Result{}, nil
 		}
 		switch e := err.(type) {
 		case *BadRequestError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_Remove_Result.ClientError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_RemoveRange_Result.ClientError")
 			}
-			return &Dosa_Remove_Result{ClientError: e}, nil
+			return &Dosa_RemoveRange_Result{ClientError: e}, nil
 		case *InternalServerError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_Remove_Result.ServerError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_RemoveRange_Result.ServerError")
 			}
-			return &Dosa_Remove_Result{ServerError: e}, nil
+			return &Dosa_RemoveRange_Result{ServerError: e}, nil
 		}
 		return nil, err
 	}
-	Dosa_Remove_Helper.UnwrapResponse = func(result *Dosa_Remove_Result) (err error) {
+	Dosa_RemoveRange_Helper.UnwrapResponse = func(result *Dosa_RemoveRange_Result) (err error) {
 		if result.ClientError != nil {
 			err = result.ClientError
 			return
@@ -134,12 +134,12 @@ func init() {
 	}
 }
 
-type Dosa_Remove_Result struct {
+type Dosa_RemoveRange_Result struct {
 	ClientError *BadRequestError     `json:"clientError,omitempty"`
 	ServerError *InternalServerError `json:"serverError,omitempty"`
 }
 
-func (v *Dosa_Remove_Result) ToWire() (wire.Value, error) {
+func (v *Dosa_RemoveRange_Result) ToWire() (wire.Value, error) {
 	var (
 		fields [2]wire.Field
 		i      int = 0
@@ -163,12 +163,12 @@ func (v *Dosa_Remove_Result) ToWire() (wire.Value, error) {
 		i++
 	}
 	if i > 1 {
-		return wire.Value{}, fmt.Errorf("Dosa_Remove_Result should have at most one field: got %v fields", i)
+		return wire.Value{}, fmt.Errorf("Dosa_RemoveRange_Result should have at most one field: got %v fields", i)
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func (v *Dosa_Remove_Result) FromWire(w wire.Value) error {
+func (v *Dosa_RemoveRange_Result) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
@@ -196,12 +196,12 @@ func (v *Dosa_Remove_Result) FromWire(w wire.Value) error {
 		count++
 	}
 	if count > 1 {
-		return fmt.Errorf("Dosa_Remove_Result should have at most one field: got %v fields", count)
+		return fmt.Errorf("Dosa_RemoveRange_Result should have at most one field: got %v fields", count)
 	}
 	return nil
 }
 
-func (v *Dosa_Remove_Result) String() string {
+func (v *Dosa_RemoveRange_Result) String() string {
 	if v == nil {
 		return "<nil>"
 	}
@@ -215,10 +215,10 @@ func (v *Dosa_Remove_Result) String() string {
 		fields[i] = fmt.Sprintf("ServerError: %v", v.ServerError)
 		i++
 	}
-	return fmt.Sprintf("Dosa_Remove_Result{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_RemoveRange_Result{%v}", strings.Join(fields[:i], ", "))
 }
 
-func (v *Dosa_Remove_Result) Equals(rhs *Dosa_Remove_Result) bool {
+func (v *Dosa_RemoveRange_Result) Equals(rhs *Dosa_RemoveRange_Result) bool {
 	if !((v.ClientError == nil && rhs.ClientError == nil) || (v.ClientError != nil && rhs.ClientError != nil && v.ClientError.Equals(rhs.ClientError))) {
 		return false
 	}
@@ -228,10 +228,10 @@ func (v *Dosa_Remove_Result) Equals(rhs *Dosa_Remove_Result) bool {
 	return true
 }
 
-func (v *Dosa_Remove_Result) MethodName() string {
-	return "remove"
+func (v *Dosa_RemoveRange_Result) MethodName() string {
+	return "removeRange"
 }
 
-func (v *Dosa_Remove_Result) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_RemoveRange_Result) EnvelopeType() wire.EnvelopeType {
 	return wire.Reply
 }
