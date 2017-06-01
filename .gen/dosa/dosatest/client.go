@@ -397,6 +397,37 @@ func (mr *_MockClientRecorder) Remove(
 	return mr.mock.ctrl.RecordCall(mr.mock, "Remove", args...)
 }
 
+// RemoveRange responds to a RemoveRange call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().RemoveRange(gomock.Any(), ...).Return(...)
+// 	... := client.RemoveRange(...)
+func (m *MockClient) RemoveRange(
+	ctx context.Context,
+	_Request *dosa.RemoveRangeRequest,
+	opts ...yarpc.CallOption,
+) (err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "RemoveRange", args...)
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) RemoveRange(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "RemoveRange", args...)
+}
+
 // Scan responds to a Scan call based on the mock expectations. This
 // call will fail if the mock does not expect this call. Use EXPECT to expect
 // a call to this function.

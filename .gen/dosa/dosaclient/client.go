@@ -5,6 +5,7 @@ package dosaclient
 
 import (
 	"context"
+	"reflect"
 	"go.uber.org/thriftrw/wire"
 	"go.uber.org/yarpc/api/transport"
 	"go.uber.org/yarpc/encoding/thrift"
@@ -80,6 +81,12 @@ type Interface interface {
 		opts ...yarpc.CallOption,
 	) error
 
+	RemoveRange(
+		ctx context.Context,
+		Request *dosa.RemoveRangeRequest,
+		opts ...yarpc.CallOption,
+	) error
+
 	Scan(
 		ctx context.Context,
 		Request *dosa.ScanRequest,
@@ -130,9 +137,11 @@ func New(c transport.ClientConfig, opts ...thrift.ClientOption) Interface {
 }
 
 func init() {
-	yarpc.RegisterClientBuilder(func(c transport.ClientConfig) Interface {
-		return New(c)
-	})
+	yarpc.RegisterClientBuilder(
+		func(c transport.ClientConfig, f reflect.StructField) Interface {
+			return New(c, thrift.ClientBuilderOptions(c, f)...)
+		},
+	)
 }
 
 type client struct {
@@ -389,6 +398,29 @@ func (c client) Remove(
 	}
 
 	err = dosa.Dosa_Remove_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) RemoveRange(
+	ctx context.Context,
+	_Request *dosa.RemoveRangeRequest,
+	opts ...yarpc.CallOption,
+) (err error) {
+
+	args := dosa.Dosa_RemoveRange_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_RemoveRange_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	err = dosa.Dosa_RemoveRange_Helper.UnwrapResponse(&result)
 	return
 }
 
