@@ -122,7 +122,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.CheckSchema),
 				},
-				Signature: "CheckSchema(Request *dosa.CheckSchemaRequest) (*dosa.CheckSchemaResponse)",
+				Signature:    "CheckSchema(Request *dosa.CheckSchemaRequest) (*dosa.CheckSchemaResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -132,7 +133,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.CheckSchemaStatus),
 				},
-				Signature: "CheckSchemaStatus(Request *dosa.CheckSchemaStatusRequest) (*dosa.CheckSchemaStatusResponse)",
+				Signature:    "CheckSchemaStatus(Request *dosa.CheckSchemaStatusRequest) (*dosa.CheckSchemaStatusResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -142,7 +144,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.CreateIfNotExists),
 				},
-				Signature: "CreateIfNotExists(Request *dosa.CreateRequest)",
+				Signature:    "CreateIfNotExists(Request *dosa.CreateRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -152,7 +155,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.CreateScope),
 				},
-				Signature: "CreateScope(Request *dosa.CreateScopeRequest)",
+				Signature:    "CreateScope(Request *dosa.CreateScopeRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -162,7 +166,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.DropScope),
 				},
-				Signature: "DropScope(Request *dosa.DropScopeRequest)",
+				Signature:    "DropScope(Request *dosa.DropScopeRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -172,7 +177,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.MultiRead),
 				},
-				Signature: "MultiRead(Request *dosa.MultiReadRequest) (*dosa.MultiReadResponse)",
+				Signature:    "MultiRead(Request *dosa.MultiReadRequest) (*dosa.MultiReadResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -182,7 +188,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.MultiRemove),
 				},
-				Signature: "MultiRemove(Request *dosa.MultiRemoveRequest) (*dosa.MultiRemoveResponse)",
+				Signature:    "MultiRemove(Request *dosa.MultiRemoveRequest) (*dosa.MultiRemoveResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -192,7 +199,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.MultiUpsert),
 				},
-				Signature: "MultiUpsert(Request *dosa.MultiUpsertRequest) (*dosa.MultiUpsertResponse)",
+				Signature:    "MultiUpsert(Request *dosa.MultiUpsertRequest) (*dosa.MultiUpsertResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -202,7 +210,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Range),
 				},
-				Signature: "Range(Request *dosa.RangeRequest) (*dosa.RangeResponse)",
+				Signature:    "Range(Request *dosa.RangeRequest) (*dosa.RangeResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -212,7 +221,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Read),
 				},
-				Signature: "Read(Request *dosa.ReadRequest) (*dosa.ReadResponse)",
+				Signature:    "Read(Request *dosa.ReadRequest) (*dosa.ReadResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -222,7 +232,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Remove),
 				},
-				Signature: "Remove(Request *dosa.RemoveRequest)",
+				Signature:    "Remove(Request *dosa.RemoveRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -232,7 +243,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.RemoveRange),
 				},
-				Signature: "RemoveRange(Request *dosa.RemoveRangeRequest)",
+				Signature:    "RemoveRange(Request *dosa.RemoveRangeRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -242,7 +254,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Scan),
 				},
-				Signature: "Scan(Request *dosa.ScanRequest) (*dosa.ScanResponse)",
+				Signature:    "Scan(Request *dosa.ScanRequest) (*dosa.ScanResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -252,7 +265,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.ScopeExists),
 				},
-				Signature: "ScopeExists(Request *dosa.ScopeExistsRequest) (*dosa.ScopeExistsResponse)",
+				Signature:    "ScopeExists(Request *dosa.ScopeExistsRequest) (*dosa.ScopeExistsResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -262,7 +276,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Search),
 				},
-				Signature: "Search(Request *dosa.SearchRequest) (*dosa.SearchResponse)",
+				Signature:    "Search(Request *dosa.SearchRequest) (*dosa.SearchResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -272,7 +287,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.TruncateScope),
 				},
-				Signature: "TruncateScope(Request *dosa.TruncateScopeRequest)",
+				Signature:    "TruncateScope(Request *dosa.TruncateScopeRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -282,7 +298,8 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.Upsert),
 				},
-				Signature: "Upsert(Request *dosa.UpsertRequest)",
+				Signature:    "Upsert(Request *dosa.UpsertRequest)",
+				ThriftModule: dosa.ThriftModule,
 			},
 
 			thrift.Method{
@@ -292,11 +309,15 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.UpsertSchema),
 				},
-				Signature: "UpsertSchema(Request *dosa.UpsertSchemaRequest) (*dosa.UpsertSchemaResponse)",
+				Signature:    "UpsertSchema(Request *dosa.UpsertSchemaRequest) (*dosa.UpsertSchemaResponse)",
+				ThriftModule: dosa.ThriftModule,
 			},
 		},
 	}
-	return thrift.BuildProcedures(service, opts...)
+
+	procedures := make([]transport.Procedure, 0, 18)
+	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
+	return procedures
 }
 
 type handler struct{ impl Interface }
