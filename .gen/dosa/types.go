@@ -924,18 +924,28 @@ func (v *DropScopeRequest) String() string {
 type ElemType int32
 
 const (
-	ElemTypeBool      ElemType = 0
-	ElemTypeBlob      ElemType = 1
-	ElemTypeString    ElemType = 2
-	ElemTypeInt32     ElemType = 3
-	ElemTypeInt64     ElemType = 4
-	ElemTypeDouble    ElemType = 5
-	ElemTypeTimestamp ElemType = 6
-	ElemTypeUUID      ElemType = 7
-	ElemTypeReserved0 ElemType = 8
-	ElemTypeReserved1 ElemType = 9
-	ElemTypeReserved2 ElemType = 10
-	ElemTypeReserved3 ElemType = 11
+	ElemTypeBool        ElemType = 0
+	ElemTypeBlob        ElemType = 1
+	ElemTypeString      ElemType = 2
+	ElemTypeInt32       ElemType = 3
+	ElemTypeInt64       ElemType = 4
+	ElemTypeDouble      ElemType = 5
+	ElemTypeTimestamp   ElemType = 6
+	ElemTypeUUID        ElemType = 7
+	ElemTypeNullbool    ElemType = 8
+	ElemTypeNullstring  ElemType = 9
+	ElemTypeNullint64   ElemType = 10
+	ElemTypeNullfloat64 ElemType = 11
+	ElemTypeNulltime    ElemType = 12
+	ElemTypeNulluuid    ElemType = 13
+	ElemTypeReserved4   ElemType = 14
+	ElemTypeReserved5   ElemType = 15
+	ElemTypeReserved6   ElemType = 16
+	ElemTypeReserved7   ElemType = 17
+	ElemTypeReserved8   ElemType = 18
+	ElemTypeReserved9   ElemType = 19
+	ElemTypeReserved10  ElemType = 20
+	ElemTypeReserved12  ElemType = 21
 )
 
 func (v ElemType) ToWire() (wire.Value, error) {
@@ -967,13 +977,33 @@ func (v ElemType) String() string {
 	case 7:
 		return "UUID"
 	case 8:
-		return "RESERVED0"
+		return "NULLBOOL"
 	case 9:
-		return "RESERVED1"
+		return "NULLSTRING"
 	case 10:
-		return "RESERVED2"
+		return "NULLINT64"
 	case 11:
-		return "RESERVED3"
+		return "NULLFLOAT64"
+	case 12:
+		return "NULLTIME"
+	case 13:
+		return "NULLUUID"
+	case 14:
+		return "RESERVED4"
+	case 15:
+		return "RESERVED5"
+	case 16:
+		return "RESERVED6"
+	case 17:
+		return "RESERVED7"
+	case 18:
+		return "RESERVED8"
+	case 19:
+		return "RESERVED9"
+	case 20:
+		return "RESERVED10"
+	case 21:
+		return "RESERVED12"
 	}
 	return fmt.Sprintf("ElemType(%d)", w)
 }
@@ -997,13 +1027,33 @@ func (v ElemType) MarshalJSON() ([]byte, error) {
 	case 7:
 		return ([]byte)("\"UUID\""), nil
 	case 8:
-		return ([]byte)("\"RESERVED0\""), nil
+		return ([]byte)("\"NULLBOOL\""), nil
 	case 9:
-		return ([]byte)("\"RESERVED1\""), nil
+		return ([]byte)("\"NULLSTRING\""), nil
 	case 10:
-		return ([]byte)("\"RESERVED2\""), nil
+		return ([]byte)("\"NULLINT64\""), nil
 	case 11:
-		return ([]byte)("\"RESERVED3\""), nil
+		return ([]byte)("\"NULLFLOAT64\""), nil
+	case 12:
+		return ([]byte)("\"NULLTIME\""), nil
+	case 13:
+		return ([]byte)("\"NULLUUID\""), nil
+	case 14:
+		return ([]byte)("\"RESERVED4\""), nil
+	case 15:
+		return ([]byte)("\"RESERVED5\""), nil
+	case 16:
+		return ([]byte)("\"RESERVED6\""), nil
+	case 17:
+		return ([]byte)("\"RESERVED7\""), nil
+	case 18:
+		return ([]byte)("\"RESERVED8\""), nil
+	case 19:
+		return ([]byte)("\"RESERVED9\""), nil
+	case 20:
+		return ([]byte)("\"RESERVED10\""), nil
+	case 21:
+		return ([]byte)("\"RESERVED12\""), nil
 	}
 	return ([]byte)(strconv.FormatInt(int64(v), 10)), nil
 }
@@ -1055,17 +1105,47 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 		case "UUID":
 			*v = ElemTypeUUID
 			return nil
-		case "RESERVED0":
-			*v = ElemTypeReserved0
+		case "NULLBOOL":
+			*v = ElemTypeNullbool
 			return nil
-		case "RESERVED1":
-			*v = ElemTypeReserved1
+		case "NULLSTRING":
+			*v = ElemTypeNullstring
 			return nil
-		case "RESERVED2":
-			*v = ElemTypeReserved2
+		case "NULLINT64":
+			*v = ElemTypeNullint64
 			return nil
-		case "RESERVED3":
-			*v = ElemTypeReserved3
+		case "NULLFLOAT64":
+			*v = ElemTypeNullfloat64
+			return nil
+		case "NULLTIME":
+			*v = ElemTypeNulltime
+			return nil
+		case "NULLUUID":
+			*v = ElemTypeNulluuid
+			return nil
+		case "RESERVED4":
+			*v = ElemTypeReserved4
+			return nil
+		case "RESERVED5":
+			*v = ElemTypeReserved5
+			return nil
+		case "RESERVED6":
+			*v = ElemTypeReserved6
+			return nil
+		case "RESERVED7":
+			*v = ElemTypeReserved7
+			return nil
+		case "RESERVED8":
+			*v = ElemTypeReserved8
+			return nil
+		case "RESERVED9":
+			*v = ElemTypeReserved9
+			return nil
+		case "RESERVED10":
+			*v = ElemTypeReserved10
+			return nil
+		case "RESERVED12":
+			*v = ElemTypeReserved12
 			return nil
 		default:
 			return fmt.Errorf("unknown enum value %q for %q", w, "ElemType")
