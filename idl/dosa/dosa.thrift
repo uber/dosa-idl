@@ -227,6 +227,7 @@ struct CheckSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
    3: optional list<EntityDefinition> entityDefs
+   4: optional bool isForUpsert
 }
 
 struct CheckSchemaResponse {

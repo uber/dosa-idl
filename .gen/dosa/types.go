@@ -227,9 +227,10 @@ func (v *BadSchemaError) Error() string {
 }
 
 type CheckSchemaRequest struct {
-	Scope      *string             `json:"scope,omitempty"`
-	NamePrefix *string             `json:"namePrefix,omitempty"`
-	EntityDefs []*EntityDefinition `json:"entityDefs"`
+	Scope       *string             `json:"scope,omitempty"`
+	NamePrefix  *string             `json:"namePrefix,omitempty"`
+	EntityDefs  []*EntityDefinition `json:"entityDefs"`
+	IsForUpsert *bool               `json:"isForUpsert,omitempty"`
 }
 
 type _List_EntityDefinition_ValueList []*EntityDefinition
@@ -264,7 +265,7 @@ func (_List_EntityDefinition_ValueList) Close() {
 
 func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -291,6 +292,14 @@ func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	if v.IsForUpsert != nil {
+		w, err = wire.NewValueBool(*(v.IsForUpsert)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -348,13 +357,22 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 					return err
 				}
 			}
+		case 4:
+			if field.Value.Type() == wire.TBool {
+				var x bool
+				x, err = field.Value.GetBool(), error(nil)
+				v.IsForUpsert = &x
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
 }
 
 func (v *CheckSchemaRequest) String() string {
-	var fields [3]string
+	var fields [4]string
 	i := 0
 	if v.Scope != nil {
 		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
@@ -366,6 +384,10 @@ func (v *CheckSchemaRequest) String() string {
 	}
 	if v.EntityDefs != nil {
 		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
+		i++
+	}
+	if v.IsForUpsert != nil {
+		fields[i] = fmt.Sprintf("IsForUpsert: %v", *(v.IsForUpsert))
 		i++
 	}
 	return fmt.Sprintf("CheckSchemaRequest{%v}", strings.Join(fields[:i], ", "))

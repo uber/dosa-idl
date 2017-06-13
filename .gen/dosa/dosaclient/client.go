@@ -5,7 +5,6 @@ package dosaclient
 
 import (
 	"context"
-	"reflect"
 	"go.uber.org/thriftrw/wire"
 	"go.uber.org/yarpc/api/transport"
 	"go.uber.org/yarpc/encoding/thrift"
@@ -137,11 +136,9 @@ func New(c transport.ClientConfig, opts ...thrift.ClientOption) Interface {
 }
 
 func init() {
-	yarpc.RegisterClientBuilder(
-		func(c transport.ClientConfig, f reflect.StructField) Interface {
-			return New(c, thrift.ClientBuilderOptions(c, f)...)
-		},
-	)
+	yarpc.RegisterClientBuilder(func(c transport.ClientConfig) Interface {
+		return New(c)
+	})
 }
 
 type client struct {
