@@ -621,3 +621,34 @@ func (mr *_MockClientRecorder) UpsertSchema(
 	args := append([]interface{}{ctx, _Request}, opts...)
 	return mr.mock.ctrl.RecordCall(mr.mock, "UpsertSchema", args...)
 }
+
+// UpsertSchemaDryRun responds to a UpsertSchemaDryRun call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().UpsertSchemaDryRun(gomock.Any(), ...).Return(...)
+// 	... := client.UpsertSchemaDryRun(...)
+func (m *MockClient) UpsertSchemaDryRun(
+	ctx context.Context,
+	_Request *dosa.UpsertSchemaDryRunRequest,
+	opts ...yarpc.CallOption,
+) (err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "UpsertSchemaDryRun", args...)
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) UpsertSchemaDryRun(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "UpsertSchemaDryRun", args...)
+}

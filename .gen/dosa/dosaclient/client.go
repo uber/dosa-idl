@@ -121,6 +121,12 @@ type Interface interface {
 		Request *dosa.UpsertSchemaRequest,
 		opts ...yarpc.CallOption,
 	) (*dosa.UpsertSchemaResponse, error)
+
+	UpsertSchemaDryRun(
+		ctx context.Context,
+		Request *dosa.UpsertSchemaDryRunRequest,
+		opts ...yarpc.CallOption,
+	) error
 }
 
 // New builds a new client for the Dosa service.
@@ -556,5 +562,28 @@ func (c client) UpsertSchema(
 	}
 
 	success, err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)
+	return
+}
+
+func (c client) UpsertSchemaDryRun(
+	ctx context.Context,
+	_Request *dosa.UpsertSchemaDryRunRequest,
+	opts ...yarpc.CallOption,
+) (err error) {
+
+	args := dosa.Dosa_UpsertSchemaDryRun_Helper.Args(_Request)
+
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_UpsertSchemaDryRun_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	err = dosa.Dosa_UpsertSchemaDryRun_Helper.UnwrapResponse(&result)
 	return
 }

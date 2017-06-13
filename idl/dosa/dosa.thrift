@@ -227,11 +227,16 @@ struct CheckSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
    3: optional list<EntityDefinition> entityDefs
-   4: optional bool isForUpsert
 }
 
 struct CheckSchemaResponse {
    1: optional i32 version
+}
+
+struct UpsertSchemaDryRunRequest {
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
 }
 
 struct UpsertSchemaRequest {
@@ -380,6 +385,14 @@ service Dosa {
 
    UpsertSchemaResponse upsertSchema(
        1: UpsertSchemaRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+       3: BadSchemaError schemaError
+   )
+
+   void upsertSchemaDryRun(
+       1: UpsertSchemaDryRunRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError

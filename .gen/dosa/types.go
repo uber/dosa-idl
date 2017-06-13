@@ -227,10 +227,9 @@ func (v *BadSchemaError) Error() string {
 }
 
 type CheckSchemaRequest struct {
-	Scope       *string             `json:"scope,omitempty"`
-	NamePrefix  *string             `json:"namePrefix,omitempty"`
-	EntityDefs  []*EntityDefinition `json:"entityDefs"`
-	IsForUpsert *bool               `json:"isForUpsert,omitempty"`
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
+	EntityDefs []*EntityDefinition `json:"entityDefs"`
 }
 
 type _List_EntityDefinition_ValueList []*EntityDefinition
@@ -265,7 +264,7 @@ func (_List_EntityDefinition_ValueList) Close() {
 
 func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -292,14 +291,6 @@ func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
-		i++
-	}
-	if v.IsForUpsert != nil {
-		w, err = wire.NewValueBool(*(v.IsForUpsert)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -357,22 +348,13 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 					return err
 				}
 			}
-		case 4:
-			if field.Value.Type() == wire.TBool {
-				var x bool
-				x, err = field.Value.GetBool(), error(nil)
-				v.IsForUpsert = &x
-				if err != nil {
-					return err
-				}
-			}
 		}
 	}
 	return nil
 }
 
 func (v *CheckSchemaRequest) String() string {
-	var fields [4]string
+	var fields [3]string
 	i := 0
 	if v.Scope != nil {
 		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
@@ -384,10 +366,6 @@ func (v *CheckSchemaRequest) String() string {
 	}
 	if v.EntityDefs != nil {
 		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
-		i++
-	}
-	if v.IsForUpsert != nil {
-		fields[i] = fmt.Sprintf("IsForUpsert: %v", *(v.IsForUpsert))
 		i++
 	}
 	return fmt.Sprintf("CheckSchemaRequest{%v}", strings.Join(fields[:i], ", "))
@@ -4224,6 +4202,98 @@ func (v *UpsertRequest) String() string {
 		i++
 	}
 	return fmt.Sprintf("UpsertRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+type UpsertSchemaDryRunRequest struct {
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
+	EntityDefs []*EntityDefinition `json:"entityDefs"`
+}
+
+func (v *UpsertSchemaDryRunRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDefs != nil {
+		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *UpsertSchemaDryRunRequest) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+			}
+		case 3:
+			if field.Value.Type() == wire.TList {
+				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *UpsertSchemaDryRunRequest) String() string {
+	var fields [3]string
+	i := 0
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.EntityDefs != nil {
+		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
+		i++
+	}
+	return fmt.Sprintf("UpsertSchemaDryRunRequest{%v}", strings.Join(fields[:i], ", "))
 }
 
 type UpsertSchemaRequest struct {
