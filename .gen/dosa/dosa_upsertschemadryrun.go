@@ -75,8 +75,8 @@ func (v *Dosa_UpsertSchemaDryRun_Args) EnvelopeType() wire.EnvelopeType {
 var Dosa_UpsertSchemaDryRun_Helper = struct {
 	Args           func(request *UpsertSchemaDryRunRequest) *Dosa_UpsertSchemaDryRun_Args
 	IsException    func(error) bool
-	WrapResponse   func(error) (*Dosa_UpsertSchemaDryRun_Result, error)
-	UnwrapResponse func(*Dosa_UpsertSchemaDryRun_Result) error
+	WrapResponse   func(*UpsertSchemaDryRunResponse, error) (*Dosa_UpsertSchemaDryRun_Result, error)
+	UnwrapResponse func(*Dosa_UpsertSchemaDryRun_Result) (*UpsertSchemaDryRunResponse, error)
 }{}
 
 func init() {
@@ -95,9 +95,9 @@ func init() {
 			return false
 		}
 	}
-	Dosa_UpsertSchemaDryRun_Helper.WrapResponse = func(err error) (*Dosa_UpsertSchemaDryRun_Result, error) {
+	Dosa_UpsertSchemaDryRun_Helper.WrapResponse = func(success *UpsertSchemaDryRunResponse, err error) (*Dosa_UpsertSchemaDryRun_Result, error) {
 		if err == nil {
-			return &Dosa_UpsertSchemaDryRun_Result{}, nil
+			return &Dosa_UpsertSchemaDryRun_Result{Success: success}, nil
 		}
 		switch e := err.(type) {
 		case *BadRequestError:
@@ -118,7 +118,7 @@ func init() {
 		}
 		return nil, err
 	}
-	Dosa_UpsertSchemaDryRun_Helper.UnwrapResponse = func(result *Dosa_UpsertSchemaDryRun_Result) (err error) {
+	Dosa_UpsertSchemaDryRun_Helper.UnwrapResponse = func(result *Dosa_UpsertSchemaDryRun_Result) (success *UpsertSchemaDryRunResponse, err error) {
 		if result.ClientError != nil {
 			err = result.ClientError
 			return
@@ -131,23 +131,37 @@ func init() {
 			err = result.SchemaError
 			return
 		}
+		if result.Success != nil {
+			success = result.Success
+			return
+		}
+		err = errors.New("expected a non-void result")
 		return
 	}
 }
 
 type Dosa_UpsertSchemaDryRun_Result struct {
-	ClientError *BadRequestError     `json:"clientError,omitempty"`
-	ServerError *InternalServerError `json:"serverError,omitempty"`
-	SchemaError *BadSchemaError      `json:"schemaError,omitempty"`
+	Success     *UpsertSchemaDryRunResponse `json:"success,omitempty"`
+	ClientError *BadRequestError            `json:"clientError,omitempty"`
+	ServerError *InternalServerError        `json:"serverError,omitempty"`
+	SchemaError *BadSchemaError             `json:"schemaError,omitempty"`
 }
 
 func (v *Dosa_UpsertSchemaDryRun_Result) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
+	if v.Success != nil {
+		w, err = v.Success.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 0, Value: w}
+		i++
+	}
 	if v.ClientError != nil {
 		w, err = v.ClientError.ToWire()
 		if err != nil {
@@ -172,16 +186,29 @@ func (v *Dosa_UpsertSchemaDryRun_Result) ToWire() (wire.Value, error) {
 		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
-	if i > 1 {
-		return wire.Value{}, fmt.Errorf("Dosa_UpsertSchemaDryRun_Result should have at most one field: got %v fields", i)
+	if i != 1 {
+		return wire.Value{}, fmt.Errorf("Dosa_UpsertSchemaDryRun_Result should have exactly one field: got %v fields", i)
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _UpsertSchemaDryRunResponse_Read(w wire.Value) (*UpsertSchemaDryRunResponse, error) {
+	var v UpsertSchemaDryRunResponse
+	err := v.FromWire(w)
+	return &v, err
 }
 
 func (v *Dosa_UpsertSchemaDryRun_Result) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
+		case 0:
+			if field.Value.Type() == wire.TStruct {
+				v.Success, err = _UpsertSchemaDryRunResponse_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
 		case 1:
 			if field.Value.Type() == wire.TStruct {
 				v.ClientError, err = _BadRequestError_Read(field.Value)
@@ -206,6 +233,9 @@ func (v *Dosa_UpsertSchemaDryRun_Result) FromWire(w wire.Value) error {
 		}
 	}
 	count := 0
+	if v.Success != nil {
+		count++
+	}
 	if v.ClientError != nil {
 		count++
 	}
@@ -215,15 +245,19 @@ func (v *Dosa_UpsertSchemaDryRun_Result) FromWire(w wire.Value) error {
 	if v.SchemaError != nil {
 		count++
 	}
-	if count > 1 {
-		return fmt.Errorf("Dosa_UpsertSchemaDryRun_Result should have at most one field: got %v fields", count)
+	if count != 1 {
+		return fmt.Errorf("Dosa_UpsertSchemaDryRun_Result should have exactly one field: got %v fields", count)
 	}
 	return nil
 }
 
 func (v *Dosa_UpsertSchemaDryRun_Result) String() string {
-	var fields [3]string
+	var fields [4]string
 	i := 0
+	if v.Success != nil {
+		fields[i] = fmt.Sprintf("Success: %v", v.Success)
+		i++
+	}
 	if v.ClientError != nil {
 		fields[i] = fmt.Sprintf("ClientError: %v", v.ClientError)
 		i++

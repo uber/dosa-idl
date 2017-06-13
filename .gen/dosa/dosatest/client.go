@@ -632,7 +632,7 @@ func (m *MockClient) UpsertSchemaDryRun(
 	ctx context.Context,
 	_Request *dosa.UpsertSchemaDryRunRequest,
 	opts ...yarpc.CallOption,
-) (err error) {
+) (success *dosa.UpsertSchemaDryRunResponse, err error) {
 
 	args := []interface{}{ctx, _Request}
 	for _, o := range opts {
@@ -640,6 +640,8 @@ func (m *MockClient) UpsertSchemaDryRun(
 	}
 	i := 0
 	ret := m.ctrl.Call(m, "UpsertSchemaDryRun", args...)
+	success, _ = ret[i].(*dosa.UpsertSchemaDryRunResponse)
+	i++
 	err, _ = ret[i].(error)
 	return
 }

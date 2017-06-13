@@ -106,7 +106,7 @@ type Interface interface {
 	UpsertSchemaDryRun(
 		ctx context.Context,
 		Request *dosa.UpsertSchemaDryRunRequest,
-	) error
+	) (*dosa.UpsertSchemaDryRunResponse, error)
 }
 
 // New prepares an implementation of the Dosa service for
@@ -307,7 +307,7 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 					Type:  transport.Unary,
 					Unary: thrift.UnaryHandler(h.UpsertSchemaDryRun),
 				},
-				Signature: "UpsertSchemaDryRun(Request *dosa.UpsertSchemaDryRunRequest)",
+				Signature: "UpsertSchemaDryRun(Request *dosa.UpsertSchemaDryRunRequest) (*dosa.UpsertSchemaDryRunResponse)",
 			},
 		},
 	}
@@ -667,10 +667,10 @@ func (h handler) UpsertSchemaDryRun(ctx context.Context, body wire.Value) (thrif
 		return thrift.Response{}, err
 	}
 
-	err := h.impl.UpsertSchemaDryRun(ctx, args.Request)
+	success, err := h.impl.UpsertSchemaDryRun(ctx, args.Request)
 
 	hadError := err != nil
-	result, err := dosa.Dosa_UpsertSchemaDryRun_Helper.WrapResponse(err)
+	result, err := dosa.Dosa_UpsertSchemaDryRun_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {
