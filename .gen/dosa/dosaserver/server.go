@@ -102,11 +102,6 @@ type Interface interface {
 		ctx context.Context,
 		Request *dosa.UpsertSchemaRequest,
 	) (*dosa.UpsertSchemaResponse, error)
-
-	UpsertSchemaDryRun(
-		ctx context.Context,
-		Request *dosa.UpsertSchemaDryRunRequest,
-	) (*dosa.UpsertSchemaDryRunResponse, error)
 }
 
 // New prepares an implementation of the Dosa service for
@@ -299,20 +294,10 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				},
 				Signature: "UpsertSchema(Request *dosa.UpsertSchemaRequest) (*dosa.UpsertSchemaResponse)",
 			},
-
-			thrift.Method{
-				Name: "upsertSchemaDryRun",
-				HandlerSpec: thrift.HandlerSpec{
-
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.UpsertSchemaDryRun),
-				},
-				Signature: "UpsertSchemaDryRun(Request *dosa.UpsertSchemaDryRunRequest) (*dosa.UpsertSchemaDryRunResponse)",
-			},
 		},
 	}
 
-	procedures := make([]transport.Procedure, 0, 19)
+	procedures := make([]transport.Procedure, 0, 18)
 	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
 	return procedures
 }
@@ -652,25 +637,6 @@ func (h handler) UpsertSchema(ctx context.Context, body wire.Value) (thrift.Resp
 
 	hadError := err != nil
 	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(success, err)
-
-	var response thrift.Response
-	if err == nil {
-		response.IsApplicationError = hadError
-		response.Body = result
-	}
-	return response, err
-}
-
-func (h handler) UpsertSchemaDryRun(ctx context.Context, body wire.Value) (thrift.Response, error) {
-	var args dosa.Dosa_UpsertSchemaDryRun_Args
-	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
-	}
-
-	success, err := h.impl.UpsertSchemaDryRun(ctx, args.Request)
-
-	hadError := err != nil
-	result, err := dosa.Dosa_UpsertSchemaDryRun_Helper.WrapResponse(success, err)
 
 	var response thrift.Response
 	if err == nil {
