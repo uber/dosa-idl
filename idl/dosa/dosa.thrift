@@ -92,10 +92,15 @@ struct PrimaryKey {
    2: optional list<ClusteringKey> clusteringKeys
 }
 
+struct IndexDefinition {
+   1: optional PrimaryKey key
+}
+
 struct EntityDefinition {
    1: optional string name
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
+   4: optional map<string, IndexDefinition> Indexes
 }
 
 struct Error {
