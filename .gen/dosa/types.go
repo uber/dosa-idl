@@ -1156,9 +1156,10 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 }
 
 type EntityDefinition struct {
-	Name       *string               `json:"name,omitempty"`
-	FieldDescs map[string]*FieldDesc `json:"fieldDescs"`
-	PrimaryKey *PrimaryKey           `json:"primaryKey,omitempty"`
+	Name       *string                     `json:"name,omitempty"`
+	FieldDescs map[string]*FieldDesc       `json:"fieldDescs"`
+	PrimaryKey *PrimaryKey                 `json:"primaryKey,omitempty"`
+	Indexes    map[string]*IndexDefinition `json:"Indexes"`
 }
 
 type _Map_String_FieldDesc_MapItemList map[string]*FieldDesc
@@ -1199,9 +1200,47 @@ func (_Map_String_FieldDesc_MapItemList) ValueType() wire.Type {
 func (_Map_String_FieldDesc_MapItemList) Close() {
 }
 
+type _Map_String_IndexDefinition_MapItemList map[string]*IndexDefinition
+
+func (m _Map_String_IndexDefinition_MapItemList) ForEach(f func(wire.MapItem) error) error {
+	for k, v := range m {
+		if v == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", k)
+		}
+		kw, err := wire.NewValueString(k), error(nil)
+		if err != nil {
+			return err
+		}
+		vw, err := v.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(wire.MapItem{Key: kw, Value: vw})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (m _Map_String_IndexDefinition_MapItemList) Size() int {
+	return len(m)
+}
+
+func (_Map_String_IndexDefinition_MapItemList) KeyType() wire.Type {
+	return wire.TBinary
+}
+
+func (_Map_String_IndexDefinition_MapItemList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_Map_String_IndexDefinition_MapItemList) Close() {
+}
+
 func (v *EntityDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1228,6 +1267,14 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	if v.Indexes != nil {
+		w, err = wire.NewValueMap(_Map_String_IndexDefinition_MapItemList(v.Indexes)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
@@ -1269,6 +1316,36 @@ func _PrimaryKey_Read(w wire.Value) (*PrimaryKey, error) {
 	return &v, err
 }
 
+func _IndexDefinition_Read(w wire.Value) (*IndexDefinition, error) {
+	var v IndexDefinition
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _Map_String_IndexDefinition_Read(m wire.MapItemList) (map[string]*IndexDefinition, error) {
+	if m.KeyType() != wire.TBinary {
+		return nil, nil
+	}
+	if m.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+	o := make(map[string]*IndexDefinition, m.Size())
+	err := m.ForEach(func(x wire.MapItem) error {
+		k, err := x.Key.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		v, err := _IndexDefinition_Read(x.Value)
+		if err != nil {
+			return err
+		}
+		o[k] = v
+		return nil
+	})
+	m.Close()
+	return o, err
+}
+
 func (v *EntityDefinition) FromWire(w wire.Value) error {
 	var err error
 	for _, field := range w.GetStruct().Fields {
@@ -1296,13 +1373,20 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 					return err
 				}
 			}
+		case 4:
+			if field.Value.Type() == wire.TMap {
+				v.Indexes, err = _Map_String_IndexDefinition_Read(field.Value.GetMap())
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
 }
 
 func (v *EntityDefinition) String() string {
-	var fields [3]string
+	var fields [4]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -1314,6 +1398,10 @@ func (v *EntityDefinition) String() string {
 	}
 	if v.PrimaryKey != nil {
 		fields[i] = fmt.Sprintf("PrimaryKey: %v", v.PrimaryKey)
+		i++
+	}
+	if v.Indexes != nil {
+		fields[i] = fmt.Sprintf("Indexes: %v", v.Indexes)
 		i++
 	}
 	return fmt.Sprintf("EntityDefinition{%v}", strings.Join(fields[:i], ", "))
@@ -1855,6 +1943,54 @@ func (v *FieldValueMap) FromWire(w wire.Value) error {
 	x, err := _Map_String_Value_Read(w.GetMap())
 	*v = (FieldValueMap)(x)
 	return err
+}
+
+type IndexDefinition struct {
+	Key *PrimaryKey `json:"key,omitempty"`
+}
+
+func (v *IndexDefinition) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+	if v.Key != nil {
+		w, err = v.Key.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func (v *IndexDefinition) FromWire(w wire.Value) error {
+	var err error
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.Key, err = _PrimaryKey_Read(field.Value)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (v *IndexDefinition) String() string {
+	var fields [1]string
+	i := 0
+	if v.Key != nil {
+		fields[i] = fmt.Sprintf("Key: %v", v.Key)
+		i++
+	}
+	return fmt.Sprintf("IndexDefinition{%v}", strings.Join(fields[:i], ", "))
 }
 
 type InternalServerError struct {
