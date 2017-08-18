@@ -127,12 +127,10 @@ type Interface interface {
 //
 // 	client := dosaclient.New(dispatcher.ClientConfig("dosa"))
 func New(c transport.ClientConfig, opts ...thrift.ClientOption) Interface {
-	return client{
-		c: thrift.New(thrift.Config{
-			Service:      "Dosa",
-			ClientConfig: c,
-		}, opts...),
-	}
+	return client{c: thrift.New(thrift.Config{
+		Service:      "Dosa",
+		ClientConfig: c,
+	}, opts...)}
 }
 
 func init() {
@@ -141,9 +139,7 @@ func init() {
 	})
 }
 
-type client struct {
-	c thrift.Client
-}
+type client struct{ c thrift.Client }
 
 func (c client) CheckSchema(
 	ctx context.Context,

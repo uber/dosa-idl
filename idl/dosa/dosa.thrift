@@ -32,32 +32,20 @@ enum ElemType {
    TIMESTAMP,
    UUID,
 
-   // Nullable types.
-   NULLBOOL,
-   NULLSTRING,
-   NULLINT64,
-   NULLFLOAT64,
-   NULLTIME,
-   NULLUUID,
-
    // Reserve a few enum types in case we want to support few more
-   RESERVED4,
-   RESERVED5,
-   RESERVED6,
-   RESERVED7,
-   RESERVED8,
-   RESERVED9,
-   RESERVED10,
-   RESERVED12,
+   RESERVED0,
+   RESERVED1,
+   RESERVED2,
+   RESERVED3,
 }
 
 union RawValue {
- 1: optional binary binaryValue                 // BLOB, UUID, NULLUUID
- 2: optional bool boolValue                     // BOOL, NULLBOOL
- 3: optional double doubleValue                 // DOUBLE, NULLFLOAT64
+ 1: optional binary binaryValue                 // BLOB, UUID
+ 2: optional bool boolValue                     // BOOL
+ 3: optional double doubleValue                 // DOUBLE
  4: optional i32 int32Value                     // INT32
- 5: optional i64 (js.type = "Long") int64Value  // INT64, TIMESTAMP, NULLINT64, NULLTIMESTAMP
- 6: optional string stringValue                 // STRING, NULLSTRING
+ 5: optional i64 (js.type = "Long") int64Value  // INT64, TIMESTAMP
+ 6: optional string stringValue                 // STRING
 }
 
 // make it union in case we want to support collections like set
@@ -159,7 +147,7 @@ struct RemoveRequest {
 }
 
 struct MultiRemoveRequest {
-   1: optional SchemaRef ref
+   1: optional SchemaRef ref 
    2: optional list<FieldValueMap> keyValues
 }
 
@@ -332,7 +320,7 @@ service Dosa {
        1: BadRequestError clientError
        2: InternalServerError serverError
    )
-
+   
    void remove (
        1: RemoveRequest request
    ) throws (
