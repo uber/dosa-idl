@@ -5,11 +5,13 @@ package dosaclient
 
 import (
 	"context"
+	"github.com/uber/dosa-idl/.gen/dosa"
+	tchannel "github.com/uber/tchannel-go"
 	"go.uber.org/thriftrw/wire"
+	"go.uber.org/yarpc"
 	"go.uber.org/yarpc/api/transport"
 	"go.uber.org/yarpc/encoding/thrift"
-	"go.uber.org/yarpc"
-	"github.com/uber/dosa-idl/.gen/dosa"
+	"reflect"
 )
 
 // Interface is a client for the Dosa service.
@@ -127,19 +129,25 @@ type Interface interface {
 //
 // 	client := dosaclient.New(dispatcher.ClientConfig("dosa"))
 func New(c transport.ClientConfig, opts ...thrift.ClientOption) Interface {
-	return client{c: thrift.New(thrift.Config{
-		Service:      "Dosa",
-		ClientConfig: c,
-	}, opts...)}
+	return client{
+		c: thrift.New(thrift.Config{
+			Service:      "Dosa",
+			ClientConfig: c,
+		}, opts...),
+	}
 }
 
 func init() {
-	yarpc.RegisterClientBuilder(func(c transport.ClientConfig) Interface {
-		return New(c)
-	})
+	yarpc.RegisterClientBuilder(
+		func(c transport.ClientConfig, f reflect.StructField) Interface {
+			return New(c, thrift.ClientBuilderOptions(c, f)...)
+		},
+	)
 }
 
-type client struct{ c thrift.Client }
+type client struct {
+	c thrift.Client
+}
 
 func (c client) CheckSchema(
 	ctx context.Context,
@@ -149,6 +157,7 @@ func (c client) CheckSchema(
 
 	args := dosa.Dosa_CheckSchema_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -172,6 +181,7 @@ func (c client) CheckSchemaStatus(
 
 	args := dosa.Dosa_CheckSchemaStatus_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -195,6 +205,7 @@ func (c client) CreateIfNotExists(
 
 	args := dosa.Dosa_CreateIfNotExists_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -218,6 +229,7 @@ func (c client) CreateScope(
 
 	args := dosa.Dosa_CreateScope_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -241,6 +253,7 @@ func (c client) DropScope(
 
 	args := dosa.Dosa_DropScope_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -264,6 +277,7 @@ func (c client) MultiRead(
 
 	args := dosa.Dosa_MultiRead_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -287,6 +301,7 @@ func (c client) MultiRemove(
 
 	args := dosa.Dosa_MultiRemove_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -310,6 +325,7 @@ func (c client) MultiUpsert(
 
 	args := dosa.Dosa_MultiUpsert_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -333,6 +349,7 @@ func (c client) Range(
 
 	args := dosa.Dosa_Range_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -356,6 +373,7 @@ func (c client) Read(
 
 	args := dosa.Dosa_Read_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -379,6 +397,7 @@ func (c client) Remove(
 
 	args := dosa.Dosa_Remove_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -402,6 +421,7 @@ func (c client) RemoveRange(
 
 	args := dosa.Dosa_RemoveRange_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -425,6 +445,7 @@ func (c client) Scan(
 
 	args := dosa.Dosa_Scan_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -448,6 +469,7 @@ func (c client) ScopeExists(
 
 	args := dosa.Dosa_ScopeExists_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -471,6 +493,7 @@ func (c client) Search(
 
 	args := dosa.Dosa_Search_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -494,6 +517,7 @@ func (c client) TruncateScope(
 
 	args := dosa.Dosa_TruncateScope_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -517,6 +541,7 @@ func (c client) Upsert(
 
 	args := dosa.Dosa_Upsert_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
@@ -540,6 +565,7 @@ func (c client) UpsertSchema(
 
 	args := dosa.Dosa_UpsertSchema_Helper.Args(_Request)
 
+	ctx = tchannel.WithoutHeaders(ctx)
 	var body wire.Value
 	body, err = c.c.Call(ctx, args, opts...)
 	if err != nil {
