@@ -5,10 +5,10 @@ package dosatest
 
 import (
 	"context"
-	"go.uber.org/yarpc"
 	"github.com/golang/mock/gomock"
 	"github.com/uber/dosa-idl/.gen/dosa"
 	"github.com/uber/dosa-idl/.gen/dosa/dosaclient"
+	"go.uber.org/yarpc"
 )
 
 // MockClient implements a gomock-compatible mock client for service

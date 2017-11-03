@@ -1,13 +1,13 @@
 .PHONY: all thriftrw
 
-THRIFTRW_VERSION := v1.0
+THRIFTRW_VERSION := v1.5
 THRIFT_SRC := idl/dosa/dosa.thrift
 OUT := .gen
 export PATH := $(GOPATH)/bin:$(PATH)
 
 THRIFTRW := thriftrw
 YARPC_PLUGIN := thriftrw-plugin-yarpc
-YARPC := yarpc
+YARPC := "yarpc -sanitize-tchannel -no-fx"
 
 all:
 ifeq (, $(shell command -v $(THRIFTRW) 2> /dev/null))
