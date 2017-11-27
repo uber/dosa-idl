@@ -216,10 +216,16 @@ struct ScanResponse {
    2: optional string nextToken
 }
 
+enum CheckSchemaOp {
+    ALREADY_REGISTERED
+    TO_UPSERT
+}
+
 struct CheckSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
    3: optional list<EntityDefinition> entityDefs
+   4: optional CheckSchemaOp op
 }
 
 struct CheckSchemaResponse {
