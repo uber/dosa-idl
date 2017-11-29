@@ -13,6 +13,11 @@ import (
 
 // Interface is the server-side interface for the Dosa service.
 type Interface interface {
+	CanUpsertSchema(
+		ctx context.Context,
+		Request *dosa.CanUpsertSchemaRequest,
+	) (*dosa.CanUpsertSchemaResponse, error)
+
 	CheckSchema(
 		ctx context.Context,
 		Request *dosa.CheckSchemaRequest,
@@ -114,6 +119,17 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 	service := thrift.Service{
 		Name: "Dosa",
 		Methods: []thrift.Method{
+
+			thrift.Method{
+				Name: "canUpsertSchema",
+				HandlerSpec: thrift.HandlerSpec{
+
+					Type:  transport.Unary,
+					Unary: thrift.UnaryHandler(h.CanUpsertSchema),
+				},
+				Signature:    "CanUpsertSchema(Request *dosa.CanUpsertSchemaRequest) (*dosa.CanUpsertSchemaResponse)",
+				ThriftModule: dosa.ThriftModule,
+			},
 
 			thrift.Method{
 				Name: "checkSchema",
@@ -315,12 +331,31 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 		},
 	}
 
-	procedures := make([]transport.Procedure, 0, 18)
+	procedures := make([]transport.Procedure, 0, 19)
 	procedures = append(procedures, thrift.BuildProcedures(service, opts...)...)
 	return procedures
 }
 
 type handler struct{ impl Interface }
+
+func (h handler) CanUpsertSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
+	var args dosa.Dosa_CanUpsertSchema_Args
+	if err := args.FromWire(body); err != nil {
+		return thrift.Response{}, err
+	}
+
+	success, err := h.impl.CanUpsertSchema(ctx, args.Request)
+
+	hadError := err != nil
+	result, err := dosa.Dosa_CanUpsertSchema_Helper.WrapResponse(success, err)
+
+	var response thrift.Response
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+	}
+	return response, err
+}
 
 func (h handler) CheckSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CheckSchema_Args

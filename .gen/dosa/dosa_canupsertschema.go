@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-// Dosa_CheckSchema_Args represents the arguments for the Dosa.checkSchema function.
+// Dosa_CanUpsertSchema_Args represents the arguments for the Dosa.canUpsertSchema function.
 //
-// The arguments for checkSchema are sent and received over the wire as this struct.
-type Dosa_CheckSchema_Args struct {
-	Request *CheckSchemaRequest `json:"request,omitempty"`
+// The arguments for canUpsertSchema are sent and received over the wire as this struct.
+type Dosa_CanUpsertSchema_Args struct {
+	Request *CanUpsertSchemaRequest `json:"request,omitempty"`
 }
 
-// ToWire translates a Dosa_CheckSchema_Args struct into a Thrift-level intermediate
+// ToWire translates a Dosa_CanUpsertSchema_Args struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
 // into bytes using a ThriftRW protocol implementation.
 //
@@ -32,7 +32,7 @@ type Dosa_CheckSchema_Args struct {
 //   if err := binaryProtocol.Encode(x, writer); err != nil {
 //     return err
 //   }
-func (v *Dosa_CheckSchema_Args) ToWire() (wire.Value, error) {
+func (v *Dosa_CanUpsertSchema_Args) ToWire() (wire.Value, error) {
 	var (
 		fields [1]wire.Field
 		i      int = 0
@@ -52,17 +52,17 @@ func (v *Dosa_CheckSchema_Args) ToWire() (wire.Value, error) {
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _CheckSchemaRequest_Read(w wire.Value) (*CheckSchemaRequest, error) {
-	var v CheckSchemaRequest
+func _CanUpsertSchemaRequest_Read(w wire.Value) (*CanUpsertSchemaRequest, error) {
+	var v CanUpsertSchemaRequest
 	err := v.FromWire(w)
 	return &v, err
 }
 
-// FromWire deserializes a Dosa_CheckSchema_Args struct from its Thrift-level
+// FromWire deserializes a Dosa_CanUpsertSchema_Args struct from its Thrift-level
 // representation. The Thrift-level representation may be obtained
 // from a ThriftRW protocol implementation.
 //
-// An error is returned if we were unable to build a Dosa_CheckSchema_Args struct
+// An error is returned if we were unable to build a Dosa_CanUpsertSchema_Args struct
 // from the provided intermediate representation.
 //
 //   x, err := binaryProtocol.Decode(reader, wire.TStruct)
@@ -70,19 +70,19 @@ func _CheckSchemaRequest_Read(w wire.Value) (*CheckSchemaRequest, error) {
 //     return nil, err
 //   }
 //
-//   var v Dosa_CheckSchema_Args
+//   var v Dosa_CanUpsertSchema_Args
 //   if err := v.FromWire(x); err != nil {
 //     return nil, err
 //   }
 //   return &v, nil
-func (v *Dosa_CheckSchema_Args) FromWire(w wire.Value) error {
+func (v *Dosa_CanUpsertSchema_Args) FromWire(w wire.Value) error {
 	var err error
 
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
 			if field.Value.Type() == wire.TStruct {
-				v.Request, err = _CheckSchemaRequest_Read(field.Value)
+				v.Request, err = _CanUpsertSchemaRequest_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -94,9 +94,9 @@ func (v *Dosa_CheckSchema_Args) FromWire(w wire.Value) error {
 	return nil
 }
 
-// String returns a readable string representation of a Dosa_CheckSchema_Args
+// String returns a readable string representation of a Dosa_CanUpsertSchema_Args
 // struct.
-func (v *Dosa_CheckSchema_Args) String() string {
+func (v *Dosa_CanUpsertSchema_Args) String() string {
 	if v == nil {
 		return "<nil>"
 	}
@@ -108,14 +108,14 @@ func (v *Dosa_CheckSchema_Args) String() string {
 		i++
 	}
 
-	return fmt.Sprintf("Dosa_CheckSchema_Args{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_CanUpsertSchema_Args{%v}", strings.Join(fields[:i], ", "))
 }
 
-// Equals returns true if all the fields of this Dosa_CheckSchema_Args match the
-// provided Dosa_CheckSchema_Args.
+// Equals returns true if all the fields of this Dosa_CanUpsertSchema_Args match the
+// provided Dosa_CanUpsertSchema_Args.
 //
 // This function performs a deep comparison.
-func (v *Dosa_CheckSchema_Args) Equals(rhs *Dosa_CheckSchema_Args) bool {
+func (v *Dosa_CanUpsertSchema_Args) Equals(rhs *Dosa_CanUpsertSchema_Args) bool {
 	if !((v.Request == nil && rhs.Request == nil) || (v.Request != nil && rhs.Request != nil && v.Request.Equals(rhs.Request))) {
 		return false
 	}
@@ -126,73 +126,73 @@ func (v *Dosa_CheckSchema_Args) Equals(rhs *Dosa_CheckSchema_Args) bool {
 // MethodName returns the name of the Thrift function as specified in
 // the IDL, for which this struct represent the arguments.
 //
-// This will always be "checkSchema" for this struct.
-func (v *Dosa_CheckSchema_Args) MethodName() string {
-	return "checkSchema"
+// This will always be "canUpsertSchema" for this struct.
+func (v *Dosa_CanUpsertSchema_Args) MethodName() string {
+	return "canUpsertSchema"
 }
 
 // EnvelopeType returns the kind of value inside this struct.
 //
 // This will always be Call for this struct.
-func (v *Dosa_CheckSchema_Args) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_CanUpsertSchema_Args) EnvelopeType() wire.EnvelopeType {
 	return wire.Call
 }
 
-// Dosa_CheckSchema_Helper provides functions that aid in handling the
-// parameters and return values of the Dosa.checkSchema
+// Dosa_CanUpsertSchema_Helper provides functions that aid in handling the
+// parameters and return values of the Dosa.canUpsertSchema
 // function.
-var Dosa_CheckSchema_Helper = struct {
-	// Args accepts the parameters of checkSchema in-order and returns
+var Dosa_CanUpsertSchema_Helper = struct {
+	// Args accepts the parameters of canUpsertSchema in-order and returns
 	// the arguments struct for the function.
 	Args func(
-		request *CheckSchemaRequest,
-	) *Dosa_CheckSchema_Args
+		request *CanUpsertSchemaRequest,
+	) *Dosa_CanUpsertSchema_Args
 
 	// IsException returns true if the given error can be thrown
-	// by checkSchema.
+	// by canUpsertSchema.
 	//
-	// An error can be thrown by checkSchema only if the
+	// An error can be thrown by canUpsertSchema only if the
 	// corresponding exception type was mentioned in the 'throws'
 	// section for it in the Thrift file.
 	IsException func(error) bool
 
-	// WrapResponse returns the result struct for checkSchema
+	// WrapResponse returns the result struct for canUpsertSchema
 	// given its return value and error.
 	//
 	// This allows mapping values and errors returned by
-	// checkSchema into a serializable result struct.
+	// canUpsertSchema into a serializable result struct.
 	// WrapResponse returns a non-nil error if the provided
-	// error cannot be thrown by checkSchema
+	// error cannot be thrown by canUpsertSchema
 	//
-	//   value, err := checkSchema(args)
-	//   result, err := Dosa_CheckSchema_Helper.WrapResponse(value, err)
+	//   value, err := canUpsertSchema(args)
+	//   result, err := Dosa_CanUpsertSchema_Helper.WrapResponse(value, err)
 	//   if err != nil {
-	//     return fmt.Errorf("unexpected error from checkSchema: %v", err)
+	//     return fmt.Errorf("unexpected error from canUpsertSchema: %v", err)
 	//   }
 	//   serialize(result)
-	WrapResponse func(*CheckSchemaResponse, error) (*Dosa_CheckSchema_Result, error)
+	WrapResponse func(*CanUpsertSchemaResponse, error) (*Dosa_CanUpsertSchema_Result, error)
 
-	// UnwrapResponse takes the result struct for checkSchema
+	// UnwrapResponse takes the result struct for canUpsertSchema
 	// and returns the value or error returned by it.
 	//
-	// The error is non-nil only if checkSchema threw an
+	// The error is non-nil only if canUpsertSchema threw an
 	// exception.
 	//
 	//   result := deserialize(bytes)
-	//   value, err := Dosa_CheckSchema_Helper.UnwrapResponse(result)
-	UnwrapResponse func(*Dosa_CheckSchema_Result) (*CheckSchemaResponse, error)
+	//   value, err := Dosa_CanUpsertSchema_Helper.UnwrapResponse(result)
+	UnwrapResponse func(*Dosa_CanUpsertSchema_Result) (*CanUpsertSchemaResponse, error)
 }{}
 
 func init() {
-	Dosa_CheckSchema_Helper.Args = func(
-		request *CheckSchemaRequest,
-	) *Dosa_CheckSchema_Args {
-		return &Dosa_CheckSchema_Args{
+	Dosa_CanUpsertSchema_Helper.Args = func(
+		request *CanUpsertSchemaRequest,
+	) *Dosa_CanUpsertSchema_Args {
+		return &Dosa_CanUpsertSchema_Args{
 			Request: request,
 		}
 	}
 
-	Dosa_CheckSchema_Helper.IsException = func(err error) bool {
+	Dosa_CanUpsertSchema_Helper.IsException = func(err error) bool {
 		switch err.(type) {
 		case *BadRequestError:
 			return true
@@ -205,32 +205,32 @@ func init() {
 		}
 	}
 
-	Dosa_CheckSchema_Helper.WrapResponse = func(success *CheckSchemaResponse, err error) (*Dosa_CheckSchema_Result, error) {
+	Dosa_CanUpsertSchema_Helper.WrapResponse = func(success *CanUpsertSchemaResponse, err error) (*Dosa_CanUpsertSchema_Result, error) {
 		if err == nil {
-			return &Dosa_CheckSchema_Result{Success: success}, nil
+			return &Dosa_CanUpsertSchema_Result{Success: success}, nil
 		}
 
 		switch e := err.(type) {
 		case *BadRequestError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CheckSchema_Result.ClientError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CanUpsertSchema_Result.ClientError")
 			}
-			return &Dosa_CheckSchema_Result{ClientError: e}, nil
+			return &Dosa_CanUpsertSchema_Result{ClientError: e}, nil
 		case *InternalServerError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CheckSchema_Result.ServerError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CanUpsertSchema_Result.ServerError")
 			}
-			return &Dosa_CheckSchema_Result{ServerError: e}, nil
+			return &Dosa_CanUpsertSchema_Result{ServerError: e}, nil
 		case *BadSchemaError:
 			if e == nil {
-				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CheckSchema_Result.SchemaError")
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CanUpsertSchema_Result.SchemaError")
 			}
-			return &Dosa_CheckSchema_Result{SchemaError: e}, nil
+			return &Dosa_CanUpsertSchema_Result{SchemaError: e}, nil
 		}
 
 		return nil, err
 	}
-	Dosa_CheckSchema_Helper.UnwrapResponse = func(result *Dosa_CheckSchema_Result) (success *CheckSchemaResponse, err error) {
+	Dosa_CanUpsertSchema_Helper.UnwrapResponse = func(result *Dosa_CanUpsertSchema_Result) (success *CanUpsertSchemaResponse, err error) {
 		if result.ClientError != nil {
 			err = result.ClientError
 			return
@@ -255,20 +255,20 @@ func init() {
 
 }
 
-// Dosa_CheckSchema_Result represents the result of a Dosa.checkSchema function call.
+// Dosa_CanUpsertSchema_Result represents the result of a Dosa.canUpsertSchema function call.
 //
-// The result of a checkSchema execution is sent and received over the wire as this struct.
+// The result of a canUpsertSchema execution is sent and received over the wire as this struct.
 //
 // Success is set only if the function did not throw an exception.
-type Dosa_CheckSchema_Result struct {
-	// Value returned by checkSchema after a successful execution.
-	Success     *CheckSchemaResponse `json:"success,omitempty"`
-	ClientError *BadRequestError     `json:"clientError,omitempty"`
-	ServerError *InternalServerError `json:"serverError,omitempty"`
-	SchemaError *BadSchemaError      `json:"schemaError,omitempty"`
+type Dosa_CanUpsertSchema_Result struct {
+	// Value returned by canUpsertSchema after a successful execution.
+	Success     *CanUpsertSchemaResponse `json:"success,omitempty"`
+	ClientError *BadRequestError         `json:"clientError,omitempty"`
+	ServerError *InternalServerError     `json:"serverError,omitempty"`
+	SchemaError *BadSchemaError          `json:"schemaError,omitempty"`
 }
 
-// ToWire translates a Dosa_CheckSchema_Result struct into a Thrift-level intermediate
+// ToWire translates a Dosa_CanUpsertSchema_Result struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
 // into bytes using a ThriftRW protocol implementation.
 //
@@ -283,7 +283,7 @@ type Dosa_CheckSchema_Result struct {
 //   if err := binaryProtocol.Encode(x, writer); err != nil {
 //     return err
 //   }
-func (v *Dosa_CheckSchema_Result) ToWire() (wire.Value, error) {
+func (v *Dosa_CanUpsertSchema_Result) ToWire() (wire.Value, error) {
 	var (
 		fields [4]wire.Field
 		i      int = 0
@@ -325,23 +325,41 @@ func (v *Dosa_CheckSchema_Result) ToWire() (wire.Value, error) {
 	}
 
 	if i != 1 {
-		return wire.Value{}, fmt.Errorf("Dosa_CheckSchema_Result should have exactly one field: got %v fields", i)
+		return wire.Value{}, fmt.Errorf("Dosa_CanUpsertSchema_Result should have exactly one field: got %v fields", i)
 	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _CheckSchemaResponse_Read(w wire.Value) (*CheckSchemaResponse, error) {
-	var v CheckSchemaResponse
+func _CanUpsertSchemaResponse_Read(w wire.Value) (*CanUpsertSchemaResponse, error) {
+	var v CanUpsertSchemaResponse
 	err := v.FromWire(w)
 	return &v, err
 }
 
-// FromWire deserializes a Dosa_CheckSchema_Result struct from its Thrift-level
+func _BadRequestError_Read(w wire.Value) (*BadRequestError, error) {
+	var v BadRequestError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _InternalServerError_Read(w wire.Value) (*InternalServerError, error) {
+	var v InternalServerError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _BadSchemaError_Read(w wire.Value) (*BadSchemaError, error) {
+	var v BadSchemaError
+	err := v.FromWire(w)
+	return &v, err
+}
+
+// FromWire deserializes a Dosa_CanUpsertSchema_Result struct from its Thrift-level
 // representation. The Thrift-level representation may be obtained
 // from a ThriftRW protocol implementation.
 //
-// An error is returned if we were unable to build a Dosa_CheckSchema_Result struct
+// An error is returned if we were unable to build a Dosa_CanUpsertSchema_Result struct
 // from the provided intermediate representation.
 //
 //   x, err := binaryProtocol.Decode(reader, wire.TStruct)
@@ -349,19 +367,19 @@ func _CheckSchemaResponse_Read(w wire.Value) (*CheckSchemaResponse, error) {
 //     return nil, err
 //   }
 //
-//   var v Dosa_CheckSchema_Result
+//   var v Dosa_CanUpsertSchema_Result
 //   if err := v.FromWire(x); err != nil {
 //     return nil, err
 //   }
 //   return &v, nil
-func (v *Dosa_CheckSchema_Result) FromWire(w wire.Value) error {
+func (v *Dosa_CanUpsertSchema_Result) FromWire(w wire.Value) error {
 	var err error
 
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 0:
 			if field.Value.Type() == wire.TStruct {
-				v.Success, err = _CheckSchemaResponse_Read(field.Value)
+				v.Success, err = _CanUpsertSchemaResponse_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -408,15 +426,15 @@ func (v *Dosa_CheckSchema_Result) FromWire(w wire.Value) error {
 		count++
 	}
 	if count != 1 {
-		return fmt.Errorf("Dosa_CheckSchema_Result should have exactly one field: got %v fields", count)
+		return fmt.Errorf("Dosa_CanUpsertSchema_Result should have exactly one field: got %v fields", count)
 	}
 
 	return nil
 }
 
-// String returns a readable string representation of a Dosa_CheckSchema_Result
+// String returns a readable string representation of a Dosa_CanUpsertSchema_Result
 // struct.
-func (v *Dosa_CheckSchema_Result) String() string {
+func (v *Dosa_CanUpsertSchema_Result) String() string {
 	if v == nil {
 		return "<nil>"
 	}
@@ -440,14 +458,14 @@ func (v *Dosa_CheckSchema_Result) String() string {
 		i++
 	}
 
-	return fmt.Sprintf("Dosa_CheckSchema_Result{%v}", strings.Join(fields[:i], ", "))
+	return fmt.Sprintf("Dosa_CanUpsertSchema_Result{%v}", strings.Join(fields[:i], ", "))
 }
 
-// Equals returns true if all the fields of this Dosa_CheckSchema_Result match the
-// provided Dosa_CheckSchema_Result.
+// Equals returns true if all the fields of this Dosa_CanUpsertSchema_Result match the
+// provided Dosa_CanUpsertSchema_Result.
 //
 // This function performs a deep comparison.
-func (v *Dosa_CheckSchema_Result) Equals(rhs *Dosa_CheckSchema_Result) bool {
+func (v *Dosa_CanUpsertSchema_Result) Equals(rhs *Dosa_CanUpsertSchema_Result) bool {
 	if !((v.Success == nil && rhs.Success == nil) || (v.Success != nil && rhs.Success != nil && v.Success.Equals(rhs.Success))) {
 		return false
 	}
@@ -467,14 +485,14 @@ func (v *Dosa_CheckSchema_Result) Equals(rhs *Dosa_CheckSchema_Result) bool {
 // MethodName returns the name of the Thrift function as specified in
 // the IDL, for which this struct represent the result.
 //
-// This will always be "checkSchema" for this struct.
-func (v *Dosa_CheckSchema_Result) MethodName() string {
-	return "checkSchema"
+// This will always be "canUpsertSchema" for this struct.
+func (v *Dosa_CanUpsertSchema_Result) MethodName() string {
+	return "canUpsertSchema"
 }
 
 // EnvelopeType returns the kind of value inside this struct.
 //
 // This will always be Reply for this struct.
-func (v *Dosa_CheckSchema_Result) EnvelopeType() wire.EnvelopeType {
+func (v *Dosa_CanUpsertSchema_Result) EnvelopeType() wire.EnvelopeType {
 	return wire.Reply
 }

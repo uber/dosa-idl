@@ -16,6 +16,12 @@ import (
 
 // Interface is a client for the Dosa service.
 type Interface interface {
+	CanUpsertSchema(
+		ctx context.Context,
+		Request *dosa.CanUpsertSchemaRequest,
+		opts ...yarpc.CallOption,
+	) (*dosa.CanUpsertSchemaResponse, error)
+
 	CheckSchema(
 		ctx context.Context,
 		Request *dosa.CheckSchemaRequest,
@@ -147,6 +153,30 @@ func init() {
 
 type client struct {
 	c thrift.Client
+}
+
+func (c client) CanUpsertSchema(
+	ctx context.Context,
+	_Request *dosa.CanUpsertSchemaRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.CanUpsertSchemaResponse, err error) {
+
+	args := dosa.Dosa_CanUpsertSchema_Helper.Args(_Request)
+
+	ctx = tchannel.WithoutHeaders(ctx)
+	var body wire.Value
+	body, err = c.c.Call(ctx, args, opts...)
+	if err != nil {
+		return
+	}
+
+	var result dosa.Dosa_CanUpsertSchema_Result
+	if err = result.FromWire(body); err != nil {
+		return
+	}
+
+	success, err = dosa.Dosa_CanUpsertSchema_Helper.UnwrapResponse(&result)
+	return
 }
 
 func (c client) CheckSchema(

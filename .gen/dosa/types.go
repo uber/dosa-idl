@@ -409,41 +409,235 @@ func (v *BadSchemaError) Error() string {
 	return v.String()
 }
 
-type CheckSchemaRequest struct {
-	Scope      *string             `json:"scope,omitempty"`
-	NamePrefix *string             `json:"namePrefix,omitempty"`
-	EntityDefs []*EntityDefinition `json:"entityDefs,omitempty"`
-	ToUpsert   *bool               `json:"toUpsert,omitempty"`
+type CanUpsertSchemaRequest struct {
+	ScopeDef *ScopeDefinition `json:"scopeDef,omitempty"`
 }
 
-type _List_EntityDefinition_ValueList []*EntityDefinition
+// ToWire translates a CanUpsertSchemaRequest struct into a Thrift-level intermediate
+// representation. This intermediate representation may be serialized
+// into bytes using a ThriftRW protocol implementation.
+//
+// An error is returned if the struct or any of its fields failed to
+// validate.
+//
+//   x, err := v.ToWire()
+//   if err != nil {
+//     return err
+//   }
+//
+//   if err := binaryProtocol.Encode(x, writer); err != nil {
+//     return err
+//   }
+func (v *CanUpsertSchemaRequest) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
 
-func (v _List_EntityDefinition_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
+	if v.ScopeDef != nil {
+		w, err = v.ScopeDef.ToWire()
 		if err != nil {
-			return err
+			return w, err
 		}
-		err = f(w)
-		if err != nil {
-			return err
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _ScopeDefinition_Read(w wire.Value) (*ScopeDefinition, error) {
+	var v ScopeDefinition
+	err := v.FromWire(w)
+	return &v, err
+}
+
+// FromWire deserializes a CanUpsertSchemaRequest struct from its Thrift-level
+// representation. The Thrift-level representation may be obtained
+// from a ThriftRW protocol implementation.
+//
+// An error is returned if we were unable to build a CanUpsertSchemaRequest struct
+// from the provided intermediate representation.
+//
+//   x, err := binaryProtocol.Decode(reader, wire.TStruct)
+//   if err != nil {
+//     return nil, err
+//   }
+//
+//   var v CanUpsertSchemaRequest
+//   if err := v.FromWire(x); err != nil {
+//     return nil, err
+//   }
+//   return &v, nil
+func (v *CanUpsertSchemaRequest) FromWire(w wire.Value) error {
+	var err error
+
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TStruct {
+				v.ScopeDef, err = _ScopeDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
+
 	return nil
 }
 
-func (v _List_EntityDefinition_ValueList) Size() int {
-	return len(v)
+// String returns a readable string representation of a CanUpsertSchemaRequest
+// struct.
+func (v *CanUpsertSchemaRequest) String() string {
+	if v == nil {
+		return "<nil>"
+	}
+
+	var fields [1]string
+	i := 0
+	if v.ScopeDef != nil {
+		fields[i] = fmt.Sprintf("ScopeDef: %v", v.ScopeDef)
+		i++
+	}
+
+	return fmt.Sprintf("CanUpsertSchemaRequest{%v}", strings.Join(fields[:i], ", "))
 }
 
-func (_List_EntityDefinition_ValueList) ValueType() wire.Type {
-	return wire.TStruct
+// Equals returns true if all the fields of this CanUpsertSchemaRequest match the
+// provided CanUpsertSchemaRequest.
+//
+// This function performs a deep comparison.
+func (v *CanUpsertSchemaRequest) Equals(rhs *CanUpsertSchemaRequest) bool {
+	if !((v.ScopeDef == nil && rhs.ScopeDef == nil) || (v.ScopeDef != nil && rhs.ScopeDef != nil && v.ScopeDef.Equals(rhs.ScopeDef))) {
+		return false
+	}
+
+	return true
 }
 
-func (_List_EntityDefinition_ValueList) Close() {}
+type CanUpsertSchemaResponse struct {
+	Version *int32 `json:"version,omitempty"`
+}
+
+// ToWire translates a CanUpsertSchemaResponse struct into a Thrift-level intermediate
+// representation. This intermediate representation may be serialized
+// into bytes using a ThriftRW protocol implementation.
+//
+// An error is returned if the struct or any of its fields failed to
+// validate.
+//
+//   x, err := v.ToWire()
+//   if err != nil {
+//     return err
+//   }
+//
+//   if err := binaryProtocol.Encode(x, writer); err != nil {
+//     return err
+//   }
+func (v *CanUpsertSchemaResponse) ToWire() (wire.Value, error) {
+	var (
+		fields [1]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+
+	if v.Version != nil {
+		w, err = wire.NewValueI32(*(v.Version)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+// FromWire deserializes a CanUpsertSchemaResponse struct from its Thrift-level
+// representation. The Thrift-level representation may be obtained
+// from a ThriftRW protocol implementation.
+//
+// An error is returned if we were unable to build a CanUpsertSchemaResponse struct
+// from the provided intermediate representation.
+//
+//   x, err := binaryProtocol.Decode(reader, wire.TStruct)
+//   if err != nil {
+//     return nil, err
+//   }
+//
+//   var v CanUpsertSchemaResponse
+//   if err := v.FromWire(x); err != nil {
+//     return nil, err
+//   }
+//   return &v, nil
+func (v *CanUpsertSchemaResponse) FromWire(w wire.Value) error {
+	var err error
+
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Version = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		}
+	}
+
+	return nil
+}
+
+// String returns a readable string representation of a CanUpsertSchemaResponse
+// struct.
+func (v *CanUpsertSchemaResponse) String() string {
+	if v == nil {
+		return "<nil>"
+	}
+
+	var fields [1]string
+	i := 0
+	if v.Version != nil {
+		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
+		i++
+	}
+
+	return fmt.Sprintf("CanUpsertSchemaResponse{%v}", strings.Join(fields[:i], ", "))
+}
+
+// Equals returns true if all the fields of this CanUpsertSchemaResponse match the
+// provided CanUpsertSchemaResponse.
+//
+// This function performs a deep comparison.
+func (v *CanUpsertSchemaResponse) Equals(rhs *CanUpsertSchemaResponse) bool {
+	if !_I32_EqualsPtr(v.Version, rhs.Version) {
+		return false
+	}
+
+	return true
+}
+
+// GetVersion returns the value of Version if it is set or its
+// zero value if it is unset.
+func (v *CanUpsertSchemaResponse) GetVersion() (o int32) {
+	if v.Version != nil {
+		return *v.Version
+	}
+
+	return
+}
+
+type CheckSchemaRequest struct {
+	ScopeDef *ScopeDefinition `json:"scopeDef,omitempty"`
+}
 
 // ToWire translates a CheckSchemaRequest struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
@@ -462,70 +656,22 @@ func (_List_EntityDefinition_ValueList) Close() {}
 //   }
 func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [1]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
 
-	if v.Scope != nil {
-		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+	if v.ScopeDef != nil {
+		w, err = v.ScopeDef.ToWire()
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
-	if v.NamePrefix != nil {
-		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 2, Value: w}
-		i++
-	}
-	if v.EntityDefs != nil {
-		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 3, Value: w}
-		i++
-	}
-	if v.ToUpsert != nil {
-		w, err = wire.NewValueBool(*(v.ToUpsert)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 4, Value: w}
-		i++
-	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _EntityDefinition_Read(w wire.Value) (*EntityDefinition, error) {
-	var v EntityDefinition
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _List_EntityDefinition_Read(l wire.ValueList) ([]*EntityDefinition, error) {
-	if l.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-
-	o := make([]*EntityDefinition, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _EntityDefinition_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
 }
 
 // FromWire deserializes a CheckSchemaRequest struct from its Thrift-level
@@ -551,38 +697,8 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TBinary {
-				var x string
-				x, err = field.Value.GetString(), error(nil)
-				v.Scope = &x
-				if err != nil {
-					return err
-				}
-
-			}
-		case 2:
-			if field.Value.Type() == wire.TBinary {
-				var x string
-				x, err = field.Value.GetString(), error(nil)
-				v.NamePrefix = &x
-				if err != nil {
-					return err
-				}
-
-			}
-		case 3:
-			if field.Value.Type() == wire.TList {
-				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
-				if err != nil {
-					return err
-				}
-
-			}
-		case 4:
-			if field.Value.Type() == wire.TBool {
-				var x bool
-				x, err = field.Value.GetBool(), error(nil)
-				v.ToUpsert = &x
+			if field.Value.Type() == wire.TStruct {
+				v.ScopeDef, err = _ScopeDefinition_Read(field.Value)
 				if err != nil {
 					return err
 				}
@@ -601,51 +717,14 @@ func (v *CheckSchemaRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [1]string
 	i := 0
-	if v.Scope != nil {
-		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
-		i++
-	}
-	if v.NamePrefix != nil {
-		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
-		i++
-	}
-	if v.EntityDefs != nil {
-		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
-		i++
-	}
-	if v.ToUpsert != nil {
-		fields[i] = fmt.Sprintf("ToUpsert: %v", *(v.ToUpsert))
+	if v.ScopeDef != nil {
+		fields[i] = fmt.Sprintf("ScopeDef: %v", v.ScopeDef)
 		i++
 	}
 
 	return fmt.Sprintf("CheckSchemaRequest{%v}", strings.Join(fields[:i], ", "))
-}
-
-func _List_EntityDefinition_Equals(lhs, rhs []*EntityDefinition) bool {
-	if len(lhs) != len(rhs) {
-		return false
-	}
-
-	for i, lv := range lhs {
-		rv := rhs[i]
-		if !lv.Equals(rv) {
-			return false
-		}
-	}
-
-	return true
-}
-
-func _Bool_EqualsPtr(lhs, rhs *bool) bool {
-	if lhs != nil && rhs != nil {
-
-		x := *lhs
-		y := *rhs
-		return (x == y)
-	}
-	return lhs == nil && rhs == nil
 }
 
 // Equals returns true if all the fields of this CheckSchemaRequest match the
@@ -653,50 +732,11 @@ func _Bool_EqualsPtr(lhs, rhs *bool) bool {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaRequest) Equals(rhs *CheckSchemaRequest) bool {
-	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
-		return false
-	}
-	if !_String_EqualsPtr(v.NamePrefix, rhs.NamePrefix) {
-		return false
-	}
-	if !((v.EntityDefs == nil && rhs.EntityDefs == nil) || (v.EntityDefs != nil && rhs.EntityDefs != nil && _List_EntityDefinition_Equals(v.EntityDefs, rhs.EntityDefs))) {
-		return false
-	}
-	if !_Bool_EqualsPtr(v.ToUpsert, rhs.ToUpsert) {
+	if !((v.ScopeDef == nil && rhs.ScopeDef == nil) || (v.ScopeDef != nil && rhs.ScopeDef != nil && v.ScopeDef.Equals(rhs.ScopeDef))) {
 		return false
 	}
 
 	return true
-}
-
-// GetScope returns the value of Scope if it is set or its
-// zero value if it is unset.
-func (v *CheckSchemaRequest) GetScope() (o string) {
-	if v.Scope != nil {
-		return *v.Scope
-	}
-
-	return
-}
-
-// GetNamePrefix returns the value of NamePrefix if it is set or its
-// zero value if it is unset.
-func (v *CheckSchemaRequest) GetNamePrefix() (o string) {
-	if v.NamePrefix != nil {
-		return *v.NamePrefix
-	}
-
-	return
-}
-
-// GetToUpsert returns the value of ToUpsert if it is set or its
-// zero value if it is unset.
-func (v *CheckSchemaRequest) GetToUpsert() (o bool) {
-	if v.ToUpsert != nil {
-		return *v.ToUpsert
-	}
-
-	return
 }
 
 type CheckSchemaResponse struct {
@@ -1270,6 +1310,16 @@ func (v *ClusteringKey) String() string {
 	}
 
 	return fmt.Sprintf("ClusteringKey{%v}", strings.Join(fields[:i], ", "))
+}
+
+func _Bool_EqualsPtr(lhs, rhs *bool) bool {
+	if lhs != nil && rhs != nil {
+
+		x := *lhs
+		y := *rhs
+		return (x == y)
+	}
+	return lhs == nil && rhs == nil
 }
 
 // Equals returns true if all the fields of this ClusteringKey match the
@@ -6916,6 +6966,250 @@ func (v *SchemaRef) GetEntityName() (o string) {
 func (v *SchemaRef) GetVersion() (o int32) {
 	if v.Version != nil {
 		return *v.Version
+	}
+
+	return
+}
+
+type ScopeDefinition struct {
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
+	EntityDefs []*EntityDefinition `json:"entityDefs,omitempty"`
+}
+
+type _List_EntityDefinition_ValueList []*EntityDefinition
+
+func (v _List_EntityDefinition_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_EntityDefinition_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_EntityDefinition_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_EntityDefinition_ValueList) Close() {}
+
+// ToWire translates a ScopeDefinition struct into a Thrift-level intermediate
+// representation. This intermediate representation may be serialized
+// into bytes using a ThriftRW protocol implementation.
+//
+// An error is returned if the struct or any of its fields failed to
+// validate.
+//
+//   x, err := v.ToWire()
+//   if err != nil {
+//     return err
+//   }
+//
+//   if err := binaryProtocol.Encode(x, writer); err != nil {
+//     return err
+//   }
+func (v *ScopeDefinition) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDefs != nil {
+		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _EntityDefinition_Read(w wire.Value) (*EntityDefinition, error) {
+	var v EntityDefinition
+	err := v.FromWire(w)
+	return &v, err
+}
+
+func _List_EntityDefinition_Read(l wire.ValueList) ([]*EntityDefinition, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+
+	o := make([]*EntityDefinition, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _EntityDefinition_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
+// FromWire deserializes a ScopeDefinition struct from its Thrift-level
+// representation. The Thrift-level representation may be obtained
+// from a ThriftRW protocol implementation.
+//
+// An error is returned if we were unable to build a ScopeDefinition struct
+// from the provided intermediate representation.
+//
+//   x, err := binaryProtocol.Decode(reader, wire.TStruct)
+//   if err != nil {
+//     return nil, err
+//   }
+//
+//   var v ScopeDefinition
+//   if err := v.FromWire(x); err != nil {
+//     return nil, err
+//   }
+//   return &v, nil
+func (v *ScopeDefinition) FromWire(w wire.Value) error {
+	var err error
+
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
+			if field.Value.Type() == wire.TList {
+				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+
+			}
+		}
+	}
+
+	return nil
+}
+
+// String returns a readable string representation of a ScopeDefinition
+// struct.
+func (v *ScopeDefinition) String() string {
+	if v == nil {
+		return "<nil>"
+	}
+
+	var fields [3]string
+	i := 0
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.EntityDefs != nil {
+		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
+		i++
+	}
+
+	return fmt.Sprintf("ScopeDefinition{%v}", strings.Join(fields[:i], ", "))
+}
+
+func _List_EntityDefinition_Equals(lhs, rhs []*EntityDefinition) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+
+	for i, lv := range lhs {
+		rv := rhs[i]
+		if !lv.Equals(rv) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Equals returns true if all the fields of this ScopeDefinition match the
+// provided ScopeDefinition.
+//
+// This function performs a deep comparison.
+func (v *ScopeDefinition) Equals(rhs *ScopeDefinition) bool {
+	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
+		return false
+	}
+	if !_String_EqualsPtr(v.NamePrefix, rhs.NamePrefix) {
+		return false
+	}
+	if !((v.EntityDefs == nil && rhs.EntityDefs == nil) || (v.EntityDefs != nil && rhs.EntityDefs != nil && _List_EntityDefinition_Equals(v.EntityDefs, rhs.EntityDefs))) {
+		return false
+	}
+
+	return true
+}
+
+// GetScope returns the value of Scope if it is set or its
+// zero value if it is unset.
+func (v *ScopeDefinition) GetScope() (o string) {
+	if v.Scope != nil {
+		return *v.Scope
+	}
+
+	return
+}
+
+// GetNamePrefix returns the value of NamePrefix if it is set or its
+// zero value if it is unset.
+func (v *ScopeDefinition) GetNamePrefix() (o string) {
+	if v.NamePrefix != nil {
+		return *v.NamePrefix
 	}
 
 	return
