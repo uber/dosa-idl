@@ -91,6 +91,12 @@ struct EntityDefinition {
    4: optional map<string, IndexDefinition> Indexes
 }
 
+struct ScopeDefinition {
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
+}
+
 struct Error {
    1: optional i32 errCode
    2: optional string msg
@@ -216,17 +222,23 @@ struct ScanResponse {
    2: optional string nextToken
 }
 
+struct CanUpsertSchemaRequest {
+   1: optional ScopeDefinition scopeDef
+}
+
+struct CanUpsertSchemaResponse {
+   1: optional i32 version
+}
+
 struct CheckSchemaRequest {
-   1: optional string scope
-   2: optional string namePrefix
-   3: optional list<EntityDefinition> entityDefs
-   4: optional bool toUpsert
+   1: optional ScopeDefinition scopeDef
 }
 
 struct CheckSchemaResponse {
    1: optional i32 version
 }
 
+// TODO(jzhan): use ScopeDefinition to replace 1, 2, and 3.
 struct UpsertSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
@@ -362,6 +374,14 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+   )
+
+   CanUpsertSchemaResponse canUpsertSchema(
+       1: CanUpsertSchemaRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+       3: BadSchemaError schemaError
    )
 
    CheckSchemaResponse checkSchema(
