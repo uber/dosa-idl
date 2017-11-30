@@ -91,12 +91,6 @@ struct EntityDefinition {
    4: optional map<string, IndexDefinition> Indexes
 }
 
-struct ScopeDefinition {
-   1: optional string scope
-   2: optional string namePrefix
-   3: optional list<EntityDefinition> entityDefs
-}
-
 struct Error {
    1: optional i32 errCode
    2: optional string msg
