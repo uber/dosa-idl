@@ -410,8 +410,39 @@ func (v *BadSchemaError) Error() string {
 }
 
 type CanUpsertSchemaRequest struct {
-	ScopeDef *ScopeDefinition `json:"scopeDef,omitempty"`
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
+	EntityDefs []*EntityDefinition `json:"entityDefs,omitempty"`
 }
+
+type _List_EntityDefinition_ValueList []*EntityDefinition
+
+func (v _List_EntityDefinition_ValueList) ForEach(f func(wire.Value) error) error {
+	for i, x := range v {
+		if x == nil {
+			return fmt.Errorf("invalid [%v]: value is nil", i)
+		}
+		w, err := x.ToWire()
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_EntityDefinition_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_EntityDefinition_ValueList) ValueType() wire.Type {
+	return wire.TStruct
+}
+
+func (_List_EntityDefinition_ValueList) Close() {}
 
 // ToWire translates a CanUpsertSchemaRequest struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
@@ -430,28 +461,62 @@ type CanUpsertSchemaRequest struct {
 //   }
 func (v *CanUpsertSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
 
-	if v.ScopeDef != nil {
-		w, err = v.ScopeDef.ToWire()
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDefs != nil {
+		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
 }
 
-func _ScopeDefinition_Read(w wire.Value) (*ScopeDefinition, error) {
-	var v ScopeDefinition
+func _EntityDefinition_Read(w wire.Value) (*EntityDefinition, error) {
+	var v EntityDefinition
 	err := v.FromWire(w)
 	return &v, err
+}
+
+func _List_EntityDefinition_Read(l wire.ValueList) ([]*EntityDefinition, error) {
+	if l.ValueType() != wire.TStruct {
+		return nil, nil
+	}
+
+	o := make([]*EntityDefinition, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := _EntityDefinition_Read(x)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
 }
 
 // FromWire deserializes a CanUpsertSchemaRequest struct from its Thrift-level
@@ -477,8 +542,28 @@ func (v *CanUpsertSchemaRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.ScopeDef, err = _ScopeDefinition_Read(field.Value)
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
+			if field.Value.Type() == wire.TList {
+				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -497,14 +582,37 @@ func (v *CanUpsertSchemaRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [3]string
 	i := 0
-	if v.ScopeDef != nil {
-		fields[i] = fmt.Sprintf("ScopeDef: %v", v.ScopeDef)
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.EntityDefs != nil {
+		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
 		i++
 	}
 
 	return fmt.Sprintf("CanUpsertSchemaRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+func _List_EntityDefinition_Equals(lhs, rhs []*EntityDefinition) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+
+	for i, lv := range lhs {
+		rv := rhs[i]
+		if !lv.Equals(rv) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // Equals returns true if all the fields of this CanUpsertSchemaRequest match the
@@ -512,11 +620,37 @@ func (v *CanUpsertSchemaRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *CanUpsertSchemaRequest) Equals(rhs *CanUpsertSchemaRequest) bool {
-	if !((v.ScopeDef == nil && rhs.ScopeDef == nil) || (v.ScopeDef != nil && rhs.ScopeDef != nil && v.ScopeDef.Equals(rhs.ScopeDef))) {
+	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
+		return false
+	}
+	if !_String_EqualsPtr(v.NamePrefix, rhs.NamePrefix) {
+		return false
+	}
+	if !((v.EntityDefs == nil && rhs.EntityDefs == nil) || (v.EntityDefs != nil && rhs.EntityDefs != nil && _List_EntityDefinition_Equals(v.EntityDefs, rhs.EntityDefs))) {
 		return false
 	}
 
 	return true
+}
+
+// GetScope returns the value of Scope if it is set or its
+// zero value if it is unset.
+func (v *CanUpsertSchemaRequest) GetScope() (o string) {
+	if v.Scope != nil {
+		return *v.Scope
+	}
+
+	return
+}
+
+// GetNamePrefix returns the value of NamePrefix if it is set or its
+// zero value if it is unset.
+func (v *CanUpsertSchemaRequest) GetNamePrefix() (o string) {
+	if v.NamePrefix != nil {
+		return *v.NamePrefix
+	}
+
+	return
 }
 
 type CanUpsertSchemaResponse struct {
@@ -636,7 +770,9 @@ func (v *CanUpsertSchemaResponse) GetVersion() (o int32) {
 }
 
 type CheckSchemaRequest struct {
-	ScopeDef *ScopeDefinition `json:"scopeDef,omitempty"`
+	Scope      *string             `json:"scope,omitempty"`
+	NamePrefix *string             `json:"namePrefix,omitempty"`
+	EntityDefs []*EntityDefinition `json:"entityDefs,omitempty"`
 }
 
 // ToWire translates a CheckSchemaRequest struct into a Thrift-level intermediate
@@ -656,18 +792,34 @@ type CheckSchemaRequest struct {
 //   }
 func (v *CheckSchemaRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
 	)
 
-	if v.ScopeDef != nil {
-		w, err = v.ScopeDef.ToWire()
+	if v.Scope != nil {
+		w, err = wire.NewValueString(*(v.Scope)), error(nil)
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.NamePrefix != nil {
+		w, err = wire.NewValueString(*(v.NamePrefix)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDefs != nil {
+		w, err = wire.NewValueList(_List_EntityDefinition_ValueList(v.EntityDefs)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -697,8 +849,28 @@ func (v *CheckSchemaRequest) FromWire(w wire.Value) error {
 	for _, field := range w.GetStruct().Fields {
 		switch field.ID {
 		case 1:
-			if field.Value.Type() == wire.TStruct {
-				v.ScopeDef, err = _ScopeDefinition_Read(field.Value)
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Scope = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.NamePrefix = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
+			if field.Value.Type() == wire.TList {
+				v.EntityDefs, err = _List_EntityDefinition_Read(field.Value.GetList())
 				if err != nil {
 					return err
 				}
@@ -717,10 +889,18 @@ func (v *CheckSchemaRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [3]string
 	i := 0
-	if v.ScopeDef != nil {
-		fields[i] = fmt.Sprintf("ScopeDef: %v", v.ScopeDef)
+	if v.Scope != nil {
+		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
+		i++
+	}
+	if v.NamePrefix != nil {
+		fields[i] = fmt.Sprintf("NamePrefix: %v", *(v.NamePrefix))
+		i++
+	}
+	if v.EntityDefs != nil {
+		fields[i] = fmt.Sprintf("EntityDefs: %v", v.EntityDefs)
 		i++
 	}
 
@@ -732,11 +912,37 @@ func (v *CheckSchemaRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaRequest) Equals(rhs *CheckSchemaRequest) bool {
-	if !((v.ScopeDef == nil && rhs.ScopeDef == nil) || (v.ScopeDef != nil && rhs.ScopeDef != nil && v.ScopeDef.Equals(rhs.ScopeDef))) {
+	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
+		return false
+	}
+	if !_String_EqualsPtr(v.NamePrefix, rhs.NamePrefix) {
+		return false
+	}
+	if !((v.EntityDefs == nil && rhs.EntityDefs == nil) || (v.EntityDefs != nil && rhs.EntityDefs != nil && _List_EntityDefinition_Equals(v.EntityDefs, rhs.EntityDefs))) {
 		return false
 	}
 
 	return true
+}
+
+// GetScope returns the value of Scope if it is set or its
+// zero value if it is unset.
+func (v *CheckSchemaRequest) GetScope() (o string) {
+	if v.Scope != nil {
+		return *v.Scope
+	}
+
+	return
+}
+
+// GetNamePrefix returns the value of NamePrefix if it is set or its
+// zero value if it is unset.
+func (v *CheckSchemaRequest) GetNamePrefix() (o string) {
+	if v.NamePrefix != nil {
+		return *v.NamePrefix
+	}
+
+	return
 }
 
 type CheckSchemaResponse struct {
@@ -6977,35 +7183,6 @@ type ScopeDefinition struct {
 	EntityDefs []*EntityDefinition `json:"entityDefs,omitempty"`
 }
 
-type _List_EntityDefinition_ValueList []*EntityDefinition
-
-func (v _List_EntityDefinition_ValueList) ForEach(f func(wire.Value) error) error {
-	for i, x := range v {
-		if x == nil {
-			return fmt.Errorf("invalid [%v]: value is nil", i)
-		}
-		w, err := x.ToWire()
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_EntityDefinition_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_EntityDefinition_ValueList) ValueType() wire.Type {
-	return wire.TStruct
-}
-
-func (_List_EntityDefinition_ValueList) Close() {}
-
 // ToWire translates a ScopeDefinition struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
 // into bytes using a ThriftRW protocol implementation.
@@ -7055,30 +7232,6 @@ func (v *ScopeDefinition) ToWire() (wire.Value, error) {
 	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _EntityDefinition_Read(w wire.Value) (*EntityDefinition, error) {
-	var v EntityDefinition
-	err := v.FromWire(w)
-	return &v, err
-}
-
-func _List_EntityDefinition_Read(l wire.ValueList) ([]*EntityDefinition, error) {
-	if l.ValueType() != wire.TStruct {
-		return nil, nil
-	}
-
-	o := make([]*EntityDefinition, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := _EntityDefinition_Read(x)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
 }
 
 // FromWire deserializes a ScopeDefinition struct from its Thrift-level
@@ -7160,21 +7313,6 @@ func (v *ScopeDefinition) String() string {
 	}
 
 	return fmt.Sprintf("ScopeDefinition{%v}", strings.Join(fields[:i], ", "))
-}
-
-func _List_EntityDefinition_Equals(lhs, rhs []*EntityDefinition) bool {
-	if len(lhs) != len(rhs) {
-		return false
-	}
-
-	for i, lv := range lhs {
-		rv := rhs[i]
-		if !lv.Equals(rv) {
-			return false
-		}
-	}
-
-	return true
 }
 
 // Equals returns true if all the fields of this ScopeDefinition match the

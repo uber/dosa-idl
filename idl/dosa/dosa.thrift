@@ -223,7 +223,9 @@ struct ScanResponse {
 }
 
 struct CanUpsertSchemaRequest {
-   1: optional ScopeDefinition scopeDef
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
 }
 
 struct CanUpsertSchemaResponse {
@@ -231,14 +233,15 @@ struct CanUpsertSchemaResponse {
 }
 
 struct CheckSchemaRequest {
-   1: optional ScopeDefinition scopeDef
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
 }
 
 struct CheckSchemaResponse {
    1: optional i32 version
 }
 
-// TODO(jzhan): use ScopeDefinition to replace 1, 2, and 3.
 struct UpsertSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
