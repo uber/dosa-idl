@@ -223,6 +223,7 @@ struct CanUpsertSchemaRequest {
 }
 
 struct CanUpsertSchemaResponse {
+   // latest upserted version
    1: optional i32 version
 }
 
