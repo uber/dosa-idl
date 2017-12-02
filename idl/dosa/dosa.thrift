@@ -216,6 +216,17 @@ struct ScanResponse {
    2: optional string nextToken
 }
 
+struct CanUpsertSchemaRequest {
+   1: optional string scope
+   2: optional string namePrefix
+   3: optional list<EntityDefinition> entityDefs
+}
+
+struct CanUpsertSchemaResponse {
+   // latest upserted version
+   1: optional i32 version
+}
+
 struct CheckSchemaRequest {
    1: optional string scope
    2: optional string namePrefix
@@ -361,6 +372,14 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+   )
+
+   CanUpsertSchemaResponse canUpsertSchema(
+       1: CanUpsertSchemaRequest request
+   ) throws (
+       1: BadRequestError clientError
+       2: InternalServerError serverError
+       3: BadSchemaError schemaError
    )
 
    CheckSchemaResponse checkSchema(

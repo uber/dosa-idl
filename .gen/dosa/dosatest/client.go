@@ -42,6 +42,39 @@ func (m *MockClient) EXPECT() *_MockClientRecorder {
 	return m.recorder
 }
 
+// CanUpsertSchema responds to a CanUpsertSchema call based on the mock expectations. This
+// call will fail if the mock does not expect this call. Use EXPECT to expect
+// a call to this function.
+//
+// 	client.EXPECT().CanUpsertSchema(gomock.Any(), ...).Return(...)
+// 	... := client.CanUpsertSchema(...)
+func (m *MockClient) CanUpsertSchema(
+	ctx context.Context,
+	_Request *dosa.CanUpsertSchemaRequest,
+	opts ...yarpc.CallOption,
+) (success *dosa.CanUpsertSchemaResponse, err error) {
+
+	args := []interface{}{ctx, _Request}
+	for _, o := range opts {
+		args = append(args, o)
+	}
+	i := 0
+	ret := m.ctrl.Call(m, "CanUpsertSchema", args...)
+	success, _ = ret[i].(*dosa.CanUpsertSchemaResponse)
+	i++
+	err, _ = ret[i].(error)
+	return
+}
+
+func (mr *_MockClientRecorder) CanUpsertSchema(
+	ctx interface{},
+	_Request interface{},
+	opts ...interface{},
+) *gomock.Call {
+	args := append([]interface{}{ctx, _Request}, opts...)
+	return mr.mock.ctrl.RecordCall(mr.mock, "CanUpsertSchema", args...)
+}
+
 // CheckSchema responds to a CheckSchema call based on the mock expectations. This
 // call will fail if the mock does not expect this call. Use EXPECT to expect
 // a call to this function.
