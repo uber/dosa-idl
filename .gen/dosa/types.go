@@ -6954,10 +6954,12 @@ func (v *ScanResponse) GetNextToken() (o string) {
 }
 
 type SchemaRef struct {
-	Scope      *string `json:"scope,omitempty"`
-	NamePrefix *string `json:"namePrefix,omitempty"`
-	EntityName *string `json:"entityName,omitempty"`
-	Version    *int32  `json:"version,omitempty"`
+	Scope      *string                     `json:"scope,omitempty"`
+	NamePrefix *string                     `json:"namePrefix,omitempty"`
+	EntityName *string                     `json:"entityName,omitempty"`
+	Version    *int32                      `json:"version,omitempty"`
+	PrimaryKey *PrimaryKey                 `json:"primaryKey,omitempty"`
+	Indexes    map[string]*IndexDefinition `json:"Indexes,omitempty"`
 }
 
 // ToWire translates a SchemaRef struct into a Thrift-level intermediate
@@ -6977,7 +6979,7 @@ type SchemaRef struct {
 //   }
 func (v *SchemaRef) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [6]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -7013,6 +7015,22 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
+		i++
+	}
+	if v.PrimaryKey != nil {
+		w, err = v.PrimaryKey.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 5, Value: w}
+		i++
+	}
+	if v.Indexes != nil {
+		w, err = wire.NewValueMap(_Map_String_IndexDefinition_MapItemList(v.Indexes)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 6, Value: w}
 		i++
 	}
 
@@ -7081,6 +7099,22 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 5:
+			if field.Value.Type() == wire.TStruct {
+				v.PrimaryKey, err = _PrimaryKey_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
+		case 6:
+			if field.Value.Type() == wire.TMap {
+				v.Indexes, err = _Map_String_IndexDefinition_Read(field.Value.GetMap())
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -7094,7 +7128,7 @@ func (v *SchemaRef) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [6]string
 	i := 0
 	if v.Scope != nil {
 		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
@@ -7110,6 +7144,14 @@ func (v *SchemaRef) String() string {
 	}
 	if v.Version != nil {
 		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
+		i++
+	}
+	if v.PrimaryKey != nil {
+		fields[i] = fmt.Sprintf("PrimaryKey: %v", v.PrimaryKey)
+		i++
+	}
+	if v.Indexes != nil {
+		fields[i] = fmt.Sprintf("Indexes: %v", v.Indexes)
 		i++
 	}
 
@@ -7131,6 +7173,12 @@ func (v *SchemaRef) Equals(rhs *SchemaRef) bool {
 		return false
 	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
+		return false
+	}
+	if !((v.PrimaryKey == nil && rhs.PrimaryKey == nil) || (v.PrimaryKey != nil && rhs.PrimaryKey != nil && v.PrimaryKey.Equals(rhs.PrimaryKey))) {
+		return false
+	}
+	if !((v.Indexes == nil && rhs.Indexes == nil) || (v.Indexes != nil && rhs.Indexes != nil && _Map_String_IndexDefinition_Equals(v.Indexes, rhs.Indexes))) {
 		return false
 	}
 

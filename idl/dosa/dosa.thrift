@@ -58,6 +58,8 @@ struct SchemaRef {
     2: optional string namePrefix
     3: optional string entityName
     4: optional i32 version
+    5: optional PrimaryKey primaryKey
+    6: optional map<string, IndexDefinition> Indexes
 }
 
 struct FieldTag {
