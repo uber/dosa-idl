@@ -100,12 +100,14 @@ struct Error {
 struct CreateRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap entityValues
+   3: optional EntityDefinition entityDef
 }
 
 struct ReadRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap keyValues
    3: optional set<string> fieldsToRead
+   4: optional EntityDefinition entityDef
 }
 
 struct ReadResponse {
@@ -116,6 +118,7 @@ struct MultiReadRequest {
    1: optional SchemaRef ref
    2: optional list<FieldValueMap> keyValues
    3: optional set<string> fieldsToRead
+   4: optional EntityDefinition entityDef
 }
 
 union EntityOrError{
@@ -134,21 +137,25 @@ struct MultiUpsertResponse {
 struct UpsertRequest {
     1: optional SchemaRef ref
     2: optional FieldValueMap entityValues
+    3: optional EntityDefinition entityDef
 }
 
 struct MultiUpsertRequest {
     1: optional SchemaRef ref
     2: optional list<FieldValueMap> entities
+    3: optional EntityDefinition entityDef
 }
 
 struct RemoveRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap keyValues
+   3: optional EntityDefinition entityDef
 }
 
 struct MultiRemoveRequest {
    1: optional SchemaRef ref 
    2: optional list<FieldValueMap> keyValues
+   3: optional EntityDefinition entityDef
 }
 
 struct MultiRemoveResponse {
@@ -179,6 +186,7 @@ struct RangeRequest {
    3: optional i32 limit
    4: optional list<Condition> conditions
    5: optional set<string> fieldsToRead
+   6: optional EntityDefinition entityDef
 }
 
 struct RangeResponse {
@@ -189,6 +197,7 @@ struct RangeResponse {
 struct RemoveRangeRequest {
    1: optional SchemaRef ref
    2: optional list<Condition> conditions
+   3: optional EntityDefinition entityDef
 }
 
 struct SearchRequest {
@@ -197,6 +206,7 @@ struct SearchRequest {
    3: optional i32 limit
    4: optional Field searchBy
    5: optional set<string> fieldsToRead
+   6: optional EntityDefinition entityDef
 }
 
 struct SearchResponse {
@@ -209,6 +219,7 @@ struct ScanRequest {
    2: optional string token
    3: optional i32 limit
    4: optional set<string> fieldsToRead
+   5: optional EntityDefinition entityDef
 }
 
 struct ScanResponse {
