@@ -1726,8 +1726,9 @@ func (v *Condition) GetOp() (o Operator) {
 }
 
 type CreateRequest struct {
-	Ref          *SchemaRef    `json:"ref,omitempty"`
-	EntityValues FieldValueMap `json:"entityValues,omitempty"`
+	Ref          *SchemaRef        `json:"ref,omitempty"`
+	EntityValues FieldValueMap     `json:"entityValues,omitempty"`
+	EntityDef    *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a CreateRequest struct into a Thrift-level intermediate
@@ -1747,7 +1748,7 @@ type CreateRequest struct {
 //   }
 func (v *CreateRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1767,6 +1768,14 @@ func (v *CreateRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -1823,6 +1832,14 @@ func (v *CreateRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -1836,7 +1853,7 @@ func (v *CreateRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -1844,6 +1861,10 @@ func (v *CreateRequest) String() string {
 	}
 	if v.EntityValues != nil {
 		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -1859,6 +1880,9 @@ func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
 		return false
 	}
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -3959,6 +3983,7 @@ type MultiReadRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
 	KeyValues    []FieldValueMap     `json:"keyValues,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead,omitempty"`
+	EntityDef    *EntityDefinition   `json:"entityDef,omitempty"`
 }
 
 type _List_FieldValueMap_ValueList []FieldValueMap
@@ -4033,7 +4058,7 @@ func (_Set_String_ValueList) Close() {}
 //   }
 func (v *MultiReadRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4061,6 +4086,14 @@ func (v *MultiReadRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 
@@ -4150,6 +4183,14 @@ func (v *MultiReadRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 4:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -4163,7 +4204,7 @@ func (v *MultiReadRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [3]string
+	var fields [4]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -4175,6 +4216,10 @@ func (v *MultiReadRequest) String() string {
 	}
 	if v.FieldsToRead != nil {
 		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -4222,6 +4267,9 @@ func (v *MultiReadRequest) Equals(rhs *MultiReadRequest) bool {
 		return false
 	}
 	if !((v.FieldsToRead == nil && rhs.FieldsToRead == nil) || (v.FieldsToRead != nil && rhs.FieldsToRead != nil && _Set_String_Equals(v.FieldsToRead, rhs.FieldsToRead))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -4401,8 +4449,9 @@ func (v *MultiReadResponse) Equals(rhs *MultiReadResponse) bool {
 }
 
 type MultiRemoveRequest struct {
-	Ref       *SchemaRef      `json:"ref,omitempty"`
-	KeyValues []FieldValueMap `json:"keyValues,omitempty"`
+	Ref       *SchemaRef        `json:"ref,omitempty"`
+	KeyValues []FieldValueMap   `json:"keyValues,omitempty"`
+	EntityDef *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a MultiRemoveRequest struct into a Thrift-level intermediate
@@ -4422,7 +4471,7 @@ type MultiRemoveRequest struct {
 //   }
 func (v *MultiRemoveRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4442,6 +4491,14 @@ func (v *MultiRemoveRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -4486,6 +4543,14 @@ func (v *MultiRemoveRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -4499,7 +4564,7 @@ func (v *MultiRemoveRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -4507,6 +4572,10 @@ func (v *MultiRemoveRequest) String() string {
 	}
 	if v.KeyValues != nil {
 		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -4522,6 +4591,9 @@ func (v *MultiRemoveRequest) Equals(rhs *MultiRemoveRequest) bool {
 		return false
 	}
 	if !((v.KeyValues == nil && rhs.KeyValues == nil) || (v.KeyValues != nil && rhs.KeyValues != nil && _List_FieldValueMap_Equals(v.KeyValues, rhs.KeyValues))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -4695,8 +4767,9 @@ func (v *MultiRemoveResponse) Equals(rhs *MultiRemoveResponse) bool {
 }
 
 type MultiUpsertRequest struct {
-	Ref      *SchemaRef      `json:"ref,omitempty"`
-	Entities []FieldValueMap `json:"entities,omitempty"`
+	Ref       *SchemaRef        `json:"ref,omitempty"`
+	Entities  []FieldValueMap   `json:"entities,omitempty"`
+	EntityDef *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a MultiUpsertRequest struct into a Thrift-level intermediate
@@ -4716,7 +4789,7 @@ type MultiUpsertRequest struct {
 //   }
 func (v *MultiUpsertRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4736,6 +4809,14 @@ func (v *MultiUpsertRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -4780,6 +4861,14 @@ func (v *MultiUpsertRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -4793,7 +4882,7 @@ func (v *MultiUpsertRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -4801,6 +4890,10 @@ func (v *MultiUpsertRequest) String() string {
 	}
 	if v.Entities != nil {
 		fields[i] = fmt.Sprintf("Entities: %v", v.Entities)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -4816,6 +4909,9 @@ func (v *MultiUpsertRequest) Equals(rhs *MultiUpsertRequest) bool {
 		return false
 	}
 	if !((v.Entities == nil && rhs.Entities == nil) || (v.Entities != nil && rhs.Entities != nil && _List_FieldValueMap_Equals(v.Entities, rhs.Entities))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -5344,6 +5440,7 @@ type RangeRequest struct {
 	Limit        *int32              `json:"limit,omitempty"`
 	Conditions   []*Condition        `json:"conditions,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead,omitempty"`
+	EntityDef    *EntityDefinition   `json:"entityDef,omitempty"`
 }
 
 type _List_Condition_ValueList []*Condition
@@ -5392,7 +5489,7 @@ func (_List_Condition_ValueList) Close() {}
 //   }
 func (v *RangeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [5]wire.Field
+		fields [6]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -5436,6 +5533,14 @@ func (v *RangeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 5, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 6, Value: w}
 		i++
 	}
 
@@ -5532,6 +5637,14 @@ func (v *RangeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 6:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -5545,7 +5658,7 @@ func (v *RangeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [5]string
+	var fields [6]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -5565,6 +5678,10 @@ func (v *RangeRequest) String() string {
 	}
 	if v.FieldsToRead != nil {
 		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -5604,6 +5721,9 @@ func (v *RangeRequest) Equals(rhs *RangeRequest) bool {
 		return false
 	}
 	if !((v.FieldsToRead == nil && rhs.FieldsToRead == nil) || (v.FieldsToRead != nil && rhs.FieldsToRead != nil && _Set_String_Equals(v.FieldsToRead, rhs.FieldsToRead))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -6105,6 +6225,7 @@ type ReadRequest struct {
 	Ref          *SchemaRef          `json:"ref,omitempty"`
 	KeyValues    FieldValueMap       `json:"keyValues,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead,omitempty"`
+	EntityDef    *EntityDefinition   `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a ReadRequest struct into a Thrift-level intermediate
@@ -6124,7 +6245,7 @@ type ReadRequest struct {
 //   }
 func (v *ReadRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -6152,6 +6273,14 @@ func (v *ReadRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 
@@ -6204,6 +6333,14 @@ func (v *ReadRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 4:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -6217,7 +6354,7 @@ func (v *ReadRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [3]string
+	var fields [4]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -6229,6 +6366,10 @@ func (v *ReadRequest) String() string {
 	}
 	if v.FieldsToRead != nil {
 		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -6247,6 +6388,9 @@ func (v *ReadRequest) Equals(rhs *ReadRequest) bool {
 		return false
 	}
 	if !((v.FieldsToRead == nil && rhs.FieldsToRead == nil) || (v.FieldsToRead != nil && rhs.FieldsToRead != nil && _Set_String_Equals(v.FieldsToRead, rhs.FieldsToRead))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -6358,8 +6502,9 @@ func (v *ReadResponse) Equals(rhs *ReadResponse) bool {
 }
 
 type RemoveRangeRequest struct {
-	Ref        *SchemaRef   `json:"ref,omitempty"`
-	Conditions []*Condition `json:"conditions,omitempty"`
+	Ref        *SchemaRef        `json:"ref,omitempty"`
+	Conditions []*Condition      `json:"conditions,omitempty"`
+	EntityDef  *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a RemoveRangeRequest struct into a Thrift-level intermediate
@@ -6379,7 +6524,7 @@ type RemoveRangeRequest struct {
 //   }
 func (v *RemoveRangeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -6399,6 +6544,14 @@ func (v *RemoveRangeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -6443,6 +6596,14 @@ func (v *RemoveRangeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -6456,7 +6617,7 @@ func (v *RemoveRangeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -6464,6 +6625,10 @@ func (v *RemoveRangeRequest) String() string {
 	}
 	if v.Conditions != nil {
 		fields[i] = fmt.Sprintf("Conditions: %v", v.Conditions)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -6481,13 +6646,17 @@ func (v *RemoveRangeRequest) Equals(rhs *RemoveRangeRequest) bool {
 	if !((v.Conditions == nil && rhs.Conditions == nil) || (v.Conditions != nil && rhs.Conditions != nil && _List_Condition_Equals(v.Conditions, rhs.Conditions))) {
 		return false
 	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
+		return false
+	}
 
 	return true
 }
 
 type RemoveRequest struct {
-	Ref       *SchemaRef    `json:"ref,omitempty"`
-	KeyValues FieldValueMap `json:"keyValues,omitempty"`
+	Ref       *SchemaRef        `json:"ref,omitempty"`
+	KeyValues FieldValueMap     `json:"keyValues,omitempty"`
+	EntityDef *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a RemoveRequest struct into a Thrift-level intermediate
@@ -6507,7 +6676,7 @@ type RemoveRequest struct {
 //   }
 func (v *RemoveRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -6527,6 +6696,14 @@ func (v *RemoveRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -6571,6 +6748,14 @@ func (v *RemoveRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -6584,7 +6769,7 @@ func (v *RemoveRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -6592,6 +6777,10 @@ func (v *RemoveRequest) String() string {
 	}
 	if v.KeyValues != nil {
 		fields[i] = fmt.Sprintf("KeyValues: %v", v.KeyValues)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -6609,6 +6798,9 @@ func (v *RemoveRequest) Equals(rhs *RemoveRequest) bool {
 	if !((v.KeyValues == nil && rhs.KeyValues == nil) || (v.KeyValues != nil && rhs.KeyValues != nil && v.KeyValues.Equals(rhs.KeyValues))) {
 		return false
 	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
+		return false
+	}
 
 	return true
 }
@@ -6618,6 +6810,7 @@ type ScanRequest struct {
 	Token        *string             `json:"token,omitempty"`
 	Limit        *int32              `json:"limit,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead,omitempty"`
+	EntityDef    *EntityDefinition   `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a ScanRequest struct into a Thrift-level intermediate
@@ -6637,7 +6830,7 @@ type ScanRequest struct {
 //   }
 func (v *ScanRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [5]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -6673,6 +6866,14 @@ func (v *ScanRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -6737,6 +6938,14 @@ func (v *ScanRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 5:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -6750,7 +6959,7 @@ func (v *ScanRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [5]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -6766,6 +6975,10 @@ func (v *ScanRequest) String() string {
 	}
 	if v.FieldsToRead != nil {
 		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -6787,6 +7000,9 @@ func (v *ScanRequest) Equals(rhs *ScanRequest) bool {
 		return false
 	}
 	if !((v.FieldsToRead == nil && rhs.FieldsToRead == nil) || (v.FieldsToRead != nil && rhs.FieldsToRead != nil && _Set_String_Equals(v.FieldsToRead, rhs.FieldsToRead))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -7415,6 +7631,7 @@ type SearchRequest struct {
 	Limit        *int32              `json:"limit,omitempty"`
 	SearchBy     *Field              `json:"searchBy,omitempty"`
 	FieldsToRead map[string]struct{} `json:"fieldsToRead,omitempty"`
+	EntityDef    *EntityDefinition   `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a SearchRequest struct into a Thrift-level intermediate
@@ -7434,7 +7651,7 @@ type SearchRequest struct {
 //   }
 func (v *SearchRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [5]wire.Field
+		fields [6]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -7478,6 +7695,14 @@ func (v *SearchRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 5, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 6, Value: w}
 		i++
 	}
 
@@ -7550,6 +7775,14 @@ func (v *SearchRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 6:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -7563,7 +7796,7 @@ func (v *SearchRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [5]string
+	var fields [6]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -7583,6 +7816,10 @@ func (v *SearchRequest) String() string {
 	}
 	if v.FieldsToRead != nil {
 		fields[i] = fmt.Sprintf("FieldsToRead: %v", v.FieldsToRead)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -7607,6 +7844,9 @@ func (v *SearchRequest) Equals(rhs *SearchRequest) bool {
 		return false
 	}
 	if !((v.FieldsToRead == nil && rhs.FieldsToRead == nil) || (v.FieldsToRead != nil && rhs.FieldsToRead != nil && _Set_String_Equals(v.FieldsToRead, rhs.FieldsToRead))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
@@ -7890,8 +8130,9 @@ func (v *TruncateScopeRequest) GetName() (o string) {
 }
 
 type UpsertRequest struct {
-	Ref          *SchemaRef    `json:"ref,omitempty"`
-	EntityValues FieldValueMap `json:"entityValues,omitempty"`
+	Ref          *SchemaRef        `json:"ref,omitempty"`
+	EntityValues FieldValueMap     `json:"entityValues,omitempty"`
+	EntityDef    *EntityDefinition `json:"entityDef,omitempty"`
 }
 
 // ToWire translates a UpsertRequest struct into a Thrift-level intermediate
@@ -7911,7 +8152,7 @@ type UpsertRequest struct {
 //   }
 func (v *UpsertRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -7931,6 +8172,14 @@ func (v *UpsertRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.EntityDef != nil {
+		w, err = v.EntityDef.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -7975,6 +8224,14 @@ func (v *UpsertRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.EntityDef, err = _EntityDefinition_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -7988,7 +8245,7 @@ func (v *UpsertRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -7996,6 +8253,10 @@ func (v *UpsertRequest) String() string {
 	}
 	if v.EntityValues != nil {
 		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
+		i++
+	}
+	if v.EntityDef != nil {
+		fields[i] = fmt.Sprintf("EntityDef: %v", v.EntityDef)
 		i++
 	}
 
@@ -8011,6 +8272,9 @@ func (v *UpsertRequest) Equals(rhs *UpsertRequest) bool {
 		return false
 	}
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
+		return false
+	}
+	if !((v.EntityDef == nil && rhs.EntityDef == nil) || (v.EntityDef != nil && rhs.EntityDef != nil && v.EntityDef.Equals(rhs.EntityDef))) {
 		return false
 	}
 
