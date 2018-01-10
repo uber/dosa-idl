@@ -262,6 +262,7 @@ struct CheckSchemaStatusResponse {
 
 struct CreateScopeRequest {
    1: optional string name
+   2: optional string requester
 }
 
 struct ScopeExistsRequest {
@@ -274,9 +275,11 @@ struct ScopeExistsResponse {
 
 struct TruncateScopeRequest {
    1: optional string name
+   2: optional string requester
 }
 struct DropScopeRequest {
    1: optional string name
+   2: optional string requester
 }
 
 exception BadRequestError {
