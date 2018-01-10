@@ -1,6 +1,6 @@
 .PHONY: all thriftrw
 
-THRIFTRW_VERSION := v1.8
+THRIFTRW_VERSION := v1.9
 THRIFT_SRC := idl/dosa/dosa.thrift
 OUT := .gen
 export PATH := $(GOPATH)/bin:$(PATH)
