@@ -1868,6 +1868,7 @@ func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
 type CreateScopeRequest struct {
 	Name      *string `json:"name,omitempty"`
 	Requester *string `json:"requester,omitempty"`
+	Owner     *string `json:"owner,omitempty"`
 }
 
 // ToWire translates a CreateScopeRequest struct into a Thrift-level intermediate
@@ -1887,7 +1888,7 @@ type CreateScopeRequest struct {
 //   }
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1907,6 +1908,14 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.Owner != nil {
+		w, err = wire.NewValueString(*(v.Owner)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -1955,6 +1964,16 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Owner = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -1968,7 +1987,7 @@ func (v *CreateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -1976,6 +1995,10 @@ func (v *CreateScopeRequest) String() string {
 	}
 	if v.Requester != nil {
 		fields[i] = fmt.Sprintf("Requester: %v", *(v.Requester))
+		i++
+	}
+	if v.Owner != nil {
+		fields[i] = fmt.Sprintf("Owner: %v", *(v.Owner))
 		i++
 	}
 
@@ -1991,6 +2014,9 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 		return false
 	}
 	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
+		return false
+	}
+	if !_String_EqualsPtr(v.Owner, rhs.Owner) {
 		return false
 	}
 
@@ -2012,6 +2038,16 @@ func (v *CreateScopeRequest) GetName() (o string) {
 func (v *CreateScopeRequest) GetRequester() (o string) {
 	if v.Requester != nil {
 		return *v.Requester
+	}
+
+	return
+}
+
+// GetOwner returns the value of Owner if it is set or its
+// zero value if it is unset.
+func (v *CreateScopeRequest) GetOwner() (o string) {
+	if v.Owner != nil {
+		return *v.Owner
 	}
 
 	return
