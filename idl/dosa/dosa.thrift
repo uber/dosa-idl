@@ -89,6 +89,7 @@ struct EntityDefinition {
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
    4: optional map<string, IndexDefinition> Indexes
+   5: optional bool enableETL
 }
 
 struct Error {

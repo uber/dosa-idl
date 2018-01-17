@@ -2322,6 +2322,7 @@ type EntityDefinition struct {
 	FieldDescs map[string]*FieldDesc       `json:"fieldDescs,omitempty"`
 	PrimaryKey *PrimaryKey                 `json:"primaryKey,omitempty"`
 	Indexes    map[string]*IndexDefinition `json:"Indexes,omitempty"`
+	EnableETL  *bool                       `json:"enableETL,omitempty"`
 }
 
 type _Map_String_FieldDesc_MapItemList map[string]*FieldDesc
@@ -2417,7 +2418,7 @@ func (_Map_String_IndexDefinition_MapItemList) Close() {}
 //   }
 func (v *EntityDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [5]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -2453,6 +2454,14 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
+		i++
+	}
+	if v.EnableETL != nil {
+		w, err = wire.NewValueBool(*(v.EnableETL)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -2589,6 +2598,16 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 5:
+			if field.Value.Type() == wire.TBool {
+				var x bool
+				x, err = field.Value.GetBool(), error(nil)
+				v.EnableETL = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -2602,7 +2621,7 @@ func (v *EntityDefinition) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [5]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -2618,6 +2637,10 @@ func (v *EntityDefinition) String() string {
 	}
 	if v.Indexes != nil {
 		fields[i] = fmt.Sprintf("Indexes: %v", v.Indexes)
+		i++
+	}
+	if v.EnableETL != nil {
+		fields[i] = fmt.Sprintf("EnableETL: %v", *(v.EnableETL))
 		i++
 	}
 
@@ -2675,6 +2698,9 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 	if !((v.Indexes == nil && rhs.Indexes == nil) || (v.Indexes != nil && rhs.Indexes != nil && _Map_String_IndexDefinition_Equals(v.Indexes, rhs.Indexes))) {
 		return false
 	}
+	if !_Bool_EqualsPtr(v.EnableETL, rhs.EnableETL) {
+		return false
+	}
 
 	return true
 }
@@ -2684,6 +2710,16 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 func (v *EntityDefinition) GetName() (o string) {
 	if v.Name != nil {
 		return *v.Name
+	}
+
+	return
+}
+
+// GetEnableETL returns the value of EnableETL if it is set or its
+// zero value if it is unset.
+func (v *EntityDefinition) GetEnableETL() (o bool) {
+	if v.EnableETL != nil {
+		return *v.EnableETL
 	}
 
 	return
