@@ -84,12 +84,17 @@ struct IndexDefinition {
    1: optional PrimaryKey key
 }
 
+enum ETLState {
+    OFF
+    ON
+}
+
 struct EntityDefinition {
    1: optional string name
    2: optional map<string, FieldDesc> fieldDescs
    3: optional PrimaryKey primaryKey
    4: optional map<string, IndexDefinition> Indexes
-   5: optional bool enableETL
+   5: optional ETLState etl
 }
 
 struct Error {
