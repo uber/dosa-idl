@@ -86,11 +86,11 @@ struct IndexDefinition {
 
 enum ETLState {
     OFF = 1,
-    ON = 2,
+    ON,
     
     // Reserve a few enum types in case we want to support more
     RESERVED0,
-    RESERVED1,
+    RESERVED1
 }
 
 struct EntityDefinition {
