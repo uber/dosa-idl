@@ -2100,8 +2100,10 @@ func (v *DropScopeRequest) GetName() (o string) {
 type ETLState int32
 
 const (
-	ETLStateOff ETLState = 0
-	ETLStateOn  ETLState = 1
+	ETLStateOff       ETLState = 1
+	ETLStateOn        ETLState = 2
+	ETLStateReserved0 ETLState = 3
+	ETLStateReserved1 ETLState = 4
 )
 
 // ETLState_Values returns all recognized values of ETLState.
@@ -2109,6 +2111,8 @@ func ETLState_Values() []ETLState {
 	return []ETLState{
 		ETLStateOff,
 		ETLStateOn,
+		ETLStateReserved0,
+		ETLStateReserved1,
 	}
 }
 
@@ -2124,6 +2128,12 @@ func (v *ETLState) UnmarshalText(value []byte) error {
 		return nil
 	case "ON":
 		*v = ETLStateOn
+		return nil
+	case "RESERVED0":
+		*v = ETLStateReserved0
+		return nil
+	case "RESERVED1":
+		*v = ETLStateReserved1
 		return nil
 	default:
 		return fmt.Errorf("unknown enum value %q for %q", value, "ETLState")
@@ -2161,10 +2171,14 @@ func (v *ETLState) FromWire(w wire.Value) error {
 func (v ETLState) String() string {
 	w := int32(v)
 	switch w {
-	case 0:
-		return "OFF"
 	case 1:
+		return "OFF"
+	case 2:
 		return "ON"
+	case 3:
+		return "RESERVED0"
+	case 4:
+		return "RESERVED1"
 	}
 	return fmt.Sprintf("ETLState(%d)", w)
 }
@@ -2183,10 +2197,14 @@ func (v ETLState) Equals(rhs ETLState) bool {
 // This implements json.Marshaler.
 func (v ETLState) MarshalJSON() ([]byte, error) {
 	switch int32(v) {
-	case 0:
-		return ([]byte)("\"OFF\""), nil
 	case 1:
+		return ([]byte)("\"OFF\""), nil
+	case 2:
 		return ([]byte)("\"ON\""), nil
+	case 3:
+		return ([]byte)("\"RESERVED0\""), nil
+	case 4:
+		return ([]byte)("\"RESERVED1\""), nil
 	}
 	return ([]byte)(strconv.FormatInt(int64(v), 10)), nil
 }
