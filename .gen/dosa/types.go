@@ -2097,6 +2097,154 @@ func (v *DropScopeRequest) GetName() (o string) {
 	return
 }
 
+type ETLState int32
+
+const (
+	ETLStateOff       ETLState = 1
+	ETLStateOn        ETLState = 2
+	ETLStateReserved0 ETLState = 3
+	ETLStateReserved1 ETLState = 4
+)
+
+// ETLState_Values returns all recognized values of ETLState.
+func ETLState_Values() []ETLState {
+	return []ETLState{
+		ETLStateOff,
+		ETLStateOn,
+		ETLStateReserved0,
+		ETLStateReserved1,
+	}
+}
+
+// UnmarshalText tries to decode ETLState from a byte slice
+// containing its name.
+//
+//   var v ETLState
+//   err := v.UnmarshalText([]byte("OFF"))
+func (v *ETLState) UnmarshalText(value []byte) error {
+	switch string(value) {
+	case "OFF":
+		*v = ETLStateOff
+		return nil
+	case "ON":
+		*v = ETLStateOn
+		return nil
+	case "RESERVED0":
+		*v = ETLStateReserved0
+		return nil
+	case "RESERVED1":
+		*v = ETLStateReserved1
+		return nil
+	default:
+		return fmt.Errorf("unknown enum value %q for %q", value, "ETLState")
+	}
+}
+
+// ToWire translates ETLState into a Thrift-level intermediate
+// representation. This intermediate representation may be serialized
+// into bytes using a ThriftRW protocol implementation.
+//
+// Enums are represented as 32-bit integers over the wire.
+func (v ETLState) ToWire() (wire.Value, error) {
+	return wire.NewValueI32(int32(v)), nil
+}
+
+// FromWire deserializes ETLState from its Thrift-level
+// representation.
+//
+//   x, err := binaryProtocol.Decode(reader, wire.TI32)
+//   if err != nil {
+//     return ETLState(0), err
+//   }
+//
+//   var v ETLState
+//   if err := v.FromWire(x); err != nil {
+//     return ETLState(0), err
+//   }
+//   return v, nil
+func (v *ETLState) FromWire(w wire.Value) error {
+	*v = (ETLState)(w.GetI32())
+	return nil
+}
+
+// String returns a readable string representation of ETLState.
+func (v ETLState) String() string {
+	w := int32(v)
+	switch w {
+	case 1:
+		return "OFF"
+	case 2:
+		return "ON"
+	case 3:
+		return "RESERVED0"
+	case 4:
+		return "RESERVED1"
+	}
+	return fmt.Sprintf("ETLState(%d)", w)
+}
+
+// Equals returns true if this ETLState value matches the provided
+// value.
+func (v ETLState) Equals(rhs ETLState) bool {
+	return v == rhs
+}
+
+// MarshalJSON serializes ETLState into JSON.
+//
+// If the enum value is recognized, its name is returned. Otherwise,
+// its integer value is returned.
+//
+// This implements json.Marshaler.
+func (v ETLState) MarshalJSON() ([]byte, error) {
+	switch int32(v) {
+	case 1:
+		return ([]byte)("\"OFF\""), nil
+	case 2:
+		return ([]byte)("\"ON\""), nil
+	case 3:
+		return ([]byte)("\"RESERVED0\""), nil
+	case 4:
+		return ([]byte)("\"RESERVED1\""), nil
+	}
+	return ([]byte)(strconv.FormatInt(int64(v), 10)), nil
+}
+
+// UnmarshalJSON attempts to decode ETLState from its JSON
+// representation.
+//
+// This implementation supports both, numeric and string inputs. If a
+// string is provided, it must be a known enum name.
+//
+// This implements json.Unmarshaler.
+func (v *ETLState) UnmarshalJSON(text []byte) error {
+	d := json.NewDecoder(bytes.NewReader(text))
+	d.UseNumber()
+	t, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	switch w := t.(type) {
+	case json.Number:
+		x, err := w.Int64()
+		if err != nil {
+			return err
+		}
+		if x > math.MaxInt32 {
+			return fmt.Errorf("enum overflow from JSON %q for %q", text, "ETLState")
+		}
+		if x < math.MinInt32 {
+			return fmt.Errorf("enum underflow from JSON %q for %q", text, "ETLState")
+		}
+		*v = (ETLState)(x)
+		return nil
+	case string:
+		return v.UnmarshalText([]byte(w))
+	default:
+		return fmt.Errorf("invalid JSON value %q (%T) to unmarshal into %q", t, t, "ETLState")
+	}
+}
+
 type ElemType int32
 
 const (
@@ -2322,6 +2470,7 @@ type EntityDefinition struct {
 	FieldDescs map[string]*FieldDesc       `json:"fieldDescs,omitempty"`
 	PrimaryKey *PrimaryKey                 `json:"primaryKey,omitempty"`
 	Indexes    map[string]*IndexDefinition `json:"Indexes,omitempty"`
+	Etl        *ETLState                   `json:"etl,omitempty"`
 }
 
 type _Map_String_FieldDesc_MapItemList map[string]*FieldDesc
@@ -2417,7 +2566,7 @@ func (_Map_String_IndexDefinition_MapItemList) Close() {}
 //   }
 func (v *EntityDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [5]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -2453,6 +2602,14 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
+		i++
+	}
+	if v.Etl != nil {
+		w, err = v.Etl.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -2533,6 +2690,12 @@ func _Map_String_IndexDefinition_Read(m wire.MapItemList) (map[string]*IndexDefi
 	return o, err
 }
 
+func _ETLState_Read(w wire.Value) (ETLState, error) {
+	var v ETLState
+	err := v.FromWire(w)
+	return v, err
+}
+
 // FromWire deserializes a EntityDefinition struct from its Thrift-level
 // representation. The Thrift-level representation may be obtained
 // from a ThriftRW protocol implementation.
@@ -2589,6 +2752,16 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 5:
+			if field.Value.Type() == wire.TI32 {
+				var x ETLState
+				x, err = _ETLState_Read(field.Value)
+				v.Etl = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -2602,7 +2775,7 @@ func (v *EntityDefinition) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [5]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -2618,6 +2791,10 @@ func (v *EntityDefinition) String() string {
 	}
 	if v.Indexes != nil {
 		fields[i] = fmt.Sprintf("Indexes: %v", v.Indexes)
+		i++
+	}
+	if v.Etl != nil {
+		fields[i] = fmt.Sprintf("Etl: %v", *(v.Etl))
 		i++
 	}
 
@@ -2658,6 +2835,16 @@ func _Map_String_IndexDefinition_Equals(lhs, rhs map[string]*IndexDefinition) bo
 	return true
 }
 
+func _ETLState_EqualsPtr(lhs, rhs *ETLState) bool {
+	if lhs != nil && rhs != nil {
+
+		x := *lhs
+		y := *rhs
+		return x.Equals(y)
+	}
+	return lhs == nil && rhs == nil
+}
+
 // Equals returns true if all the fields of this EntityDefinition match the
 // provided EntityDefinition.
 //
@@ -2675,6 +2862,9 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 	if !((v.Indexes == nil && rhs.Indexes == nil) || (v.Indexes != nil && rhs.Indexes != nil && _Map_String_IndexDefinition_Equals(v.Indexes, rhs.Indexes))) {
 		return false
 	}
+	if !_ETLState_EqualsPtr(v.Etl, rhs.Etl) {
+		return false
+	}
 
 	return true
 }
@@ -2684,6 +2874,16 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 func (v *EntityDefinition) GetName() (o string) {
 	if v.Name != nil {
 		return *v.Name
+	}
+
+	return
+}
+
+// GetEtl returns the value of Etl if it is set or its
+// zero value if it is unset.
+func (v *EntityDefinition) GetEtl() (o ETLState) {
+	if v.Etl != nil {
+		return *v.Etl
 	}
 
 	return
