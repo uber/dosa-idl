@@ -272,8 +272,9 @@ struct CheckSchemaStatusResponse {
 
 struct CreateScopeRequest {
    1: optional string name
-   2: optional string requester
-   3: optional string owner
+   2: optional i32 type
+   3: optional string requester
+   4: optional string owner
 }
 
 struct ScopeExistsRequest {

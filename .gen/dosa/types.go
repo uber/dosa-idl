@@ -1867,6 +1867,7 @@ func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
 
 type CreateScopeRequest struct {
 	Name      *string `json:"name,omitempty"`
+	Type      *int32  `json:"type,omitempty"`
 	Requester *string `json:"requester,omitempty"`
 	Owner     *string `json:"owner,omitempty"`
 }
@@ -1888,7 +1889,7 @@ type CreateScopeRequest struct {
 //   }
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [3]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1902,12 +1903,20 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
+	if v.Type != nil {
+		w, err = wire.NewValueI32(*(v.Type)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
 	if v.Requester != nil {
 		w, err = wire.NewValueString(*(v.Requester)), error(nil)
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 2, Value: w}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 	if v.Owner != nil {
@@ -1915,7 +1924,7 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 		if err != nil {
 			return w, err
 		}
-		fields[i] = wire.Field{ID: 3, Value: w}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 
@@ -1955,6 +1964,16 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 
 			}
 		case 2:
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.Type = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
 			if field.Value.Type() == wire.TBinary {
 				var x string
 				x, err = field.Value.GetString(), error(nil)
@@ -1964,7 +1983,7 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
-		case 3:
+		case 4:
 			if field.Value.Type() == wire.TBinary {
 				var x string
 				x, err = field.Value.GetString(), error(nil)
@@ -1987,10 +2006,14 @@ func (v *CreateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [3]string
+	var fields [4]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
+		i++
+	}
+	if v.Type != nil {
+		fields[i] = fmt.Sprintf("Type: %v", *(v.Type))
 		i++
 	}
 	if v.Requester != nil {
@@ -2013,6 +2036,9 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
+	if !_I32_EqualsPtr(v.Type, rhs.Type) {
+		return false
+	}
 	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
 		return false
 	}
@@ -2028,6 +2054,16 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 func (v *CreateScopeRequest) GetName() (o string) {
 	if v.Name != nil {
 		return *v.Name
+	}
+
+	return
+}
+
+// GetType returns the value of Type if it is set or its
+// zero value if it is unset.
+func (v *CreateScopeRequest) GetType() (o int32) {
+	if v.Type != nil {
+		return *v.Type
 	}
 
 	return
