@@ -275,6 +275,7 @@ struct CreateScopeRequest {
    2: optional i32 type
    3: optional string requester
    4: optional string owner
+   5: optional string cluster
 }
 
 struct ScopeExistsRequest {
