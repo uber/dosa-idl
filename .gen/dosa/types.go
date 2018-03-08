@@ -1870,6 +1870,7 @@ type CreateScopeRequest struct {
 	Type      *int32  `json:"type,omitempty"`
 	Requester *string `json:"requester,omitempty"`
 	Owner     *string `json:"owner,omitempty"`
+	Cluster   *string `json:"cluster,omitempty"`
 }
 
 // ToWire translates a CreateScopeRequest struct into a Thrift-level intermediate
@@ -1889,7 +1890,7 @@ type CreateScopeRequest struct {
 //   }
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [5]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1925,6 +1926,14 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
+		i++
+	}
+	if v.Cluster != nil {
+		w, err = wire.NewValueString(*(v.Cluster)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -1993,6 +2002,16 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 5:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Cluster = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -2006,7 +2025,7 @@ func (v *CreateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [5]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -2022,6 +2041,10 @@ func (v *CreateScopeRequest) String() string {
 	}
 	if v.Owner != nil {
 		fields[i] = fmt.Sprintf("Owner: %v", *(v.Owner))
+		i++
+	}
+	if v.Cluster != nil {
+		fields[i] = fmt.Sprintf("Cluster: %v", *(v.Cluster))
 		i++
 	}
 
@@ -2043,6 +2066,9 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 		return false
 	}
 	if !_String_EqualsPtr(v.Owner, rhs.Owner) {
+		return false
+	}
+	if !_String_EqualsPtr(v.Cluster, rhs.Cluster) {
 		return false
 	}
 
@@ -2084,6 +2110,16 @@ func (v *CreateScopeRequest) GetRequester() (o string) {
 func (v *CreateScopeRequest) GetOwner() (o string) {
 	if v.Owner != nil {
 		return *v.Owner
+	}
+
+	return
+}
+
+// GetCluster returns the value of Cluster if it is set or its
+// zero value if it is unset.
+func (v *CreateScopeRequest) GetCluster() (o string) {
+	if v.Cluster != nil {
+		return *v.Cluster
 	}
 
 	return
