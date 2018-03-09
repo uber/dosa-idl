@@ -58,6 +58,7 @@ struct SchemaRef {
     2: optional string namePrefix
     3: optional string entityName
     4: optional i32 version
+    5: optional i64 ttl
 }
 
 struct FieldTag {
@@ -110,6 +111,7 @@ struct Error {
 struct CreateRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap entityValues
+
 }
 
 struct ReadRequest {
