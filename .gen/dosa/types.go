@@ -1728,6 +1728,7 @@ func (v *Condition) GetOp() (o Operator) {
 type CreateRequest struct {
 	Ref          *SchemaRef    `json:"ref,omitempty"`
 	EntityValues FieldValueMap `json:"entityValues,omitempty"`
+	TTL          *int64        `json:"ttl,omitempty"`
 }
 
 // ToWire translates a CreateRequest struct into a Thrift-level intermediate
@@ -1747,7 +1748,7 @@ type CreateRequest struct {
 //   }
 func (v *CreateRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1767,6 +1768,14 @@ func (v *CreateRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.TTL != nil {
+		w, err = wire.NewValueI64(*(v.TTL)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -1823,6 +1832,16 @@ func (v *CreateRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TI64 {
+				var x int64
+				x, err = field.Value.GetI64(), error(nil)
+				v.TTL = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -1836,7 +1855,7 @@ func (v *CreateRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -1846,8 +1865,22 @@ func (v *CreateRequest) String() string {
 		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
 		i++
 	}
+	if v.TTL != nil {
+		fields[i] = fmt.Sprintf("TTL: %v", *(v.TTL))
+		i++
+	}
 
 	return fmt.Sprintf("CreateRequest{%v}", strings.Join(fields[:i], ", "))
+}
+
+func _I64_EqualsPtr(lhs, rhs *int64) bool {
+	if lhs != nil && rhs != nil {
+
+		x := *lhs
+		y := *rhs
+		return (x == y)
+	}
+	return lhs == nil && rhs == nil
 }
 
 // Equals returns true if all the fields of this CreateRequest match the
@@ -1861,8 +1894,21 @@ func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
 		return false
 	}
+	if !_I64_EqualsPtr(v.TTL, rhs.TTL) {
+		return false
+	}
 
 	return true
+}
+
+// GetTTL returns the value of TTL if it is set or its
+// zero value if it is unset.
+func (v *CreateRequest) GetTTL() (o int64) {
+	if v.TTL != nil {
+		return *v.TTL
+	}
+
+	return
 }
 
 type CreateScopeRequest struct {
@@ -6229,16 +6275,6 @@ func _Double_EqualsPtr(lhs, rhs *float64) bool {
 	return lhs == nil && rhs == nil
 }
 
-func _I64_EqualsPtr(lhs, rhs *int64) bool {
-	if lhs != nil && rhs != nil {
-
-		x := *lhs
-		y := *rhs
-		return (x == y)
-	}
-	return lhs == nil && rhs == nil
-}
-
 // Equals returns true if all the fields of this RawValue match the
 // provided RawValue.
 //
@@ -7173,7 +7209,6 @@ type SchemaRef struct {
 	NamePrefix *string `json:"namePrefix,omitempty"`
 	EntityName *string `json:"entityName,omitempty"`
 	Version    *int32  `json:"version,omitempty"`
-	TTL        *int64  `json:"ttl,omitempty"`
 }
 
 // ToWire translates a SchemaRef struct into a Thrift-level intermediate
@@ -7193,7 +7228,7 @@ type SchemaRef struct {
 //   }
 func (v *SchemaRef) ToWire() (wire.Value, error) {
 	var (
-		fields [5]wire.Field
+		fields [4]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -7229,14 +7264,6 @@ func (v *SchemaRef) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 4, Value: w}
-		i++
-	}
-	if v.TTL != nil {
-		w, err = wire.NewValueI64(*(v.TTL)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -7305,16 +7332,6 @@ func (v *SchemaRef) FromWire(w wire.Value) error {
 				}
 
 			}
-		case 5:
-			if field.Value.Type() == wire.TI64 {
-				var x int64
-				x, err = field.Value.GetI64(), error(nil)
-				v.TTL = &x
-				if err != nil {
-					return err
-				}
-
-			}
 		}
 	}
 
@@ -7328,7 +7345,7 @@ func (v *SchemaRef) String() string {
 		return "<nil>"
 	}
 
-	var fields [5]string
+	var fields [4]string
 	i := 0
 	if v.Scope != nil {
 		fields[i] = fmt.Sprintf("Scope: %v", *(v.Scope))
@@ -7344,10 +7361,6 @@ func (v *SchemaRef) String() string {
 	}
 	if v.Version != nil {
 		fields[i] = fmt.Sprintf("Version: %v", *(v.Version))
-		i++
-	}
-	if v.TTL != nil {
-		fields[i] = fmt.Sprintf("TTL: %v", *(v.TTL))
 		i++
 	}
 
@@ -7369,9 +7382,6 @@ func (v *SchemaRef) Equals(rhs *SchemaRef) bool {
 		return false
 	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
-		return false
-	}
-	if !_I64_EqualsPtr(v.TTL, rhs.TTL) {
 		return false
 	}
 
@@ -7413,16 +7423,6 @@ func (v *SchemaRef) GetEntityName() (o string) {
 func (v *SchemaRef) GetVersion() (o int32) {
 	if v.Version != nil {
 		return *v.Version
-	}
-
-	return
-}
-
-// GetTTL returns the value of TTL if it is set or its
-// zero value if it is unset.
-func (v *SchemaRef) GetTTL() (o int64) {
-	if v.TTL != nil {
-		return *v.TTL
 	}
 
 	return
@@ -8143,6 +8143,7 @@ func (v *TruncateScopeRequest) GetName() (o string) {
 type UpsertRequest struct {
 	Ref          *SchemaRef    `json:"ref,omitempty"`
 	EntityValues FieldValueMap `json:"entityValues,omitempty"`
+	TTL          *int64        `json:"ttl,omitempty"`
 }
 
 // ToWire translates a UpsertRequest struct into a Thrift-level intermediate
@@ -8162,7 +8163,7 @@ type UpsertRequest struct {
 //   }
 func (v *UpsertRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -8182,6 +8183,14 @@ func (v *UpsertRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.TTL != nil {
+		w, err = wire.NewValueI64(*(v.TTL)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -8226,6 +8235,16 @@ func (v *UpsertRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TI64 {
+				var x int64
+				x, err = field.Value.GetI64(), error(nil)
+				v.TTL = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -8239,7 +8258,7 @@ func (v *UpsertRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Ref != nil {
 		fields[i] = fmt.Sprintf("Ref: %v", v.Ref)
@@ -8247,6 +8266,10 @@ func (v *UpsertRequest) String() string {
 	}
 	if v.EntityValues != nil {
 		fields[i] = fmt.Sprintf("EntityValues: %v", v.EntityValues)
+		i++
+	}
+	if v.TTL != nil {
+		fields[i] = fmt.Sprintf("TTL: %v", *(v.TTL))
 		i++
 	}
 
@@ -8264,8 +8287,21 @@ func (v *UpsertRequest) Equals(rhs *UpsertRequest) bool {
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
 		return false
 	}
+	if !_I64_EqualsPtr(v.TTL, rhs.TTL) {
+		return false
+	}
 
 	return true
+}
+
+// GetTTL returns the value of TTL if it is set or its
+// zero value if it is unset.
+func (v *UpsertRequest) GetTTL() (o int64) {
+	if v.TTL != nil {
+		return *v.TTL
+	}
+
+	return
 }
 
 type UpsertSchemaRequest struct {
