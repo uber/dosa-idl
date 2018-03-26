@@ -111,7 +111,6 @@ struct CreateRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap entityValues
    3: optional i64 ttl
-
 }
 
 struct ReadRequest {
