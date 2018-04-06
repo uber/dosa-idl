@@ -151,6 +151,7 @@ struct UpsertRequest {
 struct MultiUpsertRequest {
     1: optional SchemaRef ref
     2: optional list<FieldValueMap> entities
+    3: optional i64 ttl
 }
 
 struct RemoveRequest {
