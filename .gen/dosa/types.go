@@ -1913,10 +1913,8 @@ func (v *CreateRequest) GetTTL() (o int64) {
 
 type CreateScopeRequest struct {
 	Name      *string `json:"name,omitempty"`
-	Type      *int32  `json:"type,omitempty"`
 	Requester *string `json:"requester,omitempty"`
-	Owner     *string `json:"owner,omitempty"`
-	Cluster   *string `json:"cluster,omitempty"`
+	Metadata  *string `json:"metadata,omitempty"`
 }
 
 // ToWire translates a CreateScopeRequest struct into a Thrift-level intermediate
@@ -1936,7 +1934,7 @@ type CreateScopeRequest struct {
 //   }
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [5]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1950,36 +1948,20 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
-	if v.Type != nil {
-		w, err = wire.NewValueI32(*(v.Type)), error(nil)
+	if v.Requester != nil {
+		w, err = wire.NewValueString(*(v.Requester)), error(nil)
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
-	if v.Requester != nil {
-		w, err = wire.NewValueString(*(v.Requester)), error(nil)
+	if v.Metadata != nil {
+		w, err = wire.NewValueString(*(v.Metadata)), error(nil)
 		if err != nil {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
-		i++
-	}
-	if v.Owner != nil {
-		w, err = wire.NewValueString(*(v.Owner)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 4, Value: w}
-		i++
-	}
-	if v.Cluster != nil {
-		w, err = wire.NewValueString(*(v.Cluster)), error(nil)
-		if err != nil {
-			return w, err
-		}
-		fields[i] = wire.Field{ID: 5, Value: w}
 		i++
 	}
 
@@ -2019,16 +2001,6 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 
 			}
 		case 2:
-			if field.Value.Type() == wire.TI32 {
-				var x int32
-				x, err = field.Value.GetI32(), error(nil)
-				v.Type = &x
-				if err != nil {
-					return err
-				}
-
-			}
-		case 3:
 			if field.Value.Type() == wire.TBinary {
 				var x string
 				x, err = field.Value.GetString(), error(nil)
@@ -2038,21 +2010,11 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
-		case 4:
+		case 3:
 			if field.Value.Type() == wire.TBinary {
 				var x string
 				x, err = field.Value.GetString(), error(nil)
-				v.Owner = &x
-				if err != nil {
-					return err
-				}
-
-			}
-		case 5:
-			if field.Value.Type() == wire.TBinary {
-				var x string
-				x, err = field.Value.GetString(), error(nil)
-				v.Cluster = &x
+				v.Metadata = &x
 				if err != nil {
 					return err
 				}
@@ -2071,26 +2033,18 @@ func (v *CreateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [5]string
+	var fields [3]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
-		i++
-	}
-	if v.Type != nil {
-		fields[i] = fmt.Sprintf("Type: %v", *(v.Type))
 		i++
 	}
 	if v.Requester != nil {
 		fields[i] = fmt.Sprintf("Requester: %v", *(v.Requester))
 		i++
 	}
-	if v.Owner != nil {
-		fields[i] = fmt.Sprintf("Owner: %v", *(v.Owner))
-		i++
-	}
-	if v.Cluster != nil {
-		fields[i] = fmt.Sprintf("Cluster: %v", *(v.Cluster))
+	if v.Metadata != nil {
+		fields[i] = fmt.Sprintf("Metadata: %v", *(v.Metadata))
 		i++
 	}
 
@@ -2105,16 +2059,10 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
-	if !_I32_EqualsPtr(v.Type, rhs.Type) {
-		return false
-	}
 	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
 		return false
 	}
-	if !_String_EqualsPtr(v.Owner, rhs.Owner) {
-		return false
-	}
-	if !_String_EqualsPtr(v.Cluster, rhs.Cluster) {
+	if !_String_EqualsPtr(v.Metadata, rhs.Metadata) {
 		return false
 	}
 
@@ -2131,16 +2079,6 @@ func (v *CreateScopeRequest) GetName() (o string) {
 	return
 }
 
-// GetType returns the value of Type if it is set or its
-// zero value if it is unset.
-func (v *CreateScopeRequest) GetType() (o int32) {
-	if v.Type != nil {
-		return *v.Type
-	}
-
-	return
-}
-
 // GetRequester returns the value of Requester if it is set or its
 // zero value if it is unset.
 func (v *CreateScopeRequest) GetRequester() (o string) {
@@ -2151,21 +2089,11 @@ func (v *CreateScopeRequest) GetRequester() (o string) {
 	return
 }
 
-// GetOwner returns the value of Owner if it is set or its
+// GetMetadata returns the value of Metadata if it is set or its
 // zero value if it is unset.
-func (v *CreateScopeRequest) GetOwner() (o string) {
-	if v.Owner != nil {
-		return *v.Owner
-	}
-
-	return
-}
-
-// GetCluster returns the value of Cluster if it is set or its
-// zero value if it is unset.
-func (v *CreateScopeRequest) GetCluster() (o string) {
-	if v.Cluster != nil {
-		return *v.Cluster
+func (v *CreateScopeRequest) GetMetadata() (o string) {
+	if v.Metadata != nil {
+		return *v.Metadata
 	}
 
 	return
