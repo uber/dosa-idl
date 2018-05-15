@@ -1912,7 +1912,9 @@ func (v *CreateRequest) GetTTL() (o int64) {
 }
 
 type CreateScopeRequest struct {
-	Name *string `json:"name,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	Requester *string `json:"requester,omitempty"`
+	Metadata  *string `json:"metadata,omitempty"`
 }
 
 // ToWire translates a CreateScopeRequest struct into a Thrift-level intermediate
@@ -1932,7 +1934,7 @@ type CreateScopeRequest struct {
 //   }
 func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -1944,6 +1946,22 @@ func (v *CreateScopeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Requester != nil {
+		w, err = wire.NewValueString(*(v.Requester)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.Metadata != nil {
+		w, err = wire.NewValueString(*(v.Metadata)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -1982,6 +2000,26 @@ func (v *CreateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Requester = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Metadata = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -1995,10 +2033,18 @@ func (v *CreateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [3]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
+		i++
+	}
+	if v.Requester != nil {
+		fields[i] = fmt.Sprintf("Requester: %v", *(v.Requester))
+		i++
+	}
+	if v.Metadata != nil {
+		fields[i] = fmt.Sprintf("Metadata: %v", *(v.Metadata))
 		i++
 	}
 
@@ -2011,6 +2057,12 @@ func (v *CreateScopeRequest) String() string {
 // This function performs a deep comparison.
 func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
+		return false
+	}
+	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
+		return false
+	}
+	if !_String_EqualsPtr(v.Metadata, rhs.Metadata) {
 		return false
 	}
 
@@ -2027,8 +2079,29 @@ func (v *CreateScopeRequest) GetName() (o string) {
 	return
 }
 
+// GetRequester returns the value of Requester if it is set or its
+// zero value if it is unset.
+func (v *CreateScopeRequest) GetRequester() (o string) {
+	if v.Requester != nil {
+		return *v.Requester
+	}
+
+	return
+}
+
+// GetMetadata returns the value of Metadata if it is set or its
+// zero value if it is unset.
+func (v *CreateScopeRequest) GetMetadata() (o string) {
+	if v.Metadata != nil {
+		return *v.Metadata
+	}
+
+	return
+}
+
 type DropScopeRequest struct {
-	Name *string `json:"name,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	Requester *string `json:"requester,omitempty"`
 }
 
 // ToWire translates a DropScopeRequest struct into a Thrift-level intermediate
@@ -2048,7 +2121,7 @@ type DropScopeRequest struct {
 //   }
 func (v *DropScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -2060,6 +2133,14 @@ func (v *DropScopeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Requester != nil {
+		w, err = wire.NewValueString(*(v.Requester)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
 
@@ -2098,6 +2179,16 @@ func (v *DropScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Requester = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -2111,10 +2202,14 @@ func (v *DropScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [2]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
+		i++
+	}
+	if v.Requester != nil {
+		fields[i] = fmt.Sprintf("Requester: %v", *(v.Requester))
 		i++
 	}
 
@@ -2129,6 +2224,9 @@ func (v *DropScopeRequest) Equals(rhs *DropScopeRequest) bool {
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
+	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
+		return false
+	}
 
 	return true
 }
@@ -2138,6 +2236,16 @@ func (v *DropScopeRequest) Equals(rhs *DropScopeRequest) bool {
 func (v *DropScopeRequest) GetName() (o string) {
 	if v.Name != nil {
 		return *v.Name
+	}
+
+	return
+}
+
+// GetRequester returns the value of Requester if it is set or its
+// zero value if it is unset.
+func (v *DropScopeRequest) GetRequester() (o string) {
+	if v.Requester != nil {
+		return *v.Requester
 	}
 
 	return
@@ -8025,7 +8133,8 @@ func (v *SearchResponse) GetNextToken() (o string) {
 }
 
 type TruncateScopeRequest struct {
-	Name *string `json:"name,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	Requester *string `json:"requester,omitempty"`
 }
 
 // ToWire translates a TruncateScopeRequest struct into a Thrift-level intermediate
@@ -8045,7 +8154,7 @@ type TruncateScopeRequest struct {
 //   }
 func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -8057,6 +8166,14 @@ func (v *TruncateScopeRequest) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 1, Value: w}
+		i++
+	}
+	if v.Requester != nil {
+		w, err = wire.NewValueString(*(v.Requester)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
 
@@ -8095,6 +8212,16 @@ func (v *TruncateScopeRequest) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Requester = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -8108,10 +8235,14 @@ func (v *TruncateScopeRequest) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [2]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
+		i++
+	}
+	if v.Requester != nil {
+		fields[i] = fmt.Sprintf("Requester: %v", *(v.Requester))
 		i++
 	}
 
@@ -8126,6 +8257,9 @@ func (v *TruncateScopeRequest) Equals(rhs *TruncateScopeRequest) bool {
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
+	if !_String_EqualsPtr(v.Requester, rhs.Requester) {
+		return false
+	}
 
 	return true
 }
@@ -8135,6 +8269,16 @@ func (v *TruncateScopeRequest) Equals(rhs *TruncateScopeRequest) bool {
 func (v *TruncateScopeRequest) GetName() (o string) {
 	if v.Name != nil {
 		return *v.Name
+	}
+
+	return
+}
+
+// GetRequester returns the value of Requester if it is set or its
+// zero value if it is unset.
+func (v *TruncateScopeRequest) GetRequester() (o string) {
+	if v.Requester != nil {
+		return *v.Requester
 	}
 
 	return
