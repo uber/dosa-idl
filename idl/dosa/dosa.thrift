@@ -87,7 +87,7 @@ struct IndexDefinition {
 enum ETLState {
     OFF = 1,
     ON,
-    
+
     // Reserve a few enum types in case we want to support more
     RESERVED0,
     RESERVED1
@@ -111,6 +111,7 @@ struct CreateRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap entityValues
    3: optional i64 ttl
+   4: optional i64 timestamp
 }
 
 struct ReadRequest {
@@ -146,21 +147,25 @@ struct UpsertRequest {
     1: optional SchemaRef ref
     2: optional FieldValueMap entityValues
     3: optional i64 ttl
+    4: optional i64 timestamp
 }
 
 struct MultiUpsertRequest {
     1: optional SchemaRef ref
     2: optional list<FieldValueMap> entities
+    3: optional i64 timestamp
 }
 
 struct RemoveRequest {
    1: optional SchemaRef ref
    2: optional FieldValueMap keyValues
+   3: optional i64 timestamp
 }
 
 struct MultiRemoveRequest {
-   1: optional SchemaRef ref 
+   1: optional SchemaRef ref
    2: optional list<FieldValueMap> keyValues
+   3: optional i64 timestamp
 }
 
 struct MultiRemoveResponse {
@@ -201,6 +206,7 @@ struct RangeResponse {
 struct RemoveRangeRequest {
    1: optional SchemaRef ref
    2: optional list<Condition> conditions
+   3: optional i64 timestamp
 }
 
 struct SearchRequest {
@@ -347,7 +353,7 @@ service Dosa {
        1: BadRequestError clientError
        2: InternalServerError serverError
    )
-   
+
    void remove (
        1: RemoveRequest request
    ) throws (
