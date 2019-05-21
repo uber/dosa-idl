@@ -6,7 +6,9 @@ package dosa
 import (
 	"errors"
 	"fmt"
+	"go.uber.org/multierr"
 	"go.uber.org/thriftrw/wire"
+	"go.uber.org/zap/zapcore"
 	"strings"
 )
 
@@ -116,11 +118,25 @@ func (v *Dosa_DropScope_Args) String() string {
 //
 // This function performs a deep comparison.
 func (v *Dosa_DropScope_Args) Equals(rhs *Dosa_DropScope_Args) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Request == nil && rhs.Request == nil) || (v.Request != nil && rhs.Request != nil && v.Request.Equals(rhs.Request))) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Dosa_DropScope_Args.
+func (v *Dosa_DropScope_Args) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Request != nil {
+		err = multierr.Append(err, enc.AddObject("request", v.Request))
+	}
+	return err
 }
 
 // GetRequest returns the value of Request if it is set or its
@@ -384,6 +400,11 @@ func (v *Dosa_DropScope_Result) String() string {
 //
 // This function performs a deep comparison.
 func (v *Dosa_DropScope_Result) Equals(rhs *Dosa_DropScope_Result) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.ClientError == nil && rhs.ClientError == nil) || (v.ClientError != nil && rhs.ClientError != nil && v.ClientError.Equals(rhs.ClientError))) {
 		return false
 	}
@@ -392,6 +413,18 @@ func (v *Dosa_DropScope_Result) Equals(rhs *Dosa_DropScope_Result) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Dosa_DropScope_Result.
+func (v *Dosa_DropScope_Result) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.ClientError != nil {
+		err = multierr.Append(err, enc.AddObject("clientError", v.ClientError))
+	}
+	if v.ServerError != nil {
+		err = multierr.Append(err, enc.AddObject("serverError", v.ServerError))
+	}
+	return err
 }
 
 // GetClientError returns the value of ClientError if it is set or its

@@ -6,7 +6,9 @@ package dosa
 import (
 	"errors"
 	"fmt"
+	"go.uber.org/multierr"
 	"go.uber.org/thriftrw/wire"
+	"go.uber.org/zap/zapcore"
 	"strings"
 )
 
@@ -116,11 +118,25 @@ func (v *Dosa_CanUpsertSchema_Args) String() string {
 //
 // This function performs a deep comparison.
 func (v *Dosa_CanUpsertSchema_Args) Equals(rhs *Dosa_CanUpsertSchema_Args) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Request == nil && rhs.Request == nil) || (v.Request != nil && rhs.Request != nil && v.Request.Equals(rhs.Request))) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Dosa_CanUpsertSchema_Args.
+func (v *Dosa_CanUpsertSchema_Args) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Request != nil {
+		err = multierr.Append(err, enc.AddObject("request", v.Request))
+	}
+	return err
 }
 
 // GetRequest returns the value of Request if it is set or its
@@ -476,6 +492,11 @@ func (v *Dosa_CanUpsertSchema_Result) String() string {
 //
 // This function performs a deep comparison.
 func (v *Dosa_CanUpsertSchema_Result) Equals(rhs *Dosa_CanUpsertSchema_Result) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Success == nil && rhs.Success == nil) || (v.Success != nil && rhs.Success != nil && v.Success.Equals(rhs.Success))) {
 		return false
 	}
@@ -490,6 +511,24 @@ func (v *Dosa_CanUpsertSchema_Result) Equals(rhs *Dosa_CanUpsertSchema_Result) b
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Dosa_CanUpsertSchema_Result.
+func (v *Dosa_CanUpsertSchema_Result) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Success != nil {
+		err = multierr.Append(err, enc.AddObject("success", v.Success))
+	}
+	if v.ClientError != nil {
+		err = multierr.Append(err, enc.AddObject("clientError", v.ClientError))
+	}
+	if v.ServerError != nil {
+		err = multierr.Append(err, enc.AddObject("serverError", v.ServerError))
+	}
+	if v.SchemaError != nil {
+		err = multierr.Append(err, enc.AddObject("schemaError", v.SchemaError))
+	}
+	return err
 }
 
 // GetSuccess returns the value of Success if it is set or its

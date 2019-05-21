@@ -5,10 +5,13 @@ package dosa
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go.uber.org/multierr"
 	"go.uber.org/thriftrw/wire"
+	"go.uber.org/zap/zapcore"
 	"math"
 	"strconv"
 	"strings"
@@ -179,6 +182,11 @@ func _I32_EqualsPtr(lhs, rhs *int32) bool {
 //
 // This function performs a deep comparison.
 func (v *BadRequestError) Equals(rhs *BadRequestError) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !(v.Err == rhs.Err) {
 		return false
 	}
@@ -190,6 +198,19 @@ func (v *BadRequestError) Equals(rhs *BadRequestError) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of BadRequestError.
+func (v *BadRequestError) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	enc.AddString("err", v.Err)
+	if v.Message != nil {
+		enc.AddString("message", *v.Message)
+	}
+	if v.ErrorCode != nil {
+		enc.AddInt32("errorCode", *v.ErrorCode)
+	}
+	return err
 }
 
 // GetErr returns the value of Err if it is set or its
@@ -402,11 +423,34 @@ func _Map_String_String_Equals(lhs, rhs map[string]string) bool {
 //
 // This function performs a deep comparison.
 func (v *BadSchemaError) Equals(rhs *BadSchemaError) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_Map_String_String_Equals(v.Reasons, rhs.Reasons) {
 		return false
 	}
 
 	return true
+}
+
+type _Map_String_String_Zapper map[string]string
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of _Map_String_String_Zapper.
+func (m _Map_String_String_Zapper) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	for k, v := range m {
+		enc.AddString((string)(k), v)
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of BadSchemaError.
+func (v *BadSchemaError) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	err = multierr.Append(err, enc.AddObject("reasons", (_Map_String_String_Zapper)(v.Reasons)))
+	return err
 }
 
 // GetReasons returns the value of Reasons if it is set or its
@@ -628,6 +672,11 @@ func _List_EntityDefinition_Equals(lhs, rhs []*EntityDefinition) bool {
 //
 // This function performs a deep comparison.
 func (v *CanUpsertSchemaRequest) Equals(rhs *CanUpsertSchemaRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
 		return false
 	}
@@ -639,6 +688,32 @@ func (v *CanUpsertSchemaRequest) Equals(rhs *CanUpsertSchemaRequest) bool {
 	}
 
 	return true
+}
+
+type _List_EntityDefinition_Zapper []*EntityDefinition
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_EntityDefinition_Zapper.
+func (l _List_EntityDefinition_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CanUpsertSchemaRequest.
+func (v *CanUpsertSchemaRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Scope != nil {
+		enc.AddString("scope", *v.Scope)
+	}
+	if v.NamePrefix != nil {
+		enc.AddString("namePrefix", *v.NamePrefix)
+	}
+	if v.EntityDefs != nil {
+		err = multierr.Append(err, enc.AddArray("entityDefs", (_List_EntityDefinition_Zapper)(v.EntityDefs)))
+	}
+	return err
 }
 
 // GetScope returns the value of Scope if it is set or its
@@ -770,11 +845,25 @@ func (v *CanUpsertSchemaResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *CanUpsertSchemaResponse) Equals(rhs *CanUpsertSchemaResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CanUpsertSchemaResponse.
+func (v *CanUpsertSchemaResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	return err
 }
 
 // GetVersion returns the value of Version if it is set or its
@@ -930,6 +1019,11 @@ func (v *CheckSchemaRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaRequest) Equals(rhs *CheckSchemaRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
 		return false
 	}
@@ -941,6 +1035,21 @@ func (v *CheckSchemaRequest) Equals(rhs *CheckSchemaRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CheckSchemaRequest.
+func (v *CheckSchemaRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Scope != nil {
+		enc.AddString("scope", *v.Scope)
+	}
+	if v.NamePrefix != nil {
+		enc.AddString("namePrefix", *v.NamePrefix)
+	}
+	if v.EntityDefs != nil {
+		err = multierr.Append(err, enc.AddArray("entityDefs", (_List_EntityDefinition_Zapper)(v.EntityDefs)))
+	}
+	return err
 }
 
 // GetScope returns the value of Scope if it is set or its
@@ -1072,11 +1181,25 @@ func (v *CheckSchemaResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaResponse) Equals(rhs *CheckSchemaResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CheckSchemaResponse.
+func (v *CheckSchemaResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	return err
 }
 
 // GetVersion returns the value of Version if it is set or its
@@ -1234,6 +1357,11 @@ func (v *CheckSchemaStatusRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaStatusRequest) Equals(rhs *CheckSchemaStatusRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
 		return false
 	}
@@ -1245,6 +1373,21 @@ func (v *CheckSchemaStatusRequest) Equals(rhs *CheckSchemaStatusRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CheckSchemaStatusRequest.
+func (v *CheckSchemaStatusRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Scope != nil {
+		enc.AddString("scope", *v.Scope)
+	}
+	if v.NamePrefix != nil {
+		enc.AddString("namePrefix", *v.NamePrefix)
+	}
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	return err
 }
 
 // GetScope returns the value of Scope if it is set or its
@@ -1399,6 +1542,11 @@ func (v *CheckSchemaStatusResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *CheckSchemaStatusResponse) Equals(rhs *CheckSchemaStatusResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
 		return false
 	}
@@ -1407,6 +1555,18 @@ func (v *CheckSchemaStatusResponse) Equals(rhs *CheckSchemaStatusResponse) bool 
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CheckSchemaStatusResponse.
+func (v *CheckSchemaStatusResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	if v.Status != nil {
+		enc.AddString("status", *v.Status)
+	}
+	return err
 }
 
 // GetVersion returns the value of Version if it is set or its
@@ -1561,6 +1721,11 @@ func _Bool_EqualsPtr(lhs, rhs *bool) bool {
 //
 // This function performs a deep comparison.
 func (v *ClusteringKey) Equals(rhs *ClusteringKey) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -1569,6 +1734,18 @@ func (v *ClusteringKey) Equals(rhs *ClusteringKey) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ClusteringKey.
+func (v *ClusteringKey) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Asc != nil {
+		enc.AddBool("asc", *v.Asc)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -1733,6 +1910,11 @@ func _Operator_EqualsPtr(lhs, rhs *Operator) bool {
 //
 // This function performs a deep comparison.
 func (v *Condition) Equals(rhs *Condition) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_Operator_EqualsPtr(v.Op, rhs.Op) {
 		return false
 	}
@@ -1741,6 +1923,18 @@ func (v *Condition) Equals(rhs *Condition) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Condition.
+func (v *Condition) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Op != nil {
+		err = multierr.Append(err, enc.AddObject("op", *v.Op))
+	}
+	if v.Field != nil {
+		err = multierr.Append(err, enc.AddObject("field", v.Field))
+	}
+	return err
 }
 
 // GetOp returns the value of Op if it is set or its
@@ -1949,6 +2143,11 @@ func _I64_EqualsPtr(lhs, rhs *int64) bool {
 //
 // This function performs a deep comparison.
 func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -1963,6 +2162,35 @@ func (v *CreateRequest) Equals(rhs *CreateRequest) bool {
 	}
 
 	return true
+}
+
+type _Map_String_Value_Zapper map[string]*Value
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of _Map_String_Value_Zapper.
+func (m _Map_String_Value_Zapper) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	for k, v := range m {
+		err = multierr.Append(err, enc.AddObject((string)(k), v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CreateRequest.
+func (v *CreateRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.EntityValues != nil {
+		err = multierr.Append(err, enc.AddObject("entityValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.EntityValues))))
+	}
+	if v.TTL != nil {
+		enc.AddInt64("ttl", *v.TTL)
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -2150,6 +2378,11 @@ func (v *CreateScopeRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -2161,6 +2394,21 @@ func (v *CreateScopeRequest) Equals(rhs *CreateScopeRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of CreateScopeRequest.
+func (v *CreateScopeRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Requester != nil {
+		enc.AddString("requester", *v.Requester)
+	}
+	if v.Metadata != nil {
+		enc.AddString("metadata", *v.Metadata)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -2315,6 +2563,11 @@ func (v *DropScopeRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *DropScopeRequest) Equals(rhs *DropScopeRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -2323,6 +2576,18 @@ func (v *DropScopeRequest) Equals(rhs *DropScopeRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of DropScopeRequest.
+func (v *DropScopeRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Requester != nil {
+		enc.AddString("requester", *v.Requester)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -2370,7 +2635,7 @@ func ETLState_Values() []ETLState {
 //   var v ETLState
 //   err := v.UnmarshalText([]byte("OFF"))
 func (v *ETLState) UnmarshalText(value []byte) error {
-	switch string(value) {
+	switch s := string(value); s {
 	case "OFF":
 		*v = ETLStateOff
 		return nil
@@ -2384,7 +2649,12 @@ func (v *ETLState) UnmarshalText(value []byte) error {
 		*v = ETLStateReserved1
 		return nil
 	default:
-		return fmt.Errorf("unknown enum value %q for %q", value, "ETLState")
+		val, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return fmt.Errorf("unknown enum value %q for %q: %v", s, "ETLState", err)
+		}
+		*v = ETLState(val)
+		return nil
 	}
 }
 
@@ -2406,6 +2676,25 @@ func (v ETLState) MarshalText() ([]byte, error) {
 		return []byte("RESERVED1"), nil
 	}
 	return []byte(strconv.FormatInt(int64(v), 10)), nil
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ETLState.
+// Enums are logged as objects, where the value is logged with key "value", and
+// if this value's name is known, the name is logged with key "name".
+func (v ETLState) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddInt32("value", int32(v))
+	switch int32(v) {
+	case 1:
+		enc.AddString("name", "OFF")
+	case 2:
+		enc.AddString("name", "ON")
+	case 3:
+		enc.AddString("name", "RESERVED0")
+	case 4:
+		enc.AddString("name", "RESERVED1")
+	}
+	return nil
 }
 
 // Ptr returns a pointer to this enum value.
@@ -2559,7 +2848,7 @@ func ElemType_Values() []ElemType {
 //   var v ElemType
 //   err := v.UnmarshalText([]byte("BOOL"))
 func (v *ElemType) UnmarshalText(value []byte) error {
-	switch string(value) {
+	switch s := string(value); s {
 	case "BOOL":
 		*v = ElemTypeBool
 		return nil
@@ -2597,7 +2886,12 @@ func (v *ElemType) UnmarshalText(value []byte) error {
 		*v = ElemTypeReserved3
 		return nil
 	default:
-		return fmt.Errorf("unknown enum value %q for %q", value, "ElemType")
+		val, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return fmt.Errorf("unknown enum value %q for %q: %v", s, "ElemType", err)
+		}
+		*v = ElemType(val)
+		return nil
 	}
 }
 
@@ -2635,6 +2929,41 @@ func (v ElemType) MarshalText() ([]byte, error) {
 		return []byte("RESERVED3"), nil
 	}
 	return []byte(strconv.FormatInt(int64(v), 10)), nil
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ElemType.
+// Enums are logged as objects, where the value is logged with key "value", and
+// if this value's name is known, the name is logged with key "name".
+func (v ElemType) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddInt32("value", int32(v))
+	switch int32(v) {
+	case 0:
+		enc.AddString("name", "BOOL")
+	case 1:
+		enc.AddString("name", "BLOB")
+	case 2:
+		enc.AddString("name", "STRING")
+	case 3:
+		enc.AddString("name", "INT32")
+	case 4:
+		enc.AddString("name", "INT64")
+	case 5:
+		enc.AddString("name", "DOUBLE")
+	case 6:
+		enc.AddString("name", "TIMESTAMP")
+	case 7:
+		enc.AddString("name", "UUID")
+	case 8:
+		enc.AddString("name", "RESERVED0")
+	case 9:
+		enc.AddString("name", "RESERVED1")
+	case 10:
+		enc.AddString("name", "RESERVED2")
+	case 11:
+		enc.AddString("name", "RESERVED3")
+	}
+	return nil
 }
 
 // Ptr returns a pointer to this enum value.
@@ -3164,6 +3493,11 @@ func _ETLState_EqualsPtr(lhs, rhs *ETLState) bool {
 //
 // This function performs a deep comparison.
 func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -3181,6 +3515,49 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 	}
 
 	return true
+}
+
+type _Map_String_FieldDesc_Zapper map[string]*FieldDesc
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of _Map_String_FieldDesc_Zapper.
+func (m _Map_String_FieldDesc_Zapper) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	for k, v := range m {
+		err = multierr.Append(err, enc.AddObject((string)(k), v))
+	}
+	return err
+}
+
+type _Map_String_IndexDefinition_Zapper map[string]*IndexDefinition
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of _Map_String_IndexDefinition_Zapper.
+func (m _Map_String_IndexDefinition_Zapper) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	for k, v := range m {
+		err = multierr.Append(err, enc.AddObject((string)(k), v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of EntityDefinition.
+func (v *EntityDefinition) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.FieldDescs != nil {
+		err = multierr.Append(err, enc.AddObject("fieldDescs", (_Map_String_FieldDesc_Zapper)(v.FieldDescs)))
+	}
+	if v.PrimaryKey != nil {
+		err = multierr.Append(err, enc.AddObject("primaryKey", v.PrimaryKey))
+	}
+	if v.Indexes != nil {
+		err = multierr.Append(err, enc.AddObject("Indexes", (_Map_String_IndexDefinition_Zapper)(v.Indexes)))
+	}
+	if v.Etl != nil {
+		err = multierr.Append(err, enc.AddObject("etl", *v.Etl))
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -3372,6 +3749,11 @@ func (v *EntityOrError) String() string {
 //
 // This function performs a deep comparison.
 func (v *EntityOrError) Equals(rhs *EntityOrError) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
 		return false
 	}
@@ -3380,6 +3762,18 @@ func (v *EntityOrError) Equals(rhs *EntityOrError) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of EntityOrError.
+func (v *EntityOrError) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.EntityValues != nil {
+		err = multierr.Append(err, enc.AddObject("entityValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.EntityValues))))
+	}
+	if v.Error != nil {
+		err = multierr.Append(err, enc.AddObject("error", v.Error))
+	}
+	return err
 }
 
 // GetEntityValues returns the value of EntityValues if it is set or its
@@ -3547,6 +3941,11 @@ func (v *Error) String() string {
 //
 // This function performs a deep comparison.
 func (v *Error) Equals(rhs *Error) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_I32_EqualsPtr(v.ErrCode, rhs.ErrCode) {
 		return false
 	}
@@ -3558,6 +3957,21 @@ func (v *Error) Equals(rhs *Error) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Error.
+func (v *Error) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.ErrCode != nil {
+		enc.AddInt32("errCode", *v.ErrCode)
+	}
+	if v.Msg != nil {
+		enc.AddString("msg", *v.Msg)
+	}
+	if v.ShouldRetry != nil {
+		enc.AddBool("shouldRetry", *v.ShouldRetry)
+	}
+	return err
 }
 
 // GetErrCode returns the value of ErrCode if it is set or its
@@ -3716,6 +4130,11 @@ func (v *Field) String() string {
 //
 // This function performs a deep comparison.
 func (v *Field) Equals(rhs *Field) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -3724,6 +4143,18 @@ func (v *Field) Equals(rhs *Field) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Field.
+func (v *Field) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Value != nil {
+		err = multierr.Append(err, enc.AddObject("value", v.Value))
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -3957,6 +4388,11 @@ func _Set_FieldTag_Equals(lhs, rhs []*FieldTag) bool {
 //
 // This function performs a deep comparison.
 func (v *FieldDesc) Equals(rhs *FieldDesc) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_ElemType_EqualsPtr(v.Type, rhs.Type) {
 		return false
 	}
@@ -3965,6 +4401,29 @@ func (v *FieldDesc) Equals(rhs *FieldDesc) bool {
 	}
 
 	return true
+}
+
+type _Set_FieldTag_Zapper []*FieldTag
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _Set_FieldTag_Zapper.
+func (s _Set_FieldTag_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range s {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of FieldDesc.
+func (v *FieldDesc) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Type != nil {
+		err = multierr.Append(err, enc.AddObject("type", *v.Type))
+	}
+	if v.Tags != nil {
+		err = multierr.Append(err, enc.AddArray("tags", (_Set_FieldTag_Zapper)(v.Tags)))
+	}
+	return err
 }
 
 // GetType returns the value of Type if it is set or its
@@ -4109,6 +4568,11 @@ func (v *FieldTag) String() string {
 //
 // This function performs a deep comparison.
 func (v *FieldTag) Equals(rhs *FieldTag) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -4117,6 +4581,18 @@ func (v *FieldTag) Equals(rhs *FieldTag) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of FieldTag.
+func (v *FieldTag) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Value != nil {
+		enc.AddString("value", *v.Value)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -4250,12 +4726,43 @@ func (v *FieldValueMap) FromWire(w wire.Value) error {
 // Equals returns true if this FieldValueMap is equal to the provided
 // FieldValueMap.
 func (lhs FieldValueMap) Equals(rhs FieldValueMap) bool {
-	return _Map_String_Value_Equals(lhs, rhs)
+	return _Map_String_Value_Equals((map[string]*Value)(lhs), (map[string]*Value)(rhs))
+}
+
+func (v FieldValueMap) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	return ((_Map_String_Value_Zapper)((map[string]*Value)(v))).MarshalLogObject(enc)
 }
 
 type IndexDefinition struct {
-	Key *PrimaryKey `json:"key,omitempty"`
+	Key     *PrimaryKey `json:"key,omitempty"`
+	Columns []string    `json:"columns,omitempty"`
 }
+
+type _List_String_ValueList []string
+
+func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for _, x := range v {
+		w, err := wire.NewValueString(x), error(nil)
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_String_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_String_ValueList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_List_String_ValueList) Close() {}
 
 // ToWire translates a IndexDefinition struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
@@ -4274,7 +4781,7 @@ type IndexDefinition struct {
 //   }
 func (v *IndexDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [1]wire.Field
+		fields [2]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4288,8 +4795,34 @@ func (v *IndexDefinition) ToWire() (wire.Value, error) {
 		fields[i] = wire.Field{ID: 1, Value: w}
 		i++
 	}
+	if v.Columns != nil {
+		w, err = wire.NewValueList(_List_String_ValueList(v.Columns)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _List_String_Read(l wire.ValueList) ([]string, error) {
+	if l.ValueType() != wire.TBinary {
+		return nil, nil
+	}
+
+	o := make([]string, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := x.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
 }
 
 // FromWire deserializes a IndexDefinition struct from its Thrift-level
@@ -4322,6 +4855,14 @@ func (v *IndexDefinition) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 2:
+			if field.Value.Type() == wire.TList {
+				v.Columns, err = _List_String_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -4335,14 +4876,33 @@ func (v *IndexDefinition) String() string {
 		return "<nil>"
 	}
 
-	var fields [1]string
+	var fields [2]string
 	i := 0
 	if v.Key != nil {
 		fields[i] = fmt.Sprintf("Key: %v", v.Key)
 		i++
 	}
+	if v.Columns != nil {
+		fields[i] = fmt.Sprintf("Columns: %v", v.Columns)
+		i++
+	}
 
 	return fmt.Sprintf("IndexDefinition{%v}", strings.Join(fields[:i], ", "))
+}
+
+func _List_String_Equals(lhs, rhs []string) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+
+	for i, lv := range lhs {
+		rv := rhs[i]
+		if !(lv == rv) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // Equals returns true if all the fields of this IndexDefinition match the
@@ -4350,11 +4910,42 @@ func (v *IndexDefinition) String() string {
 //
 // This function performs a deep comparison.
 func (v *IndexDefinition) Equals(rhs *IndexDefinition) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Key == nil && rhs.Key == nil) || (v.Key != nil && rhs.Key != nil && v.Key.Equals(rhs.Key))) {
+		return false
+	}
+	if !((v.Columns == nil && rhs.Columns == nil) || (v.Columns != nil && rhs.Columns != nil && _List_String_Equals(v.Columns, rhs.Columns))) {
 		return false
 	}
 
 	return true
+}
+
+type _List_String_Zapper []string
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_String_Zapper.
+func (l _List_String_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		enc.AppendString(v)
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of IndexDefinition.
+func (v *IndexDefinition) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Key != nil {
+		err = multierr.Append(err, enc.AddObject("key", v.Key))
+	}
+	if v.Columns != nil {
+		err = multierr.Append(err, enc.AddArray("columns", (_List_String_Zapper)(v.Columns)))
+	}
+	return err
 }
 
 // GetKey returns the value of Key if it is set or its
@@ -4362,6 +4953,16 @@ func (v *IndexDefinition) Equals(rhs *IndexDefinition) bool {
 func (v *IndexDefinition) GetKey() (o *PrimaryKey) {
 	if v.Key != nil {
 		return v.Key
+	}
+
+	return
+}
+
+// GetColumns returns the value of Columns if it is set or its
+// zero value if it is unset.
+func (v *IndexDefinition) GetColumns() (o []string) {
+	if v.Columns != nil {
+		return v.Columns
 	}
 
 	return
@@ -4512,6 +5113,11 @@ func (v *InternalServerError) String() string {
 //
 // This function performs a deep comparison.
 func (v *InternalServerError) Equals(rhs *InternalServerError) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !(v.Err == rhs.Err) {
 		return false
 	}
@@ -4523,6 +5129,19 @@ func (v *InternalServerError) Equals(rhs *InternalServerError) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of InternalServerError.
+func (v *InternalServerError) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	enc.AddString("err", v.Err)
+	if v.Message != nil {
+		enc.AddString("message", *v.Message)
+	}
+	if v.ErrorCode != nil {
+		enc.AddInt32("errorCode", *v.ErrorCode)
+	}
+	return err
 }
 
 // GetErr returns the value of Err if it is set or its
@@ -4813,6 +5432,11 @@ func _Set_String_Equals(lhs, rhs map[string]struct{}) bool {
 //
 // This function performs a deep comparison.
 func (v *MultiReadRequest) Equals(rhs *MultiReadRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -4824,6 +5448,43 @@ func (v *MultiReadRequest) Equals(rhs *MultiReadRequest) bool {
 	}
 
 	return true
+}
+
+type _List_FieldValueMap_Zapper []FieldValueMap
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_FieldValueMap_Zapper.
+func (l _List_FieldValueMap_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject((_Map_String_Value_Zapper)((map[string]*Value)(v))))
+	}
+	return err
+}
+
+type _Set_String_Zapper map[string]struct{}
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _Set_String_Zapper.
+func (s _Set_String_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for v := range s {
+		enc.AppendString(v)
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiReadRequest.
+func (v *MultiReadRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.KeyValues != nil {
+		err = multierr.Append(err, enc.AddArray("keyValues", (_List_FieldValueMap_Zapper)(v.KeyValues)))
+	}
+	if v.FieldsToRead != nil {
+		err = multierr.Append(err, enc.AddArray("fieldsToRead", (_Set_String_Zapper)(v.FieldsToRead)))
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -5021,11 +5682,36 @@ func _List_EntityOrError_Equals(lhs, rhs []*EntityOrError) bool {
 //
 // This function performs a deep comparison.
 func (v *MultiReadResponse) Equals(rhs *MultiReadResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Results == nil && rhs.Results == nil) || (v.Results != nil && rhs.Results != nil && _List_EntityOrError_Equals(v.Results, rhs.Results))) {
 		return false
 	}
 
 	return true
+}
+
+type _List_EntityOrError_Zapper []*EntityOrError
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_EntityOrError_Zapper.
+func (l _List_EntityOrError_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiReadResponse.
+func (v *MultiReadResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Results != nil {
+		err = multierr.Append(err, enc.AddArray("results", (_List_EntityOrError_Zapper)(v.Results)))
+	}
+	return err
 }
 
 // GetResults returns the value of Results if it is set or its
@@ -5179,6 +5865,11 @@ func (v *MultiRemoveRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *MultiRemoveRequest) Equals(rhs *MultiRemoveRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -5190,6 +5881,21 @@ func (v *MultiRemoveRequest) Equals(rhs *MultiRemoveRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiRemoveRequest.
+func (v *MultiRemoveRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.KeyValues != nil {
+		err = multierr.Append(err, enc.AddArray("keyValues", (_List_FieldValueMap_Zapper)(v.KeyValues)))
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -5381,11 +6087,36 @@ func _List_Error_Equals(lhs, rhs []*Error) bool {
 //
 // This function performs a deep comparison.
 func (v *MultiRemoveResponse) Equals(rhs *MultiRemoveResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Errors == nil && rhs.Errors == nil) || (v.Errors != nil && rhs.Errors != nil && _List_Error_Equals(v.Errors, rhs.Errors))) {
 		return false
 	}
 
 	return true
+}
+
+type _List_Error_Zapper []*Error
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_Error_Zapper.
+func (l _List_Error_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiRemoveResponse.
+func (v *MultiRemoveResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Errors != nil {
+		err = multierr.Append(err, enc.AddArray("errors", (_List_Error_Zapper)(v.Errors)))
+	}
+	return err
 }
 
 // GetErrors returns the value of Errors if it is set or its
@@ -5539,6 +6270,11 @@ func (v *MultiUpsertRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *MultiUpsertRequest) Equals(rhs *MultiUpsertRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -5550,6 +6286,21 @@ func (v *MultiUpsertRequest) Equals(rhs *MultiUpsertRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiUpsertRequest.
+func (v *MultiUpsertRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.Entities != nil {
+		err = multierr.Append(err, enc.AddArray("entities", (_List_FieldValueMap_Zapper)(v.Entities)))
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -5679,11 +6430,25 @@ func (v *MultiUpsertResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *MultiUpsertResponse) Equals(rhs *MultiUpsertResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Errors == nil && rhs.Errors == nil) || (v.Errors != nil && rhs.Errors != nil && _List_Error_Equals(v.Errors, rhs.Errors))) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of MultiUpsertResponse.
+func (v *MultiUpsertResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Errors != nil {
+		err = multierr.Append(err, enc.AddArray("errors", (_List_Error_Zapper)(v.Errors)))
+	}
+	return err
 }
 
 // GetErrors returns the value of Errors if it is set or its
@@ -5723,7 +6488,7 @@ func Operator_Values() []Operator {
 //   var v Operator
 //   err := v.UnmarshalText([]byte("EQ"))
 func (v *Operator) UnmarshalText(value []byte) error {
-	switch string(value) {
+	switch s := string(value); s {
 	case "EQ":
 		*v = OperatorEq
 		return nil
@@ -5740,7 +6505,12 @@ func (v *Operator) UnmarshalText(value []byte) error {
 		*v = OperatorGtOrEq
 		return nil
 	default:
-		return fmt.Errorf("unknown enum value %q for %q", value, "Operator")
+		val, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return fmt.Errorf("unknown enum value %q for %q: %v", s, "Operator", err)
+		}
+		*v = Operator(val)
+		return nil
 	}
 }
 
@@ -5764,6 +6534,27 @@ func (v Operator) MarshalText() ([]byte, error) {
 		return []byte("GT_OR_EQ"), nil
 	}
 	return []byte(strconv.FormatInt(int64(v), 10)), nil
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Operator.
+// Enums are logged as objects, where the value is logged with key "value", and
+// if this value's name is known, the name is logged with key "name".
+func (v Operator) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddInt32("value", int32(v))
+	switch int32(v) {
+	case 0:
+		enc.AddString("name", "EQ")
+	case 1:
+		enc.AddString("name", "LT")
+	case 2:
+		enc.AddString("name", "GT")
+	case 3:
+		enc.AddString("name", "LT_OR_EQ")
+	case 4:
+		enc.AddString("name", "GT_OR_EQ")
+	}
+	return nil
 }
 
 // Ptr returns a pointer to this enum value.
@@ -5885,32 +6676,6 @@ type PrimaryKey struct {
 	ClusteringKeys []*ClusteringKey `json:"clusteringKeys,omitempty"`
 }
 
-type _List_String_ValueList []string
-
-func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
-	for _, x := range v {
-		w, err := wire.NewValueString(x), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_String_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_String_ValueList) ValueType() wire.Type {
-	return wire.TBinary
-}
-
-func (_List_String_ValueList) Close() {}
-
 type _List_ClusteringKey_ValueList []*ClusteringKey
 
 func (v _List_ClusteringKey_ValueList) ForEach(f func(wire.Value) error) error {
@@ -5981,24 +6746,6 @@ func (v *PrimaryKey) ToWire() (wire.Value, error) {
 	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _List_String_Read(l wire.ValueList) ([]string, error) {
-	if l.ValueType() != wire.TBinary {
-		return nil, nil
-	}
-
-	o := make([]string, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := x.GetString(), error(nil)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
 }
 
 func _ClusteringKey_Read(w wire.Value) (*ClusteringKey, error) {
@@ -6090,21 +6837,6 @@ func (v *PrimaryKey) String() string {
 	return fmt.Sprintf("PrimaryKey{%v}", strings.Join(fields[:i], ", "))
 }
 
-func _List_String_Equals(lhs, rhs []string) bool {
-	if len(lhs) != len(rhs) {
-		return false
-	}
-
-	for i, lv := range lhs {
-		rv := rhs[i]
-		if !(lv == rv) {
-			return false
-		}
-	}
-
-	return true
-}
-
 func _List_ClusteringKey_Equals(lhs, rhs []*ClusteringKey) bool {
 	if len(lhs) != len(rhs) {
 		return false
@@ -6125,6 +6857,11 @@ func _List_ClusteringKey_Equals(lhs, rhs []*ClusteringKey) bool {
 //
 // This function performs a deep comparison.
 func (v *PrimaryKey) Equals(rhs *PrimaryKey) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.PartitionKeys == nil && rhs.PartitionKeys == nil) || (v.PartitionKeys != nil && rhs.PartitionKeys != nil && _List_String_Equals(v.PartitionKeys, rhs.PartitionKeys))) {
 		return false
 	}
@@ -6133,6 +6870,29 @@ func (v *PrimaryKey) Equals(rhs *PrimaryKey) bool {
 	}
 
 	return true
+}
+
+type _List_ClusteringKey_Zapper []*ClusteringKey
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_ClusteringKey_Zapper.
+func (l _List_ClusteringKey_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of PrimaryKey.
+func (v *PrimaryKey) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.PartitionKeys != nil {
+		err = multierr.Append(err, enc.AddArray("partitionKeys", (_List_String_Zapper)(v.PartitionKeys)))
+	}
+	if v.ClusteringKeys != nil {
+		err = multierr.Append(err, enc.AddArray("clusteringKeys", (_List_ClusteringKey_Zapper)(v.ClusteringKeys)))
+	}
+	return err
 }
 
 // GetPartitionKeys returns the value of PartitionKeys if it is set or its
@@ -6408,6 +7168,11 @@ func _List_Condition_Equals(lhs, rhs []*Condition) bool {
 //
 // This function performs a deep comparison.
 func (v *RangeRequest) Equals(rhs *RangeRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -6425,6 +7190,38 @@ func (v *RangeRequest) Equals(rhs *RangeRequest) bool {
 	}
 
 	return true
+}
+
+type _List_Condition_Zapper []*Condition
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_Condition_Zapper.
+func (l _List_Condition_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		err = multierr.Append(err, enc.AppendObject(v))
+	}
+	return err
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RangeRequest.
+func (v *RangeRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.Token != nil {
+		enc.AddString("token", *v.Token)
+	}
+	if v.Limit != nil {
+		enc.AddInt32("limit", *v.Limit)
+	}
+	if v.Conditions != nil {
+		err = multierr.Append(err, enc.AddArray("conditions", (_List_Condition_Zapper)(v.Conditions)))
+	}
+	if v.FieldsToRead != nil {
+		err = multierr.Append(err, enc.AddArray("fieldsToRead", (_Set_String_Zapper)(v.FieldsToRead)))
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -6597,6 +7394,11 @@ func (v *RangeResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *RangeResponse) Equals(rhs *RangeResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Entities == nil && rhs.Entities == nil) || (v.Entities != nil && rhs.Entities != nil && _List_FieldValueMap_Equals(v.Entities, rhs.Entities))) {
 		return false
 	}
@@ -6605,6 +7407,18 @@ func (v *RangeResponse) Equals(rhs *RangeResponse) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RangeResponse.
+func (v *RangeResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Entities != nil {
+		err = multierr.Append(err, enc.AddArray("entities", (_List_FieldValueMap_Zapper)(v.Entities)))
+	}
+	if v.NextToken != nil {
+		enc.AddString("nextToken", *v.NextToken)
+	}
+	return err
 }
 
 // GetEntities returns the value of Entities if it is set or its
@@ -6876,6 +7690,11 @@ func _Double_EqualsPtr(lhs, rhs *float64) bool {
 //
 // This function performs a deep comparison.
 func (v *RawValue) Equals(rhs *RawValue) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.BinaryValue == nil && rhs.BinaryValue == nil) || (v.BinaryValue != nil && rhs.BinaryValue != nil && bytes.Equal(v.BinaryValue, rhs.BinaryValue))) {
 		return false
 	}
@@ -6896,6 +7715,30 @@ func (v *RawValue) Equals(rhs *RawValue) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RawValue.
+func (v *RawValue) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.BinaryValue != nil {
+		enc.AddString("binaryValue", base64.StdEncoding.EncodeToString(v.BinaryValue))
+	}
+	if v.BoolValue != nil {
+		enc.AddBool("boolValue", *v.BoolValue)
+	}
+	if v.DoubleValue != nil {
+		enc.AddFloat64("doubleValue", *v.DoubleValue)
+	}
+	if v.Int32Value != nil {
+		enc.AddInt32("int32Value", *v.Int32Value)
+	}
+	if v.Int64Value != nil {
+		enc.AddInt64("int64Value", *v.Int64Value)
+	}
+	if v.StringValue != nil {
+		enc.AddString("stringValue", *v.StringValue)
+	}
+	return err
 }
 
 // GetBinaryValue returns the value of BinaryValue if it is set or its
@@ -7097,6 +7940,11 @@ func (v *ReadRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *ReadRequest) Equals(rhs *ReadRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -7108,6 +7956,21 @@ func (v *ReadRequest) Equals(rhs *ReadRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ReadRequest.
+func (v *ReadRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.KeyValues != nil {
+		err = multierr.Append(err, enc.AddObject("keyValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.KeyValues))))
+	}
+	if v.FieldsToRead != nil {
+		err = multierr.Append(err, enc.AddArray("fieldsToRead", (_Set_String_Zapper)(v.FieldsToRead)))
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -7237,11 +8100,25 @@ func (v *ReadResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *ReadResponse) Equals(rhs *ReadResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.EntityValues == nil && rhs.EntityValues == nil) || (v.EntityValues != nil && rhs.EntityValues != nil && v.EntityValues.Equals(rhs.EntityValues))) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ReadResponse.
+func (v *ReadResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.EntityValues != nil {
+		err = multierr.Append(err, enc.AddObject("entityValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.EntityValues))))
+	}
+	return err
 }
 
 // GetEntityValues returns the value of EntityValues if it is set or its
@@ -7395,6 +8272,11 @@ func (v *RemoveRangeRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *RemoveRangeRequest) Equals(rhs *RemoveRangeRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -7406,6 +8288,21 @@ func (v *RemoveRangeRequest) Equals(rhs *RemoveRangeRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RemoveRangeRequest.
+func (v *RemoveRangeRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.Conditions != nil {
+		err = multierr.Append(err, enc.AddArray("conditions", (_List_Condition_Zapper)(v.Conditions)))
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -7579,6 +8476,11 @@ func (v *RemoveRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *RemoveRequest) Equals(rhs *RemoveRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -7590,6 +8492,21 @@ func (v *RemoveRequest) Equals(rhs *RemoveRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RemoveRequest.
+func (v *RemoveRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.KeyValues != nil {
+		err = multierr.Append(err, enc.AddObject("keyValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.KeyValues))))
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -7786,6 +8703,11 @@ func (v *ScanRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *ScanRequest) Equals(rhs *ScanRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -7800,6 +8722,24 @@ func (v *ScanRequest) Equals(rhs *ScanRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ScanRequest.
+func (v *ScanRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.Token != nil {
+		enc.AddString("token", *v.Token)
+	}
+	if v.Limit != nil {
+		enc.AddInt32("limit", *v.Limit)
+	}
+	if v.FieldsToRead != nil {
+		err = multierr.Append(err, enc.AddArray("fieldsToRead", (_Set_String_Zapper)(v.FieldsToRead)))
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -7962,6 +8902,11 @@ func (v *ScanResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *ScanResponse) Equals(rhs *ScanResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Entities == nil && rhs.Entities == nil) || (v.Entities != nil && rhs.Entities != nil && _List_FieldValueMap_Equals(v.Entities, rhs.Entities))) {
 		return false
 	}
@@ -7970,6 +8915,18 @@ func (v *ScanResponse) Equals(rhs *ScanResponse) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ScanResponse.
+func (v *ScanResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Entities != nil {
+		err = multierr.Append(err, enc.AddArray("entities", (_List_FieldValueMap_Zapper)(v.Entities)))
+	}
+	if v.NextToken != nil {
+		enc.AddString("nextToken", *v.NextToken)
+	}
+	return err
 }
 
 // GetEntities returns the value of Entities if it is set or its
@@ -8160,6 +9117,11 @@ func (v *SchemaRef) String() string {
 //
 // This function performs a deep comparison.
 func (v *SchemaRef) Equals(rhs *SchemaRef) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
 		return false
 	}
@@ -8174,6 +9136,24 @@ func (v *SchemaRef) Equals(rhs *SchemaRef) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of SchemaRef.
+func (v *SchemaRef) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Scope != nil {
+		enc.AddString("scope", *v.Scope)
+	}
+	if v.NamePrefix != nil {
+		enc.AddString("namePrefix", *v.NamePrefix)
+	}
+	if v.EntityName != nil {
+		enc.AddString("entityName", *v.EntityName)
+	}
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	return err
 }
 
 // GetScope returns the value of Scope if it is set or its
@@ -8315,11 +9295,25 @@ func (v *ScopeExistsRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *ScopeExistsRequest) Equals(rhs *ScopeExistsRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ScopeExistsRequest.
+func (v *ScopeExistsRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -8431,11 +9425,25 @@ func (v *ScopeExistsResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *ScopeExistsResponse) Equals(rhs *ScopeExistsResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_Bool_EqualsPtr(v.Exists, rhs.Exists) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of ScopeExistsResponse.
+func (v *ScopeExistsResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Exists != nil {
+		enc.AddBool("exists", *v.Exists)
+	}
+	return err
 }
 
 // GetExists returns the value of Exists if it is set or its
@@ -8633,6 +9641,11 @@ func (v *SearchRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *SearchRequest) Equals(rhs *SearchRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -8650,6 +9663,27 @@ func (v *SearchRequest) Equals(rhs *SearchRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of SearchRequest.
+func (v *SearchRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.Token != nil {
+		enc.AddString("token", *v.Token)
+	}
+	if v.Limit != nil {
+		enc.AddInt32("limit", *v.Limit)
+	}
+	if v.SearchBy != nil {
+		err = multierr.Append(err, enc.AddObject("searchBy", v.SearchBy))
+	}
+	if v.FieldsToRead != nil {
+		err = multierr.Append(err, enc.AddArray("fieldsToRead", (_Set_String_Zapper)(v.FieldsToRead)))
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -8822,6 +9856,11 @@ func (v *SearchResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *SearchResponse) Equals(rhs *SearchResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Entities == nil && rhs.Entities == nil) || (v.Entities != nil && rhs.Entities != nil && _List_FieldValueMap_Equals(v.Entities, rhs.Entities))) {
 		return false
 	}
@@ -8830,6 +9869,18 @@ func (v *SearchResponse) Equals(rhs *SearchResponse) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of SearchResponse.
+func (v *SearchResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Entities != nil {
+		err = multierr.Append(err, enc.AddArray("entities", (_List_FieldValueMap_Zapper)(v.Entities)))
+	}
+	if v.NextToken != nil {
+		enc.AddString("nextToken", *v.NextToken)
+	}
+	return err
 }
 
 // GetEntities returns the value of Entities if it is set or its
@@ -8974,6 +10025,11 @@ func (v *TruncateScopeRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *TruncateScopeRequest) Equals(rhs *TruncateScopeRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Name, rhs.Name) {
 		return false
 	}
@@ -8982,6 +10038,18 @@ func (v *TruncateScopeRequest) Equals(rhs *TruncateScopeRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of TruncateScopeRequest.
+func (v *TruncateScopeRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Name != nil {
+		enc.AddString("name", *v.Name)
+	}
+	if v.Requester != nil {
+		enc.AddString("requester", *v.Requester)
+	}
+	return err
 }
 
 // GetName returns the value of Name if it is set or its
@@ -9168,6 +10236,11 @@ func (v *UpsertRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *UpsertRequest) Equals(rhs *UpsertRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.Ref == nil && rhs.Ref == nil) || (v.Ref != nil && rhs.Ref != nil && v.Ref.Equals(rhs.Ref))) {
 		return false
 	}
@@ -9182,6 +10255,24 @@ func (v *UpsertRequest) Equals(rhs *UpsertRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of UpsertRequest.
+func (v *UpsertRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Ref != nil {
+		err = multierr.Append(err, enc.AddObject("ref", v.Ref))
+	}
+	if v.EntityValues != nil {
+		err = multierr.Append(err, enc.AddObject("entityValues", (_Map_String_Value_Zapper)((map[string]*Value)(v.EntityValues))))
+	}
+	if v.TTL != nil {
+		enc.AddInt64("ttl", *v.TTL)
+	}
+	if v.Timestamp != nil {
+		enc.AddInt64("timestamp", *v.Timestamp)
+	}
+	return err
 }
 
 // GetRef returns the value of Ref if it is set or its
@@ -9390,6 +10481,11 @@ func (v *UpsertSchemaRequest) String() string {
 //
 // This function performs a deep comparison.
 func (v *UpsertSchemaRequest) Equals(rhs *UpsertSchemaRequest) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_String_EqualsPtr(v.Scope, rhs.Scope) {
 		return false
 	}
@@ -9404,6 +10500,24 @@ func (v *UpsertSchemaRequest) Equals(rhs *UpsertSchemaRequest) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of UpsertSchemaRequest.
+func (v *UpsertSchemaRequest) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Scope != nil {
+		enc.AddString("scope", *v.Scope)
+	}
+	if v.NamePrefix != nil {
+		enc.AddString("namePrefix", *v.NamePrefix)
+	}
+	if v.EntityDefs != nil {
+		err = multierr.Append(err, enc.AddArray("entityDefs", (_List_EntityDefinition_Zapper)(v.EntityDefs)))
+	}
+	if v.DryRun != nil {
+		enc.AddBool("dryRun", *v.DryRun)
+	}
+	return err
 }
 
 // GetScope returns the value of Scope if it is set or its
@@ -9568,6 +10682,11 @@ func (v *UpsertSchemaResponse) String() string {
 //
 // This function performs a deep comparison.
 func (v *UpsertSchemaResponse) Equals(rhs *UpsertSchemaResponse) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !_I32_EqualsPtr(v.Version, rhs.Version) {
 		return false
 	}
@@ -9576,6 +10695,18 @@ func (v *UpsertSchemaResponse) Equals(rhs *UpsertSchemaResponse) bool {
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of UpsertSchemaResponse.
+func (v *UpsertSchemaResponse) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.Version != nil {
+		enc.AddInt32("version", *v.Version)
+	}
+	if v.Status != nil {
+		enc.AddString("status", *v.Status)
+	}
+	return err
 }
 
 // GetVersion returns the value of Version if it is set or its
@@ -9713,11 +10844,25 @@ func (v *Value) String() string {
 //
 // This function performs a deep comparison.
 func (v *Value) Equals(rhs *Value) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
 	if !((v.ElemValue == nil && rhs.ElemValue == nil) || (v.ElemValue != nil && rhs.ElemValue != nil && v.ElemValue.Equals(rhs.ElemValue))) {
 		return false
 	}
 
 	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of Value.
+func (v *Value) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	if v.ElemValue != nil {
+		err = multierr.Append(err, enc.AddObject("elemValue", v.ElemValue))
+	}
+	return err
 }
 
 // GetElemValue returns the value of ElemValue if it is set or its

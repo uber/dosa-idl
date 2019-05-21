@@ -18,4 +18,3 @@ Use the appropriate version.
 License
 -------
 MIT License, please see [LICENSE](https://github.com/uber/dosa-idl/blob/master/LICENSE) for details.
-
