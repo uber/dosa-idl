@@ -82,6 +82,7 @@ struct PrimaryKey {
 
 struct IndexDefinition {
    1: optional PrimaryKey key
+   2: optional list<string> columns
 }
 
 enum ETLState {
@@ -455,4 +456,3 @@ service Dosa {
        2: InternalServerError serverError
    )
 }
-

@@ -11,11 +11,10 @@ Install thriftrw:
 
     go get -u go.uber.org/thriftrw
     cd .../thriftrw
-    git checkout v1.13.0
+    git checkout v1.19.1
 
 Use the appropriate version.
 
 License
 -------
 MIT License, please see [LICENSE](https://github.com/uber/dosa-idl/blob/master/LICENSE) for details.
-
