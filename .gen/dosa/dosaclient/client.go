@@ -5,7 +5,7 @@ package dosaclient
 
 import (
 	"context"
-	"github.com/uber-go/dosa-idl/.gen/dosa"
+	"github.com/uber/dosa-idl/.gen/dosa"
 	tchannel "github.com/uber/tchannel-go"
 	"go.uber.org/thriftrw/wire"
 	"go.uber.org/yarpc"

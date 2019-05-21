@@ -5,7 +5,7 @@ package dosaserver
 
 import (
 	"context"
-	"github.com/uber-go/dosa-idl/.gen/dosa"
+	"github.com/uber/dosa-idl/.gen/dosa"
 	"go.uber.org/thriftrw/wire"
 	"go.uber.org/yarpc/api/transport"
 	"go.uber.org/yarpc/encoding/thrift"

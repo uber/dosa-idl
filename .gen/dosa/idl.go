@@ -8,7 +8,7 @@ import "go.uber.org/thriftrw/thriftreflect"
 // ThriftModule represents the IDL file used to generate this package.
 var ThriftModule = &thriftreflect.ThriftModule{
 	Name:     "dosa",
-	Package:  "github.com/uber-go/dosa-idl/.gen/dosa",
+	Package:  "github.com/uber/dosa-idl/.gen/dosa",
 	FilePath: "dosa.thrift",
 	SHA1:     "f8bf40338e4b4c8fb6ff06540da7d06786f1d89e",
 	Raw:      rawIDL,
