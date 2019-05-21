@@ -4,14 +4,14 @@
 package dosaclient
 
 import (
-	context "context"
-	dosa "github.com/uber-go/dosa-idl/.gen/dosa"
+	"context"
+	"github.com/uber-go/dosa-idl/.gen/dosa"
 	tchannel "github.com/uber/tchannel-go"
-	wire "go.uber.org/thriftrw/wire"
-	yarpc "go.uber.org/yarpc"
-	transport "go.uber.org/yarpc/api/transport"
-	thrift "go.uber.org/yarpc/encoding/thrift"
-	reflect "reflect"
+	"go.uber.org/thriftrw/wire"
+	"go.uber.org/yarpc"
+	"go.uber.org/yarpc/api/transport"
+	"go.uber.org/yarpc/encoding/thrift"
+	"reflect"
 )
 
 // Interface is a client for the Dosa service.

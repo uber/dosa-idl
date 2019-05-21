@@ -4,11 +4,11 @@
 package dosaserver
 
 import (
-	context "context"
-	dosa "github.com/uber-go/dosa-idl/.gen/dosa"
-	wire "go.uber.org/thriftrw/wire"
-	transport "go.uber.org/yarpc/api/transport"
-	thrift "go.uber.org/yarpc/encoding/thrift"
+	"context"
+	"github.com/uber-go/dosa-idl/.gen/dosa"
+	"go.uber.org/thriftrw/wire"
+	"go.uber.org/yarpc/api/transport"
+	"go.uber.org/yarpc/encoding/thrift"
 )
 
 // Interface is the server-side interface for the Dosa service.
