@@ -11,7 +11,11 @@ Install thriftrw:
 
     go get -u go.uber.org/thriftrw
     cd .../thriftrw
+<<<<<<< HEAD
     git checkout v1.19.0
+=======
+    git checkout v1.19.1
+>>>>>>> add columns tag in IndexDefinition
 
 Use the appropriate version.
 

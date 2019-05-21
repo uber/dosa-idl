@@ -1,6 +1,10 @@
 .PHONY: all thriftrw
 
+<<<<<<< HEAD
 THRIFTRW_VERSION := v1.9
+=======
+THRIFTRW_VERSION := v1.19
+>>>>>>> add columns tag in IndexDefinition
 THRIFT_SRC := idl/dosa/dosa.thrift
 OUT := .gen
 export PATH := $(GOPATH)/bin:$(PATH)
