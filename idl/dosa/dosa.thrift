@@ -83,6 +83,7 @@ struct PrimaryKey {
 struct IndexDefinition {
    1: optional PrimaryKey key
    2: optional list<string> columns
+   3: optional bool defunct
 }
 
 enum ETLState {
