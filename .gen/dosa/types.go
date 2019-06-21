@@ -4736,6 +4736,7 @@ func (v FieldValueMap) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 type IndexDefinition struct {
 	Key     *PrimaryKey `json:"key,omitempty"`
 	Columns []string    `json:"columns,omitempty"`
+	Defunct *bool       `json:"defunct,omitempty"`
 }
 
 type _List_String_ValueList []string
@@ -4781,7 +4782,7 @@ func (_List_String_ValueList) Close() {}
 //   }
 func (v *IndexDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -4801,6 +4802,14 @@ func (v *IndexDefinition) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.Defunct != nil {
+		w, err = wire.NewValueBool(*(v.Defunct)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
 		i++
 	}
 
@@ -4863,6 +4872,16 @@ func (v *IndexDefinition) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TBool {
+				var x bool
+				x, err = field.Value.GetBool(), error(nil)
+				v.Defunct = &x
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -4876,7 +4895,7 @@ func (v *IndexDefinition) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.Key != nil {
 		fields[i] = fmt.Sprintf("Key: %v", v.Key)
@@ -4884,6 +4903,10 @@ func (v *IndexDefinition) String() string {
 	}
 	if v.Columns != nil {
 		fields[i] = fmt.Sprintf("Columns: %v", v.Columns)
+		i++
+	}
+	if v.Defunct != nil {
+		fields[i] = fmt.Sprintf("Defunct: %v", *(v.Defunct))
 		i++
 	}
 
@@ -4921,6 +4944,9 @@ func (v *IndexDefinition) Equals(rhs *IndexDefinition) bool {
 	if !((v.Columns == nil && rhs.Columns == nil) || (v.Columns != nil && rhs.Columns != nil && _List_String_Equals(v.Columns, rhs.Columns))) {
 		return false
 	}
+	if !_Bool_EqualsPtr(v.Defunct, rhs.Defunct) {
+		return false
+	}
 
 	return true
 }
@@ -4945,6 +4971,9 @@ func (v *IndexDefinition) MarshalLogObject(enc zapcore.ObjectEncoder) (err error
 	if v.Columns != nil {
 		err = multierr.Append(err, enc.AddArray("columns", (_List_String_Zapper)(v.Columns)))
 	}
+	if v.Defunct != nil {
+		enc.AddBool("defunct", *v.Defunct)
+	}
 	return err
 }
 
@@ -4963,6 +4992,16 @@ func (v *IndexDefinition) GetKey() (o *PrimaryKey) {
 func (v *IndexDefinition) GetColumns() (o []string) {
 	if v.Columns != nil {
 		return v.Columns
+	}
+
+	return
+}
+
+// GetDefunct returns the value of Defunct if it is set or its
+// zero value if it is unset.
+func (v *IndexDefinition) GetDefunct() (o bool) {
+	if v.Defunct != nil {
+		return *v.Defunct
 	}
 
 	return
