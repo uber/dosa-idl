@@ -29,7 +29,7 @@ enum ElemType {
    INT32,
    INT64,
    DOUBLE,
-   TIMESTAMP,
+   TIMESTAMP, // Timestamps are 64-bit integers, the number of ns from the Unix epoch.
    UUID,
 
    // Reserve a few enum types in case we want to support few more
