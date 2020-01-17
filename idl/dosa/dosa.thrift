@@ -101,6 +101,7 @@ struct EntityDefinition {
    3: optional PrimaryKey primaryKey
    4: optional map<string, IndexDefinition> Indexes
    5: optional ETLState etl
+   6: optional list<string> columnOrder
 }
 
 struct Error {
