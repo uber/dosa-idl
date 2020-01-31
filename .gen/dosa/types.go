@@ -3109,11 +3109,12 @@ func (v *ElemType) UnmarshalJSON(text []byte) error {
 }
 
 type EntityDefinition struct {
-	Name       *string                     `json:"name,omitempty"`
-	FieldDescs map[string]*FieldDesc       `json:"fieldDescs,omitempty"`
-	PrimaryKey *PrimaryKey                 `json:"primaryKey,omitempty"`
-	Indexes    map[string]*IndexDefinition `json:"Indexes,omitempty"`
-	Etl        *ETLState                   `json:"etl,omitempty"`
+	Name        *string                     `json:"name,omitempty"`
+	FieldDescs  map[string]*FieldDesc       `json:"fieldDescs,omitempty"`
+	PrimaryKey  *PrimaryKey                 `json:"primaryKey,omitempty"`
+	Indexes     map[string]*IndexDefinition `json:"Indexes,omitempty"`
+	Etl         *ETLState                   `json:"etl,omitempty"`
+	ColumnOrder []string                    `json:"columnOrder,omitempty"`
 }
 
 type _Map_String_FieldDesc_MapItemList map[string]*FieldDesc
@@ -3192,6 +3193,32 @@ func (_Map_String_IndexDefinition_MapItemList) ValueType() wire.Type {
 
 func (_Map_String_IndexDefinition_MapItemList) Close() {}
 
+type _List_String_ValueList []string
+
+func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
+	for _, x := range v {
+		w, err := wire.NewValueString(x), error(nil)
+		if err != nil {
+			return err
+		}
+		err = f(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (v _List_String_ValueList) Size() int {
+	return len(v)
+}
+
+func (_List_String_ValueList) ValueType() wire.Type {
+	return wire.TBinary
+}
+
+func (_List_String_ValueList) Close() {}
+
 // ToWire translates a EntityDefinition struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
 // into bytes using a ThriftRW protocol implementation.
@@ -3209,7 +3236,7 @@ func (_Map_String_IndexDefinition_MapItemList) Close() {}
 //   }
 func (v *EntityDefinition) ToWire() (wire.Value, error) {
 	var (
-		fields [5]wire.Field
+		fields [6]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -3253,6 +3280,14 @@ func (v *EntityDefinition) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 5, Value: w}
+		i++
+	}
+	if v.ColumnOrder != nil {
+		w, err = wire.NewValueList(_List_String_ValueList(v.ColumnOrder)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 6, Value: w}
 		i++
 	}
 
@@ -3339,6 +3374,24 @@ func _ETLState_Read(w wire.Value) (ETLState, error) {
 	return v, err
 }
 
+func _List_String_Read(l wire.ValueList) ([]string, error) {
+	if l.ValueType() != wire.TBinary {
+		return nil, nil
+	}
+
+	o := make([]string, 0, l.Size())
+	err := l.ForEach(func(x wire.Value) error {
+		i, err := x.GetString(), error(nil)
+		if err != nil {
+			return err
+		}
+		o = append(o, i)
+		return nil
+	})
+	l.Close()
+	return o, err
+}
+
 // FromWire deserializes a EntityDefinition struct from its Thrift-level
 // representation. The Thrift-level representation may be obtained
 // from a ThriftRW protocol implementation.
@@ -3405,6 +3458,14 @@ func (v *EntityDefinition) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 6:
+			if field.Value.Type() == wire.TList {
+				v.ColumnOrder, err = _List_String_Read(field.Value.GetList())
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -3418,7 +3479,7 @@ func (v *EntityDefinition) String() string {
 		return "<nil>"
 	}
 
-	var fields [5]string
+	var fields [6]string
 	i := 0
 	if v.Name != nil {
 		fields[i] = fmt.Sprintf("Name: %v", *(v.Name))
@@ -3438,6 +3499,10 @@ func (v *EntityDefinition) String() string {
 	}
 	if v.Etl != nil {
 		fields[i] = fmt.Sprintf("Etl: %v", *(v.Etl))
+		i++
+	}
+	if v.ColumnOrder != nil {
+		fields[i] = fmt.Sprintf("ColumnOrder: %v", v.ColumnOrder)
 		i++
 	}
 
@@ -3488,6 +3553,21 @@ func _ETLState_EqualsPtr(lhs, rhs *ETLState) bool {
 	return lhs == nil && rhs == nil
 }
 
+func _List_String_Equals(lhs, rhs []string) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+
+	for i, lv := range lhs {
+		rv := rhs[i]
+		if !(lv == rv) {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Equals returns true if all the fields of this EntityDefinition match the
 // provided EntityDefinition.
 //
@@ -3511,6 +3591,9 @@ func (v *EntityDefinition) Equals(rhs *EntityDefinition) bool {
 		return false
 	}
 	if !_ETLState_EqualsPtr(v.Etl, rhs.Etl) {
+		return false
+	}
+	if !((v.ColumnOrder == nil && rhs.ColumnOrder == nil) || (v.ColumnOrder != nil && rhs.ColumnOrder != nil && _List_String_Equals(v.ColumnOrder, rhs.ColumnOrder))) {
 		return false
 	}
 
@@ -3539,6 +3622,17 @@ func (m _Map_String_IndexDefinition_Zapper) MarshalLogObject(enc zapcore.ObjectE
 	return err
 }
 
+type _List_String_Zapper []string
+
+// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
+// fast logging of _List_String_Zapper.
+func (l _List_String_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
+	for _, v := range l {
+		enc.AppendString(v)
+	}
+	return err
+}
+
 // MarshalLogObject implements zapcore.ObjectMarshaler, enabling
 // fast logging of EntityDefinition.
 func (v *EntityDefinition) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
@@ -3556,6 +3650,9 @@ func (v *EntityDefinition) MarshalLogObject(enc zapcore.ObjectEncoder) (err erro
 	}
 	if v.Etl != nil {
 		err = multierr.Append(err, enc.AddObject("etl", *v.Etl))
+	}
+	if v.ColumnOrder != nil {
+		err = multierr.Append(err, enc.AddArray("columnOrder", (_List_String_Zapper)(v.ColumnOrder)))
 	}
 	return err
 }
@@ -3605,6 +3702,16 @@ func (v *EntityDefinition) GetIndexes() (o map[string]*IndexDefinition) {
 func (v *EntityDefinition) GetEtl() (o ETLState) {
 	if v.Etl != nil {
 		return *v.Etl
+	}
+
+	return
+}
+
+// GetColumnOrder returns the value of ColumnOrder if it is set or its
+// zero value if it is unset.
+func (v *EntityDefinition) GetColumnOrder() (o []string) {
+	if v.ColumnOrder != nil {
+		return v.ColumnOrder
 	}
 
 	return
@@ -4739,32 +4846,6 @@ type IndexDefinition struct {
 	Defunct *bool       `json:"defunct,omitempty"`
 }
 
-type _List_String_ValueList []string
-
-func (v _List_String_ValueList) ForEach(f func(wire.Value) error) error {
-	for _, x := range v {
-		w, err := wire.NewValueString(x), error(nil)
-		if err != nil {
-			return err
-		}
-		err = f(w)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (v _List_String_ValueList) Size() int {
-	return len(v)
-}
-
-func (_List_String_ValueList) ValueType() wire.Type {
-	return wire.TBinary
-}
-
-func (_List_String_ValueList) Close() {}
-
 // ToWire translates a IndexDefinition struct into a Thrift-level intermediate
 // representation. This intermediate representation may be serialized
 // into bytes using a ThriftRW protocol implementation.
@@ -4814,24 +4895,6 @@ func (v *IndexDefinition) ToWire() (wire.Value, error) {
 	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
-}
-
-func _List_String_Read(l wire.ValueList) ([]string, error) {
-	if l.ValueType() != wire.TBinary {
-		return nil, nil
-	}
-
-	o := make([]string, 0, l.Size())
-	err := l.ForEach(func(x wire.Value) error {
-		i, err := x.GetString(), error(nil)
-		if err != nil {
-			return err
-		}
-		o = append(o, i)
-		return nil
-	})
-	l.Close()
-	return o, err
 }
 
 // FromWire deserializes a IndexDefinition struct from its Thrift-level
@@ -4913,21 +4976,6 @@ func (v *IndexDefinition) String() string {
 	return fmt.Sprintf("IndexDefinition{%v}", strings.Join(fields[:i], ", "))
 }
 
-func _List_String_Equals(lhs, rhs []string) bool {
-	if len(lhs) != len(rhs) {
-		return false
-	}
-
-	for i, lv := range lhs {
-		rv := rhs[i]
-		if !(lv == rv) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // Equals returns true if all the fields of this IndexDefinition match the
 // provided IndexDefinition.
 //
@@ -4949,17 +4997,6 @@ func (v *IndexDefinition) Equals(rhs *IndexDefinition) bool {
 	}
 
 	return true
-}
-
-type _List_String_Zapper []string
-
-// MarshalLogArray implements zapcore.ArrayMarshaler, enabling
-// fast logging of _List_String_Zapper.
-func (l _List_String_Zapper) MarshalLogArray(enc zapcore.ArrayEncoder) (err error) {
-	for _, v := range l {
-		enc.AppendString(v)
-	}
-	return err
 }
 
 // MarshalLogObject implements zapcore.ObjectMarshaler, enabling
