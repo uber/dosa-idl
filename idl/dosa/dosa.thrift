@@ -321,12 +321,19 @@ exception BadSchemaError {
     1: required map<string, string> reasons
 }
 
+exception RateLimitError {
+    1: required string err
+    2: optional string message
+    3: optional i32 errorCode
+}
+
 service Dosa {
    void createIfNotExists(
        1: CreateRequest request
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    ReadResponse read (
@@ -334,6 +341,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    MultiReadResponse multiRead (
@@ -341,6 +349,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void upsert (
@@ -348,6 +357,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    MultiUpsertResponse multiUpsert (
@@ -355,6 +365,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void remove (
@@ -362,6 +373,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    MultiRemoveResponse multiRemove (
@@ -369,6 +381,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    RangeResponse range (
@@ -376,6 +389,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void removeRange (
@@ -383,6 +397,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    SearchResponse search (
@@ -390,6 +405,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    ScanResponse scan (
@@ -397,6 +413,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    CanUpsertSchemaResponse canUpsertSchema(
