@@ -225,6 +225,8 @@ func init() {
 			return true
 		case *InternalServerError:
 			return true
+		case *RateLimitError:
+			return true
 		default:
 			return false
 		}
@@ -246,6 +248,11 @@ func init() {
 				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CreateIfNotExists_Result.ServerError")
 			}
 			return &Dosa_CreateIfNotExists_Result{ServerError: e}, nil
+		case *RateLimitError:
+			if e == nil {
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_CreateIfNotExists_Result.LimitError")
+			}
+			return &Dosa_CreateIfNotExists_Result{LimitError: e}, nil
 		}
 
 		return nil, err
@@ -259,6 +266,10 @@ func init() {
 			err = result.ServerError
 			return
 		}
+		if result.LimitError != nil {
+			err = result.LimitError
+			return
+		}
 		return
 	}
 
@@ -270,6 +281,7 @@ func init() {
 type Dosa_CreateIfNotExists_Result struct {
 	ClientError *BadRequestError     `json:"clientError,omitempty"`
 	ServerError *InternalServerError `json:"serverError,omitempty"`
+	LimitError  *RateLimitError      `json:"limitError,omitempty"`
 }
 
 // ToWire translates a Dosa_CreateIfNotExists_Result struct into a Thrift-level intermediate
@@ -289,7 +301,7 @@ type Dosa_CreateIfNotExists_Result struct {
 //   }
 func (v *Dosa_CreateIfNotExists_Result) ToWire() (wire.Value, error) {
 	var (
-		fields [2]wire.Field
+		fields [3]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -311,12 +323,26 @@ func (v *Dosa_CreateIfNotExists_Result) ToWire() (wire.Value, error) {
 		fields[i] = wire.Field{ID: 2, Value: w}
 		i++
 	}
+	if v.LimitError != nil {
+		w, err = v.LimitError.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
 
 	if i > 1 {
 		return wire.Value{}, fmt.Errorf("Dosa_CreateIfNotExists_Result should have at most one field: got %v fields", i)
 	}
 
 	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+func _RateLimitError_Read(w wire.Value) (*RateLimitError, error) {
+	var v RateLimitError
+	err := v.FromWire(w)
+	return &v, err
 }
 
 // FromWire deserializes a Dosa_CreateIfNotExists_Result struct from its Thrift-level
@@ -357,6 +383,14 @@ func (v *Dosa_CreateIfNotExists_Result) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 3:
+			if field.Value.Type() == wire.TStruct {
+				v.LimitError, err = _RateLimitError_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -365,6 +399,9 @@ func (v *Dosa_CreateIfNotExists_Result) FromWire(w wire.Value) error {
 		count++
 	}
 	if v.ServerError != nil {
+		count++
+	}
+	if v.LimitError != nil {
 		count++
 	}
 	if count > 1 {
@@ -381,7 +418,7 @@ func (v *Dosa_CreateIfNotExists_Result) String() string {
 		return "<nil>"
 	}
 
-	var fields [2]string
+	var fields [3]string
 	i := 0
 	if v.ClientError != nil {
 		fields[i] = fmt.Sprintf("ClientError: %v", v.ClientError)
@@ -389,6 +426,10 @@ func (v *Dosa_CreateIfNotExists_Result) String() string {
 	}
 	if v.ServerError != nil {
 		fields[i] = fmt.Sprintf("ServerError: %v", v.ServerError)
+		i++
+	}
+	if v.LimitError != nil {
+		fields[i] = fmt.Sprintf("LimitError: %v", v.LimitError)
 		i++
 	}
 
@@ -411,6 +452,9 @@ func (v *Dosa_CreateIfNotExists_Result) Equals(rhs *Dosa_CreateIfNotExists_Resul
 	if !((v.ServerError == nil && rhs.ServerError == nil) || (v.ServerError != nil && rhs.ServerError != nil && v.ServerError.Equals(rhs.ServerError))) {
 		return false
 	}
+	if !((v.LimitError == nil && rhs.LimitError == nil) || (v.LimitError != nil && rhs.LimitError != nil && v.LimitError.Equals(rhs.LimitError))) {
+		return false
+	}
 
 	return true
 }
@@ -423,6 +467,9 @@ func (v *Dosa_CreateIfNotExists_Result) MarshalLogObject(enc zapcore.ObjectEncod
 	}
 	if v.ServerError != nil {
 		err = multierr.Append(err, enc.AddObject("serverError", v.ServerError))
+	}
+	if v.LimitError != nil {
+		err = multierr.Append(err, enc.AddObject("limitError", v.LimitError))
 	}
 	return err
 }
@@ -442,6 +489,16 @@ func (v *Dosa_CreateIfNotExists_Result) GetClientError() (o *BadRequestError) {
 func (v *Dosa_CreateIfNotExists_Result) GetServerError() (o *InternalServerError) {
 	if v.ServerError != nil {
 		return v.ServerError
+	}
+
+	return
+}
+
+// GetLimitError returns the value of LimitError if it is set or its
+// zero value if it is unset.
+func (v *Dosa_CreateIfNotExists_Result) GetLimitError() (o *RateLimitError) {
+	if v.LimitError != nil {
+		return v.LimitError
 	}
 
 	return
