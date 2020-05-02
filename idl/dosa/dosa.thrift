@@ -422,6 +422,7 @@ service Dosa {
        1: BadRequestError clientError
        2: InternalServerError serverError
        3: BadSchemaError schemaError
+       4: RateLimitError limitError
    )
 
    CheckSchemaResponse checkSchema(
@@ -430,6 +431,7 @@ service Dosa {
        1: BadRequestError clientError
        2: InternalServerError serverError
        3: BadSchemaError schemaError
+       4: RateLimitError limitError
    )
 
    UpsertSchemaResponse upsertSchema(
@@ -438,6 +440,7 @@ service Dosa {
        1: BadRequestError clientError
        2: InternalServerError serverError
        3: BadSchemaError schemaError
+       4: RateLimitError limitError
    )
 
    CheckSchemaStatusResponse checkSchemaStatus(
@@ -445,6 +448,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void createScope(
@@ -452,6 +456,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    ScopeExistsResponse scopeExists(
@@ -459,6 +464,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void truncateScope(
@@ -466,6 +472,7 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 
    void dropScope(
@@ -473,5 +480,6 @@ service Dosa {
    ) throws (
        1: BadRequestError clientError
        2: InternalServerError serverError
+       3: RateLimitError limitError
    )
 }
