@@ -7517,6 +7517,210 @@ func (v *RangeResponse) GetNextToken() (o string) {
 	return
 }
 
+type RateLimitError struct {
+	Err       string  `json:"err,required"`
+	Message   *string `json:"message,omitempty"`
+	ErrorCode *int32  `json:"errorCode,omitempty"`
+}
+
+// ToWire translates a RateLimitError struct into a Thrift-level intermediate
+// representation. This intermediate representation may be serialized
+// into bytes using a ThriftRW protocol implementation.
+//
+// An error is returned if the struct or any of its fields failed to
+// validate.
+//
+//   x, err := v.ToWire()
+//   if err != nil {
+//     return err
+//   }
+//
+//   if err := binaryProtocol.Encode(x, writer); err != nil {
+//     return err
+//   }
+func (v *RateLimitError) ToWire() (wire.Value, error) {
+	var (
+		fields [3]wire.Field
+		i      int = 0
+		w      wire.Value
+		err    error
+	)
+
+	w, err = wire.NewValueString(v.Err), error(nil)
+	if err != nil {
+		return w, err
+	}
+	fields[i] = wire.Field{ID: 1, Value: w}
+	i++
+	if v.Message != nil {
+		w, err = wire.NewValueString(*(v.Message)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 2, Value: w}
+		i++
+	}
+	if v.ErrorCode != nil {
+		w, err = wire.NewValueI32(*(v.ErrorCode)), error(nil)
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+
+	return wire.NewValueStruct(wire.Struct{Fields: fields[:i]}), nil
+}
+
+// FromWire deserializes a RateLimitError struct from its Thrift-level
+// representation. The Thrift-level representation may be obtained
+// from a ThriftRW protocol implementation.
+//
+// An error is returned if we were unable to build a RateLimitError struct
+// from the provided intermediate representation.
+//
+//   x, err := binaryProtocol.Decode(reader, wire.TStruct)
+//   if err != nil {
+//     return nil, err
+//   }
+//
+//   var v RateLimitError
+//   if err := v.FromWire(x); err != nil {
+//     return nil, err
+//   }
+//   return &v, nil
+func (v *RateLimitError) FromWire(w wire.Value) error {
+	var err error
+
+	errIsSet := false
+
+	for _, field := range w.GetStruct().Fields {
+		switch field.ID {
+		case 1:
+			if field.Value.Type() == wire.TBinary {
+				v.Err, err = field.Value.GetString(), error(nil)
+				if err != nil {
+					return err
+				}
+				errIsSet = true
+			}
+		case 2:
+			if field.Value.Type() == wire.TBinary {
+				var x string
+				x, err = field.Value.GetString(), error(nil)
+				v.Message = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		case 3:
+			if field.Value.Type() == wire.TI32 {
+				var x int32
+				x, err = field.Value.GetI32(), error(nil)
+				v.ErrorCode = &x
+				if err != nil {
+					return err
+				}
+
+			}
+		}
+	}
+
+	if !errIsSet {
+		return errors.New("field Err of RateLimitError is required")
+	}
+
+	return nil
+}
+
+// String returns a readable string representation of a RateLimitError
+// struct.
+func (v *RateLimitError) String() string {
+	if v == nil {
+		return "<nil>"
+	}
+
+	var fields [3]string
+	i := 0
+	fields[i] = fmt.Sprintf("Err: %v", v.Err)
+	i++
+	if v.Message != nil {
+		fields[i] = fmt.Sprintf("Message: %v", *(v.Message))
+		i++
+	}
+	if v.ErrorCode != nil {
+		fields[i] = fmt.Sprintf("ErrorCode: %v", *(v.ErrorCode))
+		i++
+	}
+
+	return fmt.Sprintf("RateLimitError{%v}", strings.Join(fields[:i], ", "))
+}
+
+// Equals returns true if all the fields of this RateLimitError match the
+// provided RateLimitError.
+//
+// This function performs a deep comparison.
+func (v *RateLimitError) Equals(rhs *RateLimitError) bool {
+	if v == nil {
+		return rhs == nil
+	} else if rhs == nil {
+		return false
+	}
+	if !(v.Err == rhs.Err) {
+		return false
+	}
+	if !_String_EqualsPtr(v.Message, rhs.Message) {
+		return false
+	}
+	if !_I32_EqualsPtr(v.ErrorCode, rhs.ErrorCode) {
+		return false
+	}
+
+	return true
+}
+
+// MarshalLogObject implements zapcore.ObjectMarshaler, enabling
+// fast logging of RateLimitError.
+func (v *RateLimitError) MarshalLogObject(enc zapcore.ObjectEncoder) (err error) {
+	enc.AddString("err", v.Err)
+	if v.Message != nil {
+		enc.AddString("message", *v.Message)
+	}
+	if v.ErrorCode != nil {
+		enc.AddInt32("errorCode", *v.ErrorCode)
+	}
+	return err
+}
+
+// GetErr returns the value of Err if it is set or its
+// zero value if it is unset.
+func (v *RateLimitError) GetErr() (o string) { return v.Err }
+
+// GetMessage returns the value of Message if it is set or its
+// zero value if it is unset.
+func (v *RateLimitError) GetMessage() (o string) {
+	if v.Message != nil {
+		return *v.Message
+	}
+
+	return
+}
+
+// GetErrorCode returns the value of ErrorCode if it is set or its
+// zero value if it is unset.
+func (v *RateLimitError) GetErrorCode() (o int32) {
+	if v.ErrorCode != nil {
+		return *v.ErrorCode
+	}
+
+	return
+}
+
+func (v *RateLimitError) Error() string {
+	return v.String()
+}
+
 type RawValue struct {
 	BinaryValue []byte   `json:"binaryValue,omitempty"`
 	BoolValue   *bool    `json:"boolValue,omitempty"`

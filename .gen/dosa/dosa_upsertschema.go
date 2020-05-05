@@ -226,6 +226,8 @@ func init() {
 			return true
 		case *BadSchemaError:
 			return true
+		case *RateLimitError:
+			return true
 		default:
 			return false
 		}
@@ -252,6 +254,11 @@ func init() {
 				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_UpsertSchema_Result.SchemaError")
 			}
 			return &Dosa_UpsertSchema_Result{SchemaError: e}, nil
+		case *RateLimitError:
+			if e == nil {
+				return nil, errors.New("WrapResponse received non-nil error type with nil value for Dosa_UpsertSchema_Result.LimitError")
+			}
+			return &Dosa_UpsertSchema_Result{LimitError: e}, nil
 		}
 
 		return nil, err
@@ -267,6 +274,10 @@ func init() {
 		}
 		if result.SchemaError != nil {
 			err = result.SchemaError
+			return
+		}
+		if result.LimitError != nil {
+			err = result.LimitError
 			return
 		}
 
@@ -292,6 +303,7 @@ type Dosa_UpsertSchema_Result struct {
 	ClientError *BadRequestError      `json:"clientError,omitempty"`
 	ServerError *InternalServerError  `json:"serverError,omitempty"`
 	SchemaError *BadSchemaError       `json:"schemaError,omitempty"`
+	LimitError  *RateLimitError       `json:"limitError,omitempty"`
 }
 
 // ToWire translates a Dosa_UpsertSchema_Result struct into a Thrift-level intermediate
@@ -311,7 +323,7 @@ type Dosa_UpsertSchema_Result struct {
 //   }
 func (v *Dosa_UpsertSchema_Result) ToWire() (wire.Value, error) {
 	var (
-		fields [4]wire.Field
+		fields [5]wire.Field
 		i      int = 0
 		w      wire.Value
 		err    error
@@ -347,6 +359,14 @@ func (v *Dosa_UpsertSchema_Result) ToWire() (wire.Value, error) {
 			return w, err
 		}
 		fields[i] = wire.Field{ID: 3, Value: w}
+		i++
+	}
+	if v.LimitError != nil {
+		w, err = v.LimitError.ToWire()
+		if err != nil {
+			return w, err
+		}
+		fields[i] = wire.Field{ID: 4, Value: w}
 		i++
 	}
 
@@ -417,6 +437,14 @@ func (v *Dosa_UpsertSchema_Result) FromWire(w wire.Value) error {
 				}
 
 			}
+		case 4:
+			if field.Value.Type() == wire.TStruct {
+				v.LimitError, err = _RateLimitError_Read(field.Value)
+				if err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 
@@ -433,6 +461,9 @@ func (v *Dosa_UpsertSchema_Result) FromWire(w wire.Value) error {
 	if v.SchemaError != nil {
 		count++
 	}
+	if v.LimitError != nil {
+		count++
+	}
 	if count != 1 {
 		return fmt.Errorf("Dosa_UpsertSchema_Result should have exactly one field: got %v fields", count)
 	}
@@ -447,7 +478,7 @@ func (v *Dosa_UpsertSchema_Result) String() string {
 		return "<nil>"
 	}
 
-	var fields [4]string
+	var fields [5]string
 	i := 0
 	if v.Success != nil {
 		fields[i] = fmt.Sprintf("Success: %v", v.Success)
@@ -463,6 +494,10 @@ func (v *Dosa_UpsertSchema_Result) String() string {
 	}
 	if v.SchemaError != nil {
 		fields[i] = fmt.Sprintf("SchemaError: %v", v.SchemaError)
+		i++
+	}
+	if v.LimitError != nil {
+		fields[i] = fmt.Sprintf("LimitError: %v", v.LimitError)
 		i++
 	}
 
@@ -491,6 +526,9 @@ func (v *Dosa_UpsertSchema_Result) Equals(rhs *Dosa_UpsertSchema_Result) bool {
 	if !((v.SchemaError == nil && rhs.SchemaError == nil) || (v.SchemaError != nil && rhs.SchemaError != nil && v.SchemaError.Equals(rhs.SchemaError))) {
 		return false
 	}
+	if !((v.LimitError == nil && rhs.LimitError == nil) || (v.LimitError != nil && rhs.LimitError != nil && v.LimitError.Equals(rhs.LimitError))) {
+		return false
+	}
 
 	return true
 }
@@ -509,6 +547,9 @@ func (v *Dosa_UpsertSchema_Result) MarshalLogObject(enc zapcore.ObjectEncoder) (
 	}
 	if v.SchemaError != nil {
 		err = multierr.Append(err, enc.AddObject("schemaError", v.SchemaError))
+	}
+	if v.LimitError != nil {
+		err = multierr.Append(err, enc.AddObject("limitError", v.LimitError))
 	}
 	return err
 }
@@ -548,6 +589,16 @@ func (v *Dosa_UpsertSchema_Result) GetServerError() (o *InternalServerError) {
 func (v *Dosa_UpsertSchema_Result) GetSchemaError() (o *BadSchemaError) {
 	if v.SchemaError != nil {
 		return v.SchemaError
+	}
+
+	return
+}
+
+// GetLimitError returns the value of LimitError if it is set or its
+// zero value if it is unset.
+func (v *Dosa_UpsertSchema_Result) GetLimitError() (o *RateLimitError) {
+	if v.LimitError != nil {
+		return v.LimitError
 	}
 
 	return
