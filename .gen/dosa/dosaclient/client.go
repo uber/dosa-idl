@@ -140,6 +140,10 @@ func New(c transport.ClientConfig, opts ...thrift.ClientOption) Interface {
 			Service:      "Dosa",
 			ClientConfig: c,
 		}, opts...),
+		nwc: thrift.NewNoWire(thrift.Config{
+			Service:      "Dosa",
+			ClientConfig: c,
+		}, opts...),
 	}
 }
 
@@ -152,7 +156,8 @@ func init() {
 }
 
 type client struct {
-	c thrift.Client
+	c   thrift.Client
+	nwc thrift.NoWireClient
 }
 
 func (c client) CanUpsertSchema(
@@ -161,18 +166,23 @@ func (c client) CanUpsertSchema(
 	opts ...yarpc.CallOption,
 ) (success *dosa.CanUpsertSchemaResponse, err error) {
 
+	var result dosa.Dosa_CanUpsertSchema_Result
 	args := dosa.Dosa_CanUpsertSchema_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_CanUpsertSchema_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_CanUpsertSchema_Helper.UnwrapResponse(&result)
@@ -185,18 +195,23 @@ func (c client) CheckSchema(
 	opts ...yarpc.CallOption,
 ) (success *dosa.CheckSchemaResponse, err error) {
 
+	var result dosa.Dosa_CheckSchema_Result
 	args := dosa.Dosa_CheckSchema_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_CheckSchema_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_CheckSchema_Helper.UnwrapResponse(&result)
@@ -209,18 +224,23 @@ func (c client) CheckSchemaStatus(
 	opts ...yarpc.CallOption,
 ) (success *dosa.CheckSchemaStatusResponse, err error) {
 
+	var result dosa.Dosa_CheckSchemaStatus_Result
 	args := dosa.Dosa_CheckSchemaStatus_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_CheckSchemaStatus_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_CheckSchemaStatus_Helper.UnwrapResponse(&result)
@@ -233,18 +253,23 @@ func (c client) CreateIfNotExists(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_CreateIfNotExists_Result
 	args := dosa.Dosa_CreateIfNotExists_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_CreateIfNotExists_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_CreateIfNotExists_Helper.UnwrapResponse(&result)
@@ -257,18 +282,23 @@ func (c client) CreateScope(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_CreateScope_Result
 	args := dosa.Dosa_CreateScope_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_CreateScope_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_CreateScope_Helper.UnwrapResponse(&result)
@@ -281,18 +311,23 @@ func (c client) DropScope(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_DropScope_Result
 	args := dosa.Dosa_DropScope_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_DropScope_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_DropScope_Helper.UnwrapResponse(&result)
@@ -305,18 +340,23 @@ func (c client) MultiRead(
 	opts ...yarpc.CallOption,
 ) (success *dosa.MultiReadResponse, err error) {
 
+	var result dosa.Dosa_MultiRead_Result
 	args := dosa.Dosa_MultiRead_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_MultiRead_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_MultiRead_Helper.UnwrapResponse(&result)
@@ -329,18 +369,23 @@ func (c client) MultiRemove(
 	opts ...yarpc.CallOption,
 ) (success *dosa.MultiRemoveResponse, err error) {
 
+	var result dosa.Dosa_MultiRemove_Result
 	args := dosa.Dosa_MultiRemove_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_MultiRemove_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_MultiRemove_Helper.UnwrapResponse(&result)
@@ -353,18 +398,23 @@ func (c client) MultiUpsert(
 	opts ...yarpc.CallOption,
 ) (success *dosa.MultiUpsertResponse, err error) {
 
+	var result dosa.Dosa_MultiUpsert_Result
 	args := dosa.Dosa_MultiUpsert_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_MultiUpsert_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_MultiUpsert_Helper.UnwrapResponse(&result)
@@ -377,18 +427,23 @@ func (c client) Range(
 	opts ...yarpc.CallOption,
 ) (success *dosa.RangeResponse, err error) {
 
+	var result dosa.Dosa_Range_Result
 	args := dosa.Dosa_Range_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Range_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_Range_Helper.UnwrapResponse(&result)
@@ -401,18 +456,23 @@ func (c client) Read(
 	opts ...yarpc.CallOption,
 ) (success *dosa.ReadResponse, err error) {
 
+	var result dosa.Dosa_Read_Result
 	args := dosa.Dosa_Read_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Read_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_Read_Helper.UnwrapResponse(&result)
@@ -425,18 +485,23 @@ func (c client) Remove(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_Remove_Result
 	args := dosa.Dosa_Remove_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Remove_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_Remove_Helper.UnwrapResponse(&result)
@@ -449,18 +514,23 @@ func (c client) RemoveRange(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_RemoveRange_Result
 	args := dosa.Dosa_RemoveRange_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_RemoveRange_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_RemoveRange_Helper.UnwrapResponse(&result)
@@ -473,18 +543,23 @@ func (c client) Scan(
 	opts ...yarpc.CallOption,
 ) (success *dosa.ScanResponse, err error) {
 
+	var result dosa.Dosa_Scan_Result
 	args := dosa.Dosa_Scan_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Scan_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_Scan_Helper.UnwrapResponse(&result)
@@ -497,18 +572,23 @@ func (c client) ScopeExists(
 	opts ...yarpc.CallOption,
 ) (success *dosa.ScopeExistsResponse, err error) {
 
+	var result dosa.Dosa_ScopeExists_Result
 	args := dosa.Dosa_ScopeExists_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_ScopeExists_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_ScopeExists_Helper.UnwrapResponse(&result)
@@ -521,18 +601,23 @@ func (c client) Search(
 	opts ...yarpc.CallOption,
 ) (success *dosa.SearchResponse, err error) {
 
+	var result dosa.Dosa_Search_Result
 	args := dosa.Dosa_Search_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Search_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_Search_Helper.UnwrapResponse(&result)
@@ -545,18 +630,23 @@ func (c client) TruncateScope(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_TruncateScope_Result
 	args := dosa.Dosa_TruncateScope_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_TruncateScope_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_TruncateScope_Helper.UnwrapResponse(&result)
@@ -569,18 +659,23 @@ func (c client) Upsert(
 	opts ...yarpc.CallOption,
 ) (err error) {
 
+	var result dosa.Dosa_Upsert_Result
 	args := dosa.Dosa_Upsert_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_Upsert_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	err = dosa.Dosa_Upsert_Helper.UnwrapResponse(&result)
@@ -593,18 +688,23 @@ func (c client) UpsertSchema(
 	opts ...yarpc.CallOption,
 ) (success *dosa.UpsertSchemaResponse, err error) {
 
+	var result dosa.Dosa_UpsertSchema_Result
 	args := dosa.Dosa_UpsertSchema_Helper.Args(_Request)
 
 	ctx = tchannel.WithoutHeaders(ctx)
-	var body wire.Value
-	body, err = c.c.Call(ctx, args, opts...)
-	if err != nil {
-		return
-	}
+	if c.nwc != nil && c.nwc.Enabled() {
+		if err = c.nwc.Call(ctx, args, &result, opts...); err != nil {
+			return
+		}
+	} else {
+		var body wire.Value
+		if body, err = c.c.Call(ctx, args, opts...); err != nil {
+			return
+		}
 
-	var result dosa.Dosa_UpsertSchema_Result
-	if err = result.FromWire(body); err != nil {
-		return
+		if err = result.FromWire(body); err != nil {
+			return
+		}
 	}
 
 	success, err = dosa.Dosa_UpsertSchema_Helper.UnwrapResponse(&result)

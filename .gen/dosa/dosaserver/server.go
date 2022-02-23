@@ -6,9 +6,11 @@ package dosaserver
 import (
 	context "context"
 	dosa "github.com/uber/dosa-idl/.gen/dosa"
+	stream "go.uber.org/thriftrw/protocol/stream"
 	wire "go.uber.org/thriftrw/wire"
 	transport "go.uber.org/yarpc/api/transport"
 	thrift "go.uber.org/yarpc/encoding/thrift"
+	yarpcerrors "go.uber.org/yarpc/yarpcerrors"
 )
 
 // Interface is the server-side interface for the Dosa service.
@@ -124,8 +126,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "canUpsertSchema",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.CanUpsertSchema),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.CanUpsertSchema),
+					NoWire: canupsertschema_NoWireHandler{impl},
 				},
 				Signature:    "CanUpsertSchema(Request *dosa.CanUpsertSchemaRequest) (*dosa.CanUpsertSchemaResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -135,8 +138,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "checkSchema",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.CheckSchema),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.CheckSchema),
+					NoWire: checkschema_NoWireHandler{impl},
 				},
 				Signature:    "CheckSchema(Request *dosa.CheckSchemaRequest) (*dosa.CheckSchemaResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -146,8 +150,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "checkSchemaStatus",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.CheckSchemaStatus),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.CheckSchemaStatus),
+					NoWire: checkschemastatus_NoWireHandler{impl},
 				},
 				Signature:    "CheckSchemaStatus(Request *dosa.CheckSchemaStatusRequest) (*dosa.CheckSchemaStatusResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -157,8 +162,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "createIfNotExists",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.CreateIfNotExists),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.CreateIfNotExists),
+					NoWire: createifnotexists_NoWireHandler{impl},
 				},
 				Signature:    "CreateIfNotExists(Request *dosa.CreateRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -168,8 +174,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "createScope",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.CreateScope),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.CreateScope),
+					NoWire: createscope_NoWireHandler{impl},
 				},
 				Signature:    "CreateScope(Request *dosa.CreateScopeRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -179,8 +186,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "dropScope",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.DropScope),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.DropScope),
+					NoWire: dropscope_NoWireHandler{impl},
 				},
 				Signature:    "DropScope(Request *dosa.DropScopeRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -190,8 +198,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "multiRead",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.MultiRead),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.MultiRead),
+					NoWire: multiread_NoWireHandler{impl},
 				},
 				Signature:    "MultiRead(Request *dosa.MultiReadRequest) (*dosa.MultiReadResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -201,8 +210,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "multiRemove",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.MultiRemove),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.MultiRemove),
+					NoWire: multiremove_NoWireHandler{impl},
 				},
 				Signature:    "MultiRemove(Request *dosa.MultiRemoveRequest) (*dosa.MultiRemoveResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -212,8 +222,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "multiUpsert",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.MultiUpsert),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.MultiUpsert),
+					NoWire: multiupsert_NoWireHandler{impl},
 				},
 				Signature:    "MultiUpsert(Request *dosa.MultiUpsertRequest) (*dosa.MultiUpsertResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -223,8 +234,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "range",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Range),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Range),
+					NoWire: range_NoWireHandler{impl},
 				},
 				Signature:    "Range(Request *dosa.RangeRequest) (*dosa.RangeResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -234,8 +246,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "read",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Read),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Read),
+					NoWire: read_NoWireHandler{impl},
 				},
 				Signature:    "Read(Request *dosa.ReadRequest) (*dosa.ReadResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -245,8 +258,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "remove",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Remove),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Remove),
+					NoWire: remove_NoWireHandler{impl},
 				},
 				Signature:    "Remove(Request *dosa.RemoveRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -256,8 +270,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "removeRange",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.RemoveRange),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.RemoveRange),
+					NoWire: removerange_NoWireHandler{impl},
 				},
 				Signature:    "RemoveRange(Request *dosa.RemoveRangeRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -267,8 +282,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "scan",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Scan),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Scan),
+					NoWire: scan_NoWireHandler{impl},
 				},
 				Signature:    "Scan(Request *dosa.ScanRequest) (*dosa.ScanResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -278,8 +294,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "scopeExists",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.ScopeExists),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.ScopeExists),
+					NoWire: scopeexists_NoWireHandler{impl},
 				},
 				Signature:    "ScopeExists(Request *dosa.ScopeExistsRequest) (*dosa.ScopeExistsResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -289,8 +306,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "search",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Search),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Search),
+					NoWire: search_NoWireHandler{impl},
 				},
 				Signature:    "Search(Request *dosa.SearchRequest) (*dosa.SearchResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -300,8 +318,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "truncateScope",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.TruncateScope),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.TruncateScope),
+					NoWire: truncatescope_NoWireHandler{impl},
 				},
 				Signature:    "TruncateScope(Request *dosa.TruncateScopeRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -311,8 +330,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "upsert",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.Upsert),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.Upsert),
+					NoWire: upsert_NoWireHandler{impl},
 				},
 				Signature:    "Upsert(Request *dosa.UpsertRequest)",
 				ThriftModule: dosa.ThriftModule,
@@ -322,8 +342,9 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 				Name: "upsertSchema",
 				HandlerSpec: thrift.HandlerSpec{
 
-					Type:  transport.Unary,
-					Unary: thrift.UnaryHandler(h.UpsertSchema),
+					Type:   transport.Unary,
+					Unary:  thrift.UnaryHandler(h.UpsertSchema),
+					NoWire: upsertschema_NoWireHandler{impl},
 				},
 				Signature:    "UpsertSchema(Request *dosa.UpsertSchemaRequest) (*dosa.UpsertSchemaResponse)",
 				ThriftModule: dosa.ThriftModule,
@@ -338,363 +359,1279 @@ func New(impl Interface, opts ...thrift.RegisterOption) []transport.Procedure {
 
 type handler struct{ impl Interface }
 
+type yarpcErrorNamer interface{ YARPCErrorName() string }
+
+type yarpcErrorCoder interface{ YARPCErrorCode() *yarpcerrors.Code }
+
 func (h handler) CanUpsertSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CanUpsertSchema_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'CanUpsertSchema': %w", err)
 	}
 
-	success, err := h.impl.CanUpsertSchema(ctx, args.Request)
+	success, appErr := h.impl.CanUpsertSchema(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_CanUpsertSchema_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CanUpsertSchema_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) CheckSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CheckSchema_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'CheckSchema': %w", err)
 	}
 
-	success, err := h.impl.CheckSchema(ctx, args.Request)
+	success, appErr := h.impl.CheckSchema(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_CheckSchema_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CheckSchema_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) CheckSchemaStatus(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CheckSchemaStatus_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'CheckSchemaStatus': %w", err)
 	}
 
-	success, err := h.impl.CheckSchemaStatus(ctx, args.Request)
+	success, appErr := h.impl.CheckSchemaStatus(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_CheckSchemaStatus_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CheckSchemaStatus_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) CreateIfNotExists(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CreateIfNotExists_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'CreateIfNotExists': %w", err)
 	}
 
-	err := h.impl.CreateIfNotExists(ctx, args.Request)
+	appErr := h.impl.CreateIfNotExists(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_CreateIfNotExists_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CreateIfNotExists_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) CreateScope(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_CreateScope_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'CreateScope': %w", err)
 	}
 
-	err := h.impl.CreateScope(ctx, args.Request)
+	appErr := h.impl.CreateScope(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_CreateScope_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CreateScope_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) DropScope(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_DropScope_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'DropScope': %w", err)
 	}
 
-	err := h.impl.DropScope(ctx, args.Request)
+	appErr := h.impl.DropScope(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_DropScope_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_DropScope_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) MultiRead(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_MultiRead_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'MultiRead': %w", err)
 	}
 
-	success, err := h.impl.MultiRead(ctx, args.Request)
+	success, appErr := h.impl.MultiRead(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_MultiRead_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiRead_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) MultiRemove(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_MultiRemove_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'MultiRemove': %w", err)
 	}
 
-	success, err := h.impl.MultiRemove(ctx, args.Request)
+	success, appErr := h.impl.MultiRemove(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_MultiRemove_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiRemove_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) MultiUpsert(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_MultiUpsert_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'MultiUpsert': %w", err)
 	}
 
-	success, err := h.impl.MultiUpsert(ctx, args.Request)
+	success, appErr := h.impl.MultiUpsert(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_MultiUpsert_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiUpsert_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Range(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Range_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Range': %w", err)
 	}
 
-	success, err := h.impl.Range(ctx, args.Request)
+	success, appErr := h.impl.Range(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Range_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Range_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Read(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Read_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Read': %w", err)
 	}
 
-	success, err := h.impl.Read(ctx, args.Request)
+	success, appErr := h.impl.Read(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Read_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Read_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Remove(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Remove_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Remove': %w", err)
 	}
 
-	err := h.impl.Remove(ctx, args.Request)
+	appErr := h.impl.Remove(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Remove_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Remove_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) RemoveRange(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_RemoveRange_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'RemoveRange': %w", err)
 	}
 
-	err := h.impl.RemoveRange(ctx, args.Request)
+	appErr := h.impl.RemoveRange(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_RemoveRange_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_RemoveRange_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Scan(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Scan_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Scan': %w", err)
 	}
 
-	success, err := h.impl.Scan(ctx, args.Request)
+	success, appErr := h.impl.Scan(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Scan_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Scan_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) ScopeExists(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_ScopeExists_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'ScopeExists': %w", err)
 	}
 
-	success, err := h.impl.ScopeExists(ctx, args.Request)
+	success, appErr := h.impl.ScopeExists(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_ScopeExists_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_ScopeExists_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Search(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Search_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Search': %w", err)
 	}
 
-	success, err := h.impl.Search(ctx, args.Request)
+	success, appErr := h.impl.Search(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Search_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Search_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) TruncateScope(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_TruncateScope_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'TruncateScope': %w", err)
 	}
 
-	err := h.impl.TruncateScope(ctx, args.Request)
+	appErr := h.impl.TruncateScope(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_TruncateScope_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_TruncateScope_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) Upsert(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_Upsert_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'Upsert': %w", err)
 	}
 
-	err := h.impl.Upsert(ctx, args.Request)
+	appErr := h.impl.Upsert(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_Upsert_Helper.WrapResponse(err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Upsert_Helper.WrapResponse(appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
+
 	return response, err
 }
 
 func (h handler) UpsertSchema(ctx context.Context, body wire.Value) (thrift.Response, error) {
 	var args dosa.Dosa_UpsertSchema_Args
 	if err := args.FromWire(body); err != nil {
-		return thrift.Response{}, err
+		return thrift.Response{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode Thrift request for service 'Dosa' procedure 'UpsertSchema': %w", err)
 	}
 
-	success, err := h.impl.UpsertSchema(ctx, args.Request)
+	success, appErr := h.impl.UpsertSchema(ctx, args.Request)
 
-	hadError := err != nil
-	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(success, err)
+	hadError := appErr != nil
+	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(success, appErr)
 
 	var response thrift.Response
 	if err == nil {
 		response.IsApplicationError = hadError
 		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+
+	return response, err
+}
+
+type canupsertschema_NoWireHandler struct{ impl Interface }
+
+func (h canupsertschema_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_CanUpsertSchema_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'CanUpsertSchema': %w", err)
+	}
+
+	success, appErr := h.impl.CanUpsertSchema(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CanUpsertSchema_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
 	}
 	return response, err
+
+}
+
+type checkschema_NoWireHandler struct{ impl Interface }
+
+func (h checkschema_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_CheckSchema_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'CheckSchema': %w", err)
+	}
+
+	success, appErr := h.impl.CheckSchema(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CheckSchema_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type checkschemastatus_NoWireHandler struct{ impl Interface }
+
+func (h checkschemastatus_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_CheckSchemaStatus_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'CheckSchemaStatus': %w", err)
+	}
+
+	success, appErr := h.impl.CheckSchemaStatus(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CheckSchemaStatus_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type createifnotexists_NoWireHandler struct{ impl Interface }
+
+func (h createifnotexists_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_CreateIfNotExists_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'CreateIfNotExists': %w", err)
+	}
+
+	appErr := h.impl.CreateIfNotExists(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CreateIfNotExists_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type createscope_NoWireHandler struct{ impl Interface }
+
+func (h createscope_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_CreateScope_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'CreateScope': %w", err)
+	}
+
+	appErr := h.impl.CreateScope(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_CreateScope_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type dropscope_NoWireHandler struct{ impl Interface }
+
+func (h dropscope_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_DropScope_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'DropScope': %w", err)
+	}
+
+	appErr := h.impl.DropScope(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_DropScope_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type multiread_NoWireHandler struct{ impl Interface }
+
+func (h multiread_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_MultiRead_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'MultiRead': %w", err)
+	}
+
+	success, appErr := h.impl.MultiRead(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiRead_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type multiremove_NoWireHandler struct{ impl Interface }
+
+func (h multiremove_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_MultiRemove_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'MultiRemove': %w", err)
+	}
+
+	success, appErr := h.impl.MultiRemove(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiRemove_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type multiupsert_NoWireHandler struct{ impl Interface }
+
+func (h multiupsert_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_MultiUpsert_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'MultiUpsert': %w", err)
+	}
+
+	success, appErr := h.impl.MultiUpsert(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_MultiUpsert_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type range_NoWireHandler struct{ impl Interface }
+
+func (h range_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Range_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Range': %w", err)
+	}
+
+	success, appErr := h.impl.Range(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Range_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type read_NoWireHandler struct{ impl Interface }
+
+func (h read_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Read_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Read': %w", err)
+	}
+
+	success, appErr := h.impl.Read(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Read_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type remove_NoWireHandler struct{ impl Interface }
+
+func (h remove_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Remove_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Remove': %w", err)
+	}
+
+	appErr := h.impl.Remove(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Remove_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type removerange_NoWireHandler struct{ impl Interface }
+
+func (h removerange_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_RemoveRange_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'RemoveRange': %w", err)
+	}
+
+	appErr := h.impl.RemoveRange(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_RemoveRange_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type scan_NoWireHandler struct{ impl Interface }
+
+func (h scan_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Scan_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Scan': %w", err)
+	}
+
+	success, appErr := h.impl.Scan(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Scan_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type scopeexists_NoWireHandler struct{ impl Interface }
+
+func (h scopeexists_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_ScopeExists_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'ScopeExists': %w", err)
+	}
+
+	success, appErr := h.impl.ScopeExists(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_ScopeExists_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type search_NoWireHandler struct{ impl Interface }
+
+func (h search_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Search_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Search': %w", err)
+	}
+
+	success, appErr := h.impl.Search(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Search_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type truncatescope_NoWireHandler struct{ impl Interface }
+
+func (h truncatescope_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_TruncateScope_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'TruncateScope': %w", err)
+	}
+
+	appErr := h.impl.TruncateScope(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_TruncateScope_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type upsert_NoWireHandler struct{ impl Interface }
+
+func (h upsert_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_Upsert_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'Upsert': %w", err)
+	}
+
+	appErr := h.impl.Upsert(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_Upsert_Helper.WrapResponse(appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
+}
+
+type upsertschema_NoWireHandler struct{ impl Interface }
+
+func (h upsertschema_NoWireHandler) HandleNoWire(ctx context.Context, nwc *thrift.NoWireCall) (thrift.NoWireResponse, error) {
+	var (
+		args dosa.Dosa_UpsertSchema_Args
+		rw   stream.ResponseWriter
+		err  error
+	)
+
+	rw, err = nwc.RequestReader.ReadRequest(ctx, nwc.EnvelopeType, nwc.Reader, &args)
+	if err != nil {
+		return thrift.NoWireResponse{}, yarpcerrors.InvalidArgumentErrorf(
+			"could not decode (via no wire) Thrift request for service 'Dosa' procedure 'UpsertSchema': %w", err)
+	}
+
+	success, appErr := h.impl.UpsertSchema(ctx, args.Request)
+
+	hadError := appErr != nil
+	result, err := dosa.Dosa_UpsertSchema_Helper.WrapResponse(success, appErr)
+	response := thrift.NoWireResponse{ResponseWriter: rw}
+	if err == nil {
+		response.IsApplicationError = hadError
+		response.Body = result
+		if namer, ok := appErr.(yarpcErrorNamer); ok {
+			response.ApplicationErrorName = namer.YARPCErrorName()
+		}
+		if extractor, ok := appErr.(yarpcErrorCoder); ok {
+			response.ApplicationErrorCode = extractor.YARPCErrorCode()
+		}
+		if appErr != nil {
+			response.ApplicationErrorDetails = appErr.Error()
+		}
+	}
+	return response, err
+
 }
