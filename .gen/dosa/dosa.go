@@ -17868,7 +17868,7 @@ func (v *Value) IsSetElemValue() bool {
 // ThriftModule represents the IDL file used to generate this package.
 var ThriftModule = &thriftreflect.ThriftModule{
 	Name:     "dosa",
-	Package:  "dosa-idl/.gen/dosa",
+	Package:  "github.com/uber/dosa-idl/.gen/dosa",
 	FilePath: "dosa.thrift",
 	SHA1:     "03d9ec431fa9b8949303908f7211be063b82bacc",
 	Raw:      rawIDL,

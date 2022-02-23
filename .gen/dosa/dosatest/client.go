@@ -5,9 +5,9 @@ package dosatest
 
 import (
 	context "context"
-	dosa "dosa-idl/.gen/dosa"
-	dosaclient "dosa-idl/.gen/dosa/dosaclient"
 	gomock "github.com/golang/mock/gomock"
+	dosa "github.com/uber/dosa-idl/.gen/dosa"
+	dosaclient "github.com/uber/dosa-idl/.gen/dosa/dosaclient"
 	yarpc "go.uber.org/yarpc"
 )
 
