@@ -11,7 +11,7 @@ Install thriftrw:
 
     go get -u go.uber.org/thriftrw
     cd .../thriftrw
-    git checkout v1.13.0
+    git checkout v1.29.2
 
 Use the appropriate version.
 
